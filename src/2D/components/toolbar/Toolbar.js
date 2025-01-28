@@ -2,6 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus, faLocationArrow } from '@fortawesome/free-solid-svg-icons';
 import './Toolbar.css';
+import VerticalSwitch from '../../../common/components/vertical-switch/VerticalSwitch';
 
 const Toolbar = ({ onZoomIn, onZoomOut, onCurrentLocation }) => {
   return (
@@ -15,6 +16,7 @@ const Toolbar = ({ onZoomIn, onZoomOut, onCurrentLocation }) => {
       <button className="toolbar-button" onClick={onCurrentLocation}>
         <FontAwesomeIcon icon={faLocationArrow} />
       </button>
+      <VerticalSwitch />
     </div>
   );
 };

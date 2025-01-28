@@ -36,7 +36,7 @@
 }
 
 .vertical-switch-checkbox:checked + .vertical-switch-label .vertical-switch-inner {
-  top: 55%;
+  top: 54%;
   background-color: #f0f0f0;
 }
 

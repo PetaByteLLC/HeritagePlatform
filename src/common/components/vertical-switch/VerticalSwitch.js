@@ -1,19 +1,19 @@
-// filepath: /Users/blaque/Documents/Coding/EGIS/heritage/src/common/components/vertical-switch/VerticalSwitch.js
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
+import { MapContext } from '../../../context/MapContext';
 import './VerticalSwitch.css';
 
 const VerticalSwitch = () => {
-  const [isChecked, setIsChecked] = useState(false);
+  const { mode, setMode } = useContext(MapContext);
 
   const handleSwitchChange = () => {
-    setIsChecked(!isChecked);
+    setMode(mode === '2D' ? '3D' : '2D');
   };
 
   return (
     <div className="vertical-switch">
       <input
         type="checkbox"
-        checked={isChecked}
+        checked={mode === '3D'}
         onChange={handleSwitchChange}
         className="vertical-switch-checkbox"
         id="vertical-switch"

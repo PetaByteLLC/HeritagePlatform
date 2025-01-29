@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 import './MapSwitcher.css';
 
 const MapSwitcher = ({ mapType, setMapType }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const mapTypes = [
     "OSM",
     "Google",
@@ -12,21 +15,29 @@ const MapSwitcher = ({ mapType, setMapType }) => {
     "OpenTopoMap"
   ];
 
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
   const handleMapTypeChange = (type) => {
     setMapType(type);
+    setIsOpen(false);
   };
 
   return (
-    <div className="map-switcher">
-      {mapTypes.map((type) => (
-        <button
-          key={type}
-          className={`map-switcher-button ${mapType === type ? 'active' : ''}`}
-          onClick={() => handleMapTypeChange(type)}
-        >
-          {type}
-        </button>
-      ))}
+    <div className="map-type-switcher">
+      <button className="map-type-button" onClick={toggleDropdown}>
+        <FontAwesomeIcon icon={faLayerGroup} />
+      </button>
+      {isOpen && (
+        <div className="map-type-dropdown">
+          {mapTypes.map((type) => (
+            <button key={type} onClick={() => handleMapTypeChange(type)}>
+              {type}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

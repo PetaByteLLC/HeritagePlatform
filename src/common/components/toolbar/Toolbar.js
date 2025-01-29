@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus, faLocationArrow } from '@fortawesome/free-solid-svg-icons';
 import { fromLonLat } from 'ol/proj'; 
 import { MapContext } from '../../../context/MapContext';
-import MapTypeSwitcher from '../map-type/MapTypeSwitcher';
+import MapSwitcher from '../map-switch/MapSwitcher';
 import './Toolbar.css';
 
 const Toolbar = ({ mapType, setMapType }) => {
@@ -64,7 +64,7 @@ const Toolbar = ({ mapType, setMapType }) => {
       <button className="toolbar-button" onClick={handleCurrentLocation}>
         <FontAwesomeIcon icon={faLocationArrow} />
       </button>
-      {mode !== '3D' && <MapTypeSwitcher mapType={mapType} setMapType={setMapType} />}
+      {mode !== '3D' && <MapSwitcher mapType={mapType} setMapType={setMapType} />}
       <VerticalSwitch />
     </div>
   );

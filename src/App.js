@@ -21,10 +21,10 @@ function AppContent() {
       <header className="App-header">
         <h1>Heritage Platform</h1>
       </header>
-      <div style={{ display: mode === '2D' ? 'block' : 'none' }}>
+      <div className={`map-container-wrap ${mode === '2D' ? 'active' : ''}`}>
         <OpenLayersMap />
       </div>
-      <div className='map-container'>
+      <div className={`map-container-wrap ${mode === '3D' ? 'active' : ''}`}>
         <ThreeDMap />
       </div>
       <Toolbar />

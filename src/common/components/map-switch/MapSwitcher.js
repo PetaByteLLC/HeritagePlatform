@@ -25,8 +25,8 @@ const MapSwitcher = ({ mapType, setMapType }) => {
   };
 
   return (
-    <div className="map-type-switcher">
-      <button className="map-type-button" onClick={toggleDropdown}>
+    <div className="map-switch">
+      <button className="map-switch-button" onClick={toggleDropdown}>
         <FontAwesomeIcon icon={faLayerGroup} />
       </button>
       {isOpen && (

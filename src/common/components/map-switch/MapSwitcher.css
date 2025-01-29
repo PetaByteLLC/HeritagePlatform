@@ -1,61 +1,75 @@
-.map-type-switcher {
-  position: relative;
+.map-switch {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.map-type-button {
-  margin: 5px;
-  padding: 10px;
+.map-switch-button {
   background-color: #282c34;
-  color: white;
   border: none;
+  padding: 8px;
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  font-size: 14px;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.map-type-button:hover {
+.map-switch-button:hover {
   background-color: #3c3f41;
+  transform: scale(1.05);
 }
 
 .map-type-dropdown {
   position: absolute;
   top: 100%;
   right: 0;
-  background-color: #282c34;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  background-color: #2c2f36;
+  border: 1px solid #444;
+  border-radius: 8px;
   z-index: 1000;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.map-switcher {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  margin-top: 6px;
+  padding: 6px;
+  min-width: max-content; /* Автоматическая ширина под контент */
+  max-width: 220px; /* Ограничение максимальной ширины */
   display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
+  flex-direction: column;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-.map-switcher-button {
-  margin: 5px;
-  padding: 10px;
-  background-color: #282c34;
-  color: white;
+.map-type-dropdown button {
+  padding: 10px 16px;
+  background-color: transparent;
+  color: #fff;
   border: none;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  text-align: left;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Отступ между иконкой и текстом, если понадобится */
 }
 
-.map-switcher-button:hover {
-  background-color: #3c3f41;
+.map-type-dropdown button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
 }
 
-.map-switcher-button.active {
+.map-type-dropdown button.active {
   background-color: #61dafb;
+  color: #2c2f36;
+  font-weight: 600;
+}
+
+.map-type-dropdown button:focus {
+  outline: none;
+  box-shadow: 0 0 8px rgba(97, 218, 251, 0.5);
 }

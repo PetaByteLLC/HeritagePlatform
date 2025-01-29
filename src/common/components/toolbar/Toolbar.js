@@ -40,7 +40,10 @@ const Toolbar = () => {
             duration: 1500,
           });
         } else {
-          // Handle 3D current location
+          window.Module.getViewCamera().setAnimationSpeed(2.0);
+          window.Module.getViewCamera().moveLonLatAlt(longitude, latitude, 500, true);
+          window.Module.getViewCamera().setTilt(90);
+          window.Module.getViewCamera().setDirect(0);
         }
       });
     }

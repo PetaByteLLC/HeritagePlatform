@@ -2,23 +2,11 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 import './MapSwitcher.css';
+import layers from '../../constants/Tiles2D';
 
 const MapSwitcher = ({ mapType, setMapType }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const mapTypes = [
-    "OSM",
-    "Google",
-    "Hybrid",
-    "Terrain",
-    "LightMap",
-    "USGSTopo",
-    "OpenTopoMap",
-    "CartoDBVoyager",
-    "CartoDBDarkMatter",
-    "EsriWorldTopo",
-    "EsriWorldImagery",
-    "EsriDarkGrayCanvas"
-  ];
+  const mapTypes = Object.keys(layers);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);

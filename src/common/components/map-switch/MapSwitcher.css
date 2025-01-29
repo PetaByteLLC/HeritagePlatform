@@ -1,0 +1,61 @@
+.map-type-switcher {
+  position: relative;
+}
+
+.map-type-button {
+  margin: 5px;
+  padding: 10px;
+  background-color: #282c34;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.map-type-button:hover {
+  background-color: #3c3f41;
+}
+
+.map-type-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #282c34;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.map-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.map-switcher-button {
+  margin: 5px;
+  padding: 10px;
+  background-color: #282c34;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.map-switcher-button:hover {
+  background-color: #3c3f41;
+}
+
+.map-switcher-button.active {
+  background-color: #61dafb;
+}

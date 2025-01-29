@@ -13,8 +13,8 @@ const OpenLayersMap = ({ mapType }) => {
 
   useEffect(() => {
     const layers = {
-      OSM: new TileLayer({
-        source: new OSM(),
+      OSM: new TileLayer({ 
+        source: new OSM() 
       }),
       Google: new TileLayer({
         source: new XYZ({
@@ -45,7 +45,32 @@ const OpenLayersMap = ({ mapType }) => {
         source: new XYZ({
           url: "https://tile.opentopomap.org/{z}/{x}/{y}.png",
         }),
-      })
+      }),
+      CartoDBVoyager: new TileLayer({
+        source: new XYZ({
+          url: "https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        }),
+      }),
+      CartoDBDarkMatter: new TileLayer({
+        source: new XYZ({
+          url: "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png",
+        }),
+      }),
+      EsriWorldTopo: new TileLayer({
+        source: new XYZ({
+          url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+        }),
+      }),
+      EsriWorldImagery: new TileLayer({
+        source: new XYZ({
+          url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        }),
+      }),
+      EsriDarkGrayCanvas: new TileLayer({
+        source: new XYZ({
+          url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+        }),
+      }),
     };
 
     if (!mapInstance.current) {
@@ -56,19 +81,15 @@ const OpenLayersMap = ({ mapType }) => {
 
       mapInstance.current = new Map({
         target: mapRef.current,
-        layers: [layers[mapType]],
+        layers: [layers[mapType] || layers.OSM],
         view: viewRef.current,
-        controls: defaultControls({
-          zoom: false,
-        }),
+        controls: defaultControls({ zoom: false }),
       });
-
-      window.mapInstance = mapInstance.current;
     } else {
       const view = mapInstance.current.getView();
       const center = view.getCenter();
       const zoom = view.getZoom();
-      mapInstance.current.setLayers([layers[mapType]]);
+      mapInstance.current.setLayers([layers[mapType] || layers.OSM]);
       view.setCenter(center);
       view.setZoom(zoom);
     }

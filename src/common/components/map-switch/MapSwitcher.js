@@ -12,7 +12,12 @@ const MapSwitcher = ({ mapType, setMapType }) => {
     "Terrain",
     "LightMap",
     "USGSTopo",
-    "OpenTopoMap"
+    "OpenTopoMap",
+    "CartoDBVoyager",
+    "CartoDBDarkMatter",
+    "EsriWorldTopo",
+    "EsriWorldImagery",
+    "EsriDarkGrayCanvas"
   ];
 
   const toggleDropdown = () => {
@@ -32,9 +37,16 @@ const MapSwitcher = ({ mapType, setMapType }) => {
       {isOpen && (
         <div className="map-type-dropdown">
           {mapTypes.map((type) => (
-            <button key={type} onClick={() => handleMapTypeChange(type)}>
+            <label key={type} className="map-type-option">
+              <input
+                type="radio"
+                name="mapType"
+                value={type}
+                checked={mapType === type}
+                onChange={() => handleMapTypeChange(type)}
+              />
               {type}
-            </button>
+            </label>
           ))}
         </div>
       )}

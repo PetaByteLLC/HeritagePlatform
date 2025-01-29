@@ -1,5 +1,4 @@
 
-
 .App-header {
   position: relative;
   z-index: 2;
@@ -24,6 +23,7 @@
 }
 
 .map-container-wrap {
+  background: #282c34;
   position: absolute;
   top: 8vh;
   left: 0;

@@ -6,16 +6,7 @@ import OSM from "ol/source/OSM";
 import XYZ from "ol/source/XYZ";
 import { defaults as defaultControls } from "ol/control";
 
-const OpenLayersMap = ({ mapType, setMapType }) => {
-  const mapTypes = [
-    "OSM",
-    "Google",
-    "Hybrid",
-    "Terrain",
-    "LightMap",
-    "USGSTopo",
-    "OpenTopoMap"
-  ];
+const OpenLayersMap = ({ mapType }) => {
   const mapRef = useRef();
   const mapInstance = useRef();
   const viewRef = useRef();
@@ -86,13 +77,6 @@ const OpenLayersMap = ({ mapType, setMapType }) => {
   return (
     <div className="map-container">
       <div ref={mapRef} className="map" />
-      <div className="map-type-buttons">
-        {mapTypes.map((type) => (
-          <button key={type} onClick={() => setMapType(type)}>
-            {type}
-          </button>
-        ))}
-      </div>
     </div>
   );
 };

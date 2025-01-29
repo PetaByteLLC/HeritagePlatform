@@ -4,9 +4,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus, faLocationArrow } from '@fortawesome/free-solid-svg-icons';
 import { fromLonLat } from 'ol/proj'; 
 import { MapContext } from '../../../context/MapContext';
+import MapTypeSwitcher from '../map-type/MapTypeSwitcher';
 import './Toolbar.css';
 
-const Toolbar = () => {
+const Toolbar = ({ mapType, setMapType }) => {
   const { mode } = useContext(MapContext);
 
   const handleZoomIn = () => {
@@ -57,6 +58,7 @@ const Toolbar = () => {
       <button className="toolbar-button" onClick={handleCurrentLocation}>
         <FontAwesomeIcon icon={faLocationArrow} />
       </button>
+      {mode !== '3D' && <MapTypeSwitcher mapType={mapType} setMapType={setMapType} />}
       <VerticalSwitch />
     </div>
   );

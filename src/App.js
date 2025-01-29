@@ -23,13 +23,17 @@ function AppContent({ mapType, setMapType }) {
       <header className="App-header">
         <h1>Heritage Platform</h1>
       </header>
-      <div style={{ display: mode === '2D' ? 'block' : 'none' }}>
-        <OpenLayersMap mapType={mapType} setMapType={setMapType} />
-      </div>
-      <div className='map-container'>
-        <ThreeDMap />
-      </div>
-      <Toolbar />
+      {mode === '2D' && (
+        <div className='map-container'>
+          <OpenLayersMap mapType={mapType} setMapType={setMapType} />
+        </div>
+      )}
+      {mode === '3D' && (
+        <div className='map-container'>
+          <ThreeDMap />
+        </div>
+      )}
+      <Toolbar mapType={mapType} setMapType={setMapType} />
     </div>
   );
 }

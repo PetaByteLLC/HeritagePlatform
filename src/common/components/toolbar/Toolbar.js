@@ -42,7 +42,7 @@ const Toolbar = () => {
           const coords = fromLonLat([longitude, latitude]);
           view.animate({
             center: coords,
-            zoom: 14,
+            zoom: 18,
             duration: 1500,
           });
         } else {

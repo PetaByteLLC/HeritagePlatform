@@ -15,7 +15,10 @@ const Toolbar = ({ mapType, setMapType }) => {
       const view = window.mapInstance.getView();
       view.setZoom(view.getZoom() + 1);
     } else {
-      // Handle 3D zoom in
+      window.Module.getViewCamera().ZoomIn();
+      window.Module.getViewCamera().ZoomIn();
+      window.Module.getViewCamera().ZoomIn();
+      window.Module.getViewCamera().ZoomIn();
     }
   };
 
@@ -24,7 +27,10 @@ const Toolbar = ({ mapType, setMapType }) => {
       const view = window.mapInstance.getView();
       view.setZoom(view.getZoom() - 1);
     } else {
-      // Handle 3D zoom out
+      window.Module.getViewCamera().ZoomOut();
+      window.Module.getViewCamera().ZoomOut();
+      window.Module.getViewCamera().ZoomOut();
+      window.Module.getViewCamera().ZoomOut();
     }
   };
 
@@ -37,11 +43,11 @@ const Toolbar = ({ mapType, setMapType }) => {
           const coords = fromLonLat([longitude, latitude]);
           view.animate({
             center: coords,
-            zoom: 14,
+            zoom: 18,
             duration: 1500,
           });
         } else {
-          // Handle 3D current location
+          window.Module.getViewCamera().moveOval(new window.Module.JSVector3D(longitude, latitude, 500.0), 90, 0, 0.1);
         }
       });
     }

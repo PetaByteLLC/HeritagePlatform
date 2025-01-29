@@ -3,22 +3,20 @@
 }
 
 .map-type-button {
-  margin: 5px;
-  padding: 10px;
-  background-color: #282c34;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  font-size: 14px;
-  width: 40px; /* Match the width of the toolbar buttons */
-  height: 40px; /* Match the height of the toolbar buttons */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s ease;
-}
+    margin: 5px;
+    padding: 10px;
+    background-color: #282c34;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+  }
 
 .map-type-button:hover {
   background-color: #3c3f41;
@@ -35,25 +33,4 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   max-height: 200px;
   overflow-y: auto;
-}
-
-.map-type-dropdown button {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  background-color: #282c34;
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  text-align: left;
-  transition: background-color 0.3s ease;
-}
-
-.map-type-dropdown button:hover {
-  background-color: #3c3f41;
-}
-
-.map-type-dropdown button.selected {
-  background-color: #3c3f41;
 }

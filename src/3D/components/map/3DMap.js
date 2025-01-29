@@ -1,11 +1,17 @@
 import React, { useEffect, useContext, useRef } from 'react';
 import { MapContext } from '../../../context/MapContext';
 
+function getHeightFromZoom(zoomLevel) {
+  const EARTH_HALF_CIRCUMFERENCE = 20037508.5;
+  return EARTH_HALF_CIRCUMFERENCE / Math.pow(2, zoomLevel);
+}
+
 const ThreeDMap = () => {
-  const { is3DMapInitialized, setIs3DMapInitialized } = useContext(MapContext);
+  const { is3DMapInitialized, setIs3DMapInitialized, currentLocation, setCurrentLocation, mode } = useContext(MapContext);
   const mapContainerRef = useRef(null);
 
   useEffect(() => {
+    
     const scriptSrc = 'https://cdn.xdworld.kr/latest/XDWorldEM.js';
 
     const loadScript = (src) => {
@@ -16,7 +22,7 @@ const ThreeDMap = () => {
         }
 
         const script = document.createElement('script');
-        script.src = `${src}?cache-bust=${new Date().getTime()}`; // Add cache-busting query parameter
+        script.src = `${src}?cache-bust=${new Date().getTime()}`;
         script.onload = resolve;
         script.onerror = reject;
         document.body.appendChild(script);
@@ -46,18 +52,34 @@ const ThreeDMap = () => {
           },
           defaultKey: 'DFG~EpIREQDmdJe1E9QpdBca#FBSDJFmdzHoe(fB4!e1E(JS1I==',
         });
+
+        Module.canvas.addEventListener("Fire_EventCameraMoveEnd", function (e) {
+          const location = Module.getViewCamera().getLocation();
+          const zoomLevel = Module.getViewCamera().getMapZoomLevel();
+          setCurrentLocation({longitude: location.longitude, latitude: location.latitude, zoomLevel3D: zoomLevel, zoomLevel2D: zoomLevel + 3});
+        });
       },
     };
 
     loadScript(scriptSrc)
       .then(() => {
         setIs3DMapInitialized(true);
-        console.log('Script loaded successfully');
       })
       .catch((err) => {
         console.error('Failed to load script', err);
       });
-  }, [is3DMapInitialized, setIs3DMapInitialized]);
+  }, [is3DMapInitialized, setIs3DMapInitialized, setCurrentLocation]);
+
+  useEffect(() => {
+    if (mode === '3D') {
+      window.Module.getViewCamera().moveOval(
+        new window.Module.JSVector3D(currentLocation.longitude, currentLocation.latitude, getHeightFromZoom(currentLocation.zoomLevel2D - 2)), 
+        90, 
+        0, 
+        0.1
+      );
+    }
+  }, [mode]);
 
   return <div id="map" ref={mapContainerRef} className="map-container" />;
 };

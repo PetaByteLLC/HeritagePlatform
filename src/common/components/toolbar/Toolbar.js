@@ -14,7 +14,10 @@ const Toolbar = () => {
       const view = window.mapInstance.getView();
       view.setZoom(view.getZoom() + 1);
     } else {
-      // Handle 3D zoom in
+      window.Module.getViewCamera().ZoomIn();
+      window.Module.getViewCamera().ZoomIn();
+      window.Module.getViewCamera().ZoomIn();
+      window.Module.getViewCamera().ZoomIn();
     }
   };
 
@@ -23,7 +26,10 @@ const Toolbar = () => {
       const view = window.mapInstance.getView();
       view.setZoom(view.getZoom() - 1);
     } else {
-      // Handle 3D zoom out
+      window.Module.getViewCamera().ZoomOut();
+      window.Module.getViewCamera().ZoomOut();
+      window.Module.getViewCamera().ZoomOut();
+      window.Module.getViewCamera().ZoomOut();
     }
   };
 
@@ -40,10 +46,7 @@ const Toolbar = () => {
             duration: 1500,
           });
         } else {
-          window.Module.getViewCamera().setAnimationSpeed(2.0);
-          window.Module.getViewCamera().moveLonLatAlt(longitude, latitude, 500, true);
-          window.Module.getViewCamera().setTilt(90);
-          window.Module.getViewCamera().setDirect(0);
+          window.Module.getViewCamera().moveOval(new window.Module.JSVector3D(longitude, latitude, 500.0), 90, 0, 0.1);
         }
       });
     }

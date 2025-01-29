@@ -1,0 +1,25 @@
+.toolbar {
+    position: absolute;
+    top: 10%;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .toolbar-button {
+    background-color: #282c34;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .toolbar-button:hover {
+    background-color: #3c3f41;
+  }

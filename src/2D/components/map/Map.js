@@ -10,10 +10,11 @@ const OpenLayersMap = ({ mapType, setMapType }) => {
   const mapTypes = [
     "OSM",
     "Google",
-    "Satellite",
     "Hybrid",
     "Terrain",
     "LightMap",
+    "USGSTopo",
+    "OpenTopoMap"
   ];
   const mapRef = useRef();
   const mapInstance = useRef();
@@ -27,11 +28,6 @@ const OpenLayersMap = ({ mapType, setMapType }) => {
       Google: new TileLayer({
         source: new XYZ({
           url: "https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-        }),
-      }),
-      Satellite: new TileLayer({
-        source: new XYZ({
-          url: "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
         }),
       }),
       Hybrid: new TileLayer({
@@ -49,6 +45,16 @@ const OpenLayersMap = ({ mapType, setMapType }) => {
           url: "https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}",
         }),
       }),
+      USGSTopo: new TileLayer({
+        source: new XYZ({
+          url: "https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}",
+        }),
+      }),
+      OpenTopoMap: new TileLayer({
+        source: new XYZ({
+          url: "https://tile.opentopomap.org/{z}/{x}/{y}.png",
+        }),
+      })
     };
 
     if (!mapInstance.current) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faSearch, faLocationArrow, faDrawPolygon } from '@fortawesome/free-solid-svg-icons';
 import { faCircle, faSquare } from '@fortawesome/free-regular-svg-icons';
@@ -6,7 +6,9 @@ import './SearchField.css';
 import { Draw } from 'ol/interaction';
 import GeoJSON from 'ol/format/GeoJSON';
 import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
 import { createBox } from 'ol/interaction/Draw';
+import { MapContext } from '../../../context/MapContext'
 
 const mockResults = [
   'Result 1',
@@ -17,11 +19,26 @@ const mockResults = [
 ];
 
 const SearchField = ({ onSearch }) => {
+  const { map2D } = useContext(MapContext);
   const [value, setValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [showNoData, setShowNoData] = useState(false);
   const [draw, setDraw] = useState(null);
   const [selectedIcon, setSelectedIcon] = useState(null);
+  const [currentFeature, setCurrentFeature] = useState(null);
+  const [vectorSource] = useState(new VectorSource());
+
+  useEffect(() => {
+    if (!map2D) return;
+    
+    const vectorLayer = new VectorLayer({
+      source: vectorSource,
+    });
+    map2D.addLayer(vectorLayer);
+    return () => {
+      map2D.removeLayer(vectorLayer);
+    };
+  }, [map2D, vectorSource]);
 
   const handleChange = (e) => {
     const newValue = e.target.value;
@@ -44,7 +61,11 @@ const SearchField = ({ onSearch }) => {
 
   const addInteraction = (type) => {
     if (draw) {
-      window.mapInstance.removeInteraction(draw);
+      map2D.removeInteraction(draw);
+    }
+    if (currentFeature) {
+      vectorSource.removeFeature(currentFeature);
+      setCurrentFeature(null);
     }
     let geometryFunction;
     if (type === 'Box') {
@@ -52,18 +73,30 @@ const SearchField = ({ onSearch }) => {
       geometryFunction = createBox();
     }
     const newDraw = new Draw({
-      source: new VectorSource(),
+      source: vectorSource,
       type: type,
       geometryFunction: geometryFunction,
     });
-    window.mapInstance.addInteraction(newDraw);
+    map2D.addInteraction(newDraw);
     setDraw(newDraw);
 
     newDraw.on('drawend', (event) => {
       const feature = event.feature;
-      const geojson = new GeoJSON().writeFeature(feature);
-      console.log(geojson);
-      // You can send the geojson to your server here
+      setCurrentFeature(feature);
+      let geometry = feature.getGeometry();
+      if (geometry.getType() === 'Circle') {
+        const center = geometry.getCenter();
+        const radius = geometry.getRadius();
+        const circumferencePoint = [center[0] + radius, center[1]];
+        const points = {
+          center: center,
+          circumferencePoint: circumferencePoint,
+        };
+        console.log(points);
+      } else {
+        const geojson = new GeoJSON().writeFeature(feature);
+        console.log(geojson);
+      }
     });
   };
 
@@ -71,7 +104,7 @@ const SearchField = ({ onSearch }) => {
     if (selectedIcon === icon) {
       setSelectedIcon(null);
       if (draw) {
-        window.mapInstance.removeInteraction(draw);
+        map2D.removeInteraction(draw);
       }
     } else {
       setSelectedIcon(icon);

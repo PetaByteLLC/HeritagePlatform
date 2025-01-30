@@ -7,7 +7,7 @@ import { transform } from 'ol/proj';
 import layers2D from '../../../common/constants/Tiles2D';
 
 const OpenLayersMap = () => {
-  const { currentLocation, setCurrentLocation, mode, map2DType } = useContext(MapContext);
+  const { currentLocation, setCurrentLocation, mode, map2DType, setMap2D } = useContext(MapContext);
   const mapRef = useRef();
   const mapInstance = useRef();
   const isMapInitialized = useRef(false);
@@ -39,6 +39,7 @@ const OpenLayersMap = () => {
     });
 
     window.mapInstance = mapInstance.current;
+    setMap2D(mapInstance.current);
     isMapInitialized.current = true;
 
     mapInstance.current.on('moveend', function(e) {
@@ -52,7 +53,7 @@ const OpenLayersMap = () => {
       });
     });
 
-  }, [mode, setCurrentLocation]);
+  }, [mode, setCurrentLocation, setMap2D]);
 
   useEffect(() => {
     if (isMapInitialized.current) {

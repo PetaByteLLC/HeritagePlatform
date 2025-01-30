@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faSearch } from '@fortawesome/free-solid-svg-icons';
 import './SearchField.css';
+import Menu from '../menu/Menu';
 
 const mockResults = [
   'Result 1',
@@ -15,6 +16,7 @@ const SearchField = ({ onSearch }) => {
   const [value, setValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [showNoData, setShowNoData] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleChange = (e) => {
     const newValue = e.target.value;
@@ -35,10 +37,18 @@ const SearchField = ({ onSearch }) => {
     setShowNoData(false);
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <div className="search-field-wrapper">
       <div className="search-field-container">
-        <FontAwesomeIcon icon={faBars} className="icon-left" />
+        <FontAwesomeIcon icon={faBars} className="icon-left" onClick={toggleMenu} />
         <input
           type="text"
           className="search-field"
@@ -49,6 +59,7 @@ const SearchField = ({ onSearch }) => {
           onBlur={handleBlur}
         />
         <FontAwesomeIcon icon={faSearch} className="icon-right" />
+        <Menu isOpen={isMenuOpen} onClose={closeMenu} />
       </div>
       {isFocused && value.trim().length > 0 && (
         <div className="result-list">

@@ -1,0 +1,22 @@
+import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes, faHome } from '@fortawesome/free-solid-svg-icons';
+import './Menu.css';
+
+const Menu = ({ isOpen, onClose }) => {
+    return (
+        <nav className={`menu ${isOpen ? 'open' : ''}`}>
+            <button className="close-button" onClick={onClose}>
+                <FontAwesomeIcon icon={faTimes} />
+            </button>
+            <ul>
+                <li><a href="#home1"><FontAwesomeIcon icon={faHome} className="icon" /> Home 1</a></li>
+                <li><a href="#home2"><FontAwesomeIcon icon={faHome} className="icon" /> Home 2</a></li>
+                <li><a href="#home3"><FontAwesomeIcon icon={faHome} className="icon" /> Home 3</a></li>
+                <li><a href="#home4"><FontAwesomeIcon icon={faHome} className="icon" /> Home 4</a></li>
+            </ul>
+        </nav>
+    );
+};
+
+export default Menu;

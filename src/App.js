@@ -2,19 +2,30 @@ import './App.css';
 import OpenLayersMap from './2D/components/map/Map';
 import ThreeDMap from './3D/components/map/3DMap';
 import { MapProvider, MapContext } from './context/MapContext';
-import { useContext } from 'react';
-import Toolbar from './common/components/toolbar/Toolbar'
+import { useContext, useState } from 'react';
+import Toolbar from './common/components/toolbar/Toolbar';
 import SearchField from './common/components/search-field/SearchField';
+import Menu from './common/components/menu/Menu';
 
 function App() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <MapProvider>
-      <AppContent />
+      <AppContent isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} closeMenu={closeMenu} />
     </MapProvider>
   );
 }
 
-function AppContent() {
+function AppContent({ isMenuOpen, toggleMenu, closeMenu }) {
   const { mode } = useContext(MapContext);
 
   return (
@@ -25,7 +36,9 @@ function AppContent() {
       <SearchField onSearch={(query) => {
           console.log('Search query:', query);
         }} 
+        toggleMenu={toggleMenu}
       />
+      <Menu isOpen={isMenuOpen} onClose={closeMenu} />
       <div className={`map-container-wrap ${mode === '2D' ? 'active' : ''}`}>
         <OpenLayersMap />
       </div>

@@ -1,0 +1,74 @@
+.menu {
+    position: fixed;
+    top: 8vh; /* Adjust this value to match the height of your header */
+    left: -250px; /* Adjusted width */
+    width: 250px; /* Adjusted width */
+    height: calc(100% - 8vh); /* Adjust this value to match the height of your header */
+    background-color: #282c34; /* Match the color with other parts of the project */
+    overflow: hidden;
+    transition: left 0.3s ease, background-color 0.3s ease;
+    z-index: 1000; /* Ensure the menu is above other elements */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.menu.open {
+    left: 0;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-button:hover {
+    color: #61dafb;
+}
+
+.menu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    padding-top: 50px; /* Add padding to avoid overlap with the close button */
+}
+
+.menu li {
+    padding: 14px 14px 14px 24px; /* Adjust left padding to move the items to the right */
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.menu li a {
+    color: white; /* Make the link color white */
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    gap: 10px; /* Add space between icon and text */
+}
+
+.menu li:hover {
+    background-color: #3c3f41;
+}
+
+.menu li a:hover {
+    color: #61dafb; /* Change the link color on hover */
+}
+
+.menu li a .icon {
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+.menu li:hover .icon {
+    transform: scale(1.2);
+}

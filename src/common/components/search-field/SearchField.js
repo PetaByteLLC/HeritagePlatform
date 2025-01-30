@@ -25,7 +25,6 @@ const SearchField = ({ onSearch }) => {
   const [showNoData, setShowNoData] = useState(false);
   const [draw, setDraw] = useState(null);
   const [selectedIcon, setSelectedIcon] = useState(null);
-  const [currentFeature, setCurrentFeature] = useState(null);
   const [vectorSource] = useState(new VectorSource());
 
   useEffect(() => {
@@ -63,10 +62,6 @@ const SearchField = ({ onSearch }) => {
     if (draw) {
       map2D.removeInteraction(draw);
     }
-    if (currentFeature) {
-      vectorSource.removeFeature(currentFeature);
-      setCurrentFeature(null);
-    }
     let geometryFunction;
     if (type === 'Box') {
       type = 'Circle';
@@ -81,8 +76,8 @@ const SearchField = ({ onSearch }) => {
     setDraw(newDraw);
 
     newDraw.on('drawend', (event) => {
+      vectorSource.clear();
       const feature = event.feature;
-      setCurrentFeature(feature);
       let geometry = feature.getGeometry();
       if (geometry.getType() === 'Circle') {
         const center = geometry.getCenter();
@@ -101,6 +96,7 @@ const SearchField = ({ onSearch }) => {
   };
 
   const handleIconClick = (icon, type) => {
+    vectorSource.clear();
     if (selectedIcon === icon) {
       setSelectedIcon(null);
       if (draw) {

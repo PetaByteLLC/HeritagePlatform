@@ -1,5 +1,6 @@
 import { React, useContext } from 'react';
 import VerticalSwitch from '../vertical-switch/VerticalSwitch';
+import TileSwitcher from '../tile-switch/TileSwitcher';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus, faLocationArrow } from '@fortawesome/free-solid-svg-icons';
 import { fromLonLat } from 'ol/proj'; 
@@ -7,7 +8,7 @@ import { MapContext } from '../../../context/MapContext';
 import './Toolbar.css';
 
 const Toolbar = () => {
-  const { mode } = useContext(MapContext);
+  const { mode, map2DType, setMap2DType } = useContext(MapContext);
 
   const handleZoomIn = () => {
     if (mode === '2D') {
@@ -63,6 +64,7 @@ const Toolbar = () => {
       <button className="toolbar-button" onClick={handleCurrentLocation}>
         <FontAwesomeIcon icon={faLocationArrow} />
       </button>
+      <TileSwitcher map2DType={map2DType} setMap2DType={setMap2DType} />
       <VerticalSwitch />
     </div>
   );

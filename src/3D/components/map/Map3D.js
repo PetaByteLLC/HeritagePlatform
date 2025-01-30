@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useRef } from 'react';
-import { MapContext } from '../../../context/MapContext';
+import { MapContext } from '../../../MapContext';
 import layers3D from '../../../common/constants/Tiles3D';
 
 function getHeightFromZoom(zoomLevel) {
@@ -7,8 +7,8 @@ function getHeightFromZoom(zoomLevel) {
   return EARTH_HALF_CIRCUMFERENCE / Math.pow(2, zoomLevel);
 }
 
-const ThreeDMap = () => {
-  const { is3DMapInitialized, setIs3DMapInitialized, currentLocation, setCurrentLocation, mode, map3DType } = useContext(MapContext);
+const Map3D = () => {
+  const { is3DMapInitialized, setIs3DMapInitialized, currentLocation, setCurrentLocation, mode, map3DType, setMap3D } = useContext(MapContext);
   const mapContainerRef = useRef(null);
 
   useEffect(() => {
@@ -60,6 +60,8 @@ const ThreeDMap = () => {
         });
       },
     };
+
+    setMap3D(window.Module);
 
     window.onresize = function(e) {
 			if (typeof window.Module == 'object') {
@@ -125,4 +127,4 @@ const ThreeDMap = () => {
   return <div id="map" ref={mapContainerRef} className="map-container" />;
 };
 
-export default ThreeDMap;
+export default Map3D;

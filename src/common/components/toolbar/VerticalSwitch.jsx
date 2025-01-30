@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { MapContext } from '../../../context/MapContext';
+import { MapContext } from '../../../MapContext';
 import './VerticalSwitch.css';
 
 const VerticalSwitch = () => {

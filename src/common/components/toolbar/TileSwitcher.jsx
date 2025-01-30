@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 import './TileSwitcher.css';
-import { MapContext } from '../../../context/MapContext';
+import { MapContext } from '../../../MapContext';
 import layers2D from '../../constants/Tiles2D';
 import layers3D from '../../constants/Tiles3D';
 

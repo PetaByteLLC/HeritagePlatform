@@ -2,11 +2,11 @@ import React, { useEffect, useContext, useRef } from 'react';
 import 'ol/ol.css';
 import { Map, View } from 'ol';
 import { defaults as defaultControls } from 'ol/control';
-import { MapContext } from '../../../context/MapContext';
+import { MapContext } from '../../../MapContext';
 import { transform } from 'ol/proj';
 import layers2D from '../../../common/constants/Tiles2D';
 
-const OpenLayersMap = () => {
+const Map2D = () => {
   const { currentLocation, setCurrentLocation, mode, map2DType, setMap2D } = useContext(MapContext);
   const mapRef = useRef();
   const mapInstance = useRef();
@@ -73,4 +73,4 @@ const OpenLayersMap = () => {
   );
 };
 
-export default OpenLayersMap;
+export default Map2D;

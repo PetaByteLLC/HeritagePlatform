@@ -100,7 +100,7 @@ const ThreeDMap = () => {
     } else {
       initializeMap(Module, map3DType);
     }
-  }, [map3DType, mode]);
+  }, [map3DType]);
   
   const clearMap = () => {
     const Module = window.Module;

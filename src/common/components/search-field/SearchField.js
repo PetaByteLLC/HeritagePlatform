@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faSearch } from '@fortawesome/free-solid-svg-icons';
 import './SearchField.css';
@@ -17,6 +17,7 @@ const SearchField = ({ onSearch }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [showNoData, setShowNoData] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
   const handleChange = (e) => {
     const newValue = e.target.value;
@@ -47,7 +48,7 @@ const SearchField = ({ onSearch }) => {
 
   return (
     <div className="search-field-wrapper">
-      <div className="search-field-container">
+      <div className="search-field-container" ref={menuRef}>
         <FontAwesomeIcon icon={faBars} className="icon-left" onClick={toggleMenu} />
         <input
           type="text"

@@ -61,6 +61,15 @@ const ThreeDMap = () => {
       },
     };
 
+    window.onresize = function(e) {
+			if (typeof window.Module == 'object') {
+				if (typeof window.Module.Resize == 'function') {
+					window.Module.Resize(window.innerWidth, window.innerHeight / 100 * 92);
+					window.Module.XDRenderData();
+				}
+			}
+		};
+
     loadScript(scriptSrc)
       .then(() => {
         setIs3DMapInitialized(true);

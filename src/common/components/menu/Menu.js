@@ -9,6 +9,7 @@ const Menu = ({ isOpen, onClose }) => {
             <button className="close-button" onClick={onClose}>
                 <FontAwesomeIcon icon={faTimes} />
             </button>
+            <h2 className="menu-title">Menu</h2>
             <ul>
                 <li><a href="#home1"><FontAwesomeIcon icon={faHome} className="icon" /> Home 1</a></li>
                 <li><a href="#home2"><FontAwesomeIcon icon={faHome} className="icon" /> Home 2</a></li>

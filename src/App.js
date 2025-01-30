@@ -1,7 +1,7 @@
 import './App.css';
-import OpenLayersMap from './2D/components/map/Map';
-import ThreeDMap from './3D/components/map/3DMap';
-import { MapProvider, MapContext } from './context/MapContext';
+import OpenLayersMap from './2D/components/map/Map2D';
+import ThreeDMap from './3D/components/map/Map3D';
+import { MapProvider, MapContext } from './MapContext';
 import { useContext } from 'react';
 import Toolbar from './common/components/toolbar/Toolbar'
 import SearchField from './common/components/search-field/SearchField';
@@ -22,9 +22,7 @@ function AppContent() {
       <header className="App-header">
         <h1>Heritage Platform</h1>
       </header>
-      <SearchField onSearch={(query) => {
-          console.log('Search query:', query);
-        }} 
+      <SearchField onSearch={(query) => {}} 
       />
       <div className={`map-container-wrap ${mode === '2D' ? 'active' : ''}`}>
         <OpenLayersMap />

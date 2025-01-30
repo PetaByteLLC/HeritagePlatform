@@ -35,12 +35,12 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
     margin-top: 6px;
     padding: 6px;
-    min-width: max-content;
-    max-width: 220px;
+    min-width: 10vw;
+    max-width: 20vw;
     display: flex;
     flex-direction: column;
     white-space: nowrap;
-    overflow: hidden;
+    overflow: hidden; /* Prevents overflow */
   }
   
   .tile-type-dropdown button {

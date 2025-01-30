@@ -45,7 +45,7 @@
 
 .no-data-container {
     position: absolute;
-    top: calc(2vh + 45px);
+    top: 11vh;
     left: 1vw;
     width: 16vw;
     background-color: #282c34;
@@ -63,7 +63,7 @@
 
 .result-list {
     position: absolute;
-    top: calc(2vh + 45px);
+    top: 11vh;
     left: 1vw;
     width: 16vw;
     max-height: 80vh;
@@ -74,7 +74,7 @@
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 2;
-  }
+}
 
 .result-item {
     padding: 10px;
@@ -101,4 +101,44 @@
 
 .result-item:hover {
     background-color: #595454;
+}
+
+.icon-buttons {
+    position: absolute;
+    top: calc(6vh - 2px);
+    left: 1vw;
+    width: 16vw;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+.icon-button-wrapper {
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    box-shadow: 0 2px 4px rgba(186, 156, 156, 0.1);
+    border-radius: 4px;
+    background-color: #282c34;
+    padding: 2px;
+    color: white;
+    cursor: pointer;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon-button {
+    border-radius: 4px;
+    background-color: #282c34;
+    padding: 5px;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.icon-button.selected {
+    background-color: white;
+    color: #282c34;
 }

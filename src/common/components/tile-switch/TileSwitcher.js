@@ -2,18 +2,18 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 import './TileSwitcher.css';
-import layers from '../../constants/Tiles2D';
+import layers2D from '../../constants/Tiles2D';
 
-const TileSwitcher = ({ mapType, setMapType }) => {
+const TileSwitcher = ({ map2DType, setMap2DType }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const mapTypes = Object.keys(layers);
+  const map2DTypes = Object.keys(layers2D);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
   const handleMapTypeChange = (type) => {
-    setMapType(type);
+    setMap2DType(type);
     setIsOpen(false);
   };
 
@@ -24,13 +24,13 @@ const TileSwitcher = ({ mapType, setMapType }) => {
       </button>
       {isOpen && (
         <div className="tile-type-dropdown">
-          {mapTypes.map((type) => (
+          {map2DTypes.map((type) => (
             <label key={type} className="tile-type-option">
               <input
                 type="radio"
                 name="mapType"
                 value={type}
-                checked={mapType === type}
+                checked={map2DType === type}
                 onChange={() => handleMapTypeChange(type)}
               />
               {type}

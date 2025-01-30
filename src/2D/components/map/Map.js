@@ -4,10 +4,10 @@ import { Map, View } from 'ol';
 import { defaults as defaultControls } from 'ol/control';
 import { MapContext } from '../../../context/MapContext';
 import { transform } from 'ol/proj';
-import layers from '../../../common/constants/Tiles2D';
+import layers2D from '../../../common/constants/Tiles2D';
 
 const OpenLayersMap = () => {
-  const { currentLocation, setCurrentLocation, mode, mapType } = useContext(MapContext);
+  const { currentLocation, setCurrentLocation, mode, map2DType } = useContext(MapContext);
   const mapRef = useRef();
   const mapInstance = useRef();
   const isMapInitialized = useRef(false);
@@ -28,7 +28,7 @@ const OpenLayersMap = () => {
 
     mapInstance.current = new Map({
       target: mapRef.current,
-      layers: [layers[mapType] || layers.OSM],
+      layers: [layers2D[map2DType] || layers2D.OSM],
       view: new View({
         center: [currentLocation.longitude, currentLocation.latitude],
         zoom: currentLocation.zoomLevel2D,
@@ -59,11 +59,11 @@ const OpenLayersMap = () => {
       const view = mapInstance.current.getView();
       const center = view.getCenter();
       const zoom = view.getZoom();
-      mapInstance.current.setLayers([layers[mapType] || layers.OSM]);
+      mapInstance.current.setLayers([layers2D[map2DType] || layers2D.OSM]);
       view.setCenter(center);
       view.setZoom(zoom);
     }
-  }, [mapType]);
+  }, [map2DType]);
 
   return (
     <div className="map-container">

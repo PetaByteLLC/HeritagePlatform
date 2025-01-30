@@ -8,7 +8,7 @@ import { MapContext } from '../../../context/MapContext';
 import './Toolbar.css';
 
 const Toolbar = () => {
-  const { mode, mapType, setMapType } = useContext(MapContext);
+  const { mode, map2DType, setMap2DType } = useContext(MapContext);
 
   const handleZoomIn = () => {
     if (mode === '2D') {
@@ -64,7 +64,7 @@ const Toolbar = () => {
       <button className="toolbar-button" onClick={handleCurrentLocation}>
         <FontAwesomeIcon icon={faLocationArrow} />
       </button>
-      <TileSwitcher mapType={mapType} setMapType={setMapType} />
+      <TileSwitcher map2DType={map2DType} setMap2DType={setMap2DType} />
       <VerticalSwitch />
     </div>
   );

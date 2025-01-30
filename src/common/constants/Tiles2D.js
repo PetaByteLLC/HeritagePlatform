@@ -2,7 +2,7 @@ import TileLayer from "ol/layer/Tile";
 import OSM from "ol/source/OSM";
 import XYZ from "ol/source/XYZ";
 
-const layers = {
+const layers2D = {
   OSM: new TileLayer({
     source: new OSM(),
   }),
@@ -63,4 +63,4 @@ const layers = {
   }),
 };
 
-export default layers;
+export default layers2D;

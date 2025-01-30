@@ -16,11 +16,7 @@ const TileSwitcher = () => {
   };
 
   const handleMapTypeChange = (type) => {
-    if (mode === '2D') {
-      setMap2DType(type);
-    } else {
-      setMap3DType(type);
-    }
+    mode === '2D' ? setMap2DType(type) : setMap3DType(type)
     setIsOpen(false);
   };
 

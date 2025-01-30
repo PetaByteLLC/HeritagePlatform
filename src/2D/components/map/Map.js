@@ -1,14 +1,13 @@
 import React, { useEffect, useContext, useRef } from 'react';
 import 'ol/ol.css';
 import { Map, View } from 'ol';
-import TileLayer from 'ol/layer/Tile';
-import OSM from 'ol/source/OSM';
 import { defaults as defaultControls } from 'ol/control';
 import { MapContext } from '../../../context/MapContext';
 import { transform } from 'ol/proj';
+import layers2D from '../../../common/constants/Tiles2D';
 
 const OpenLayersMap = () => {
-  const { currentLocation, setCurrentLocation, mode } = useContext(MapContext);
+  const { currentLocation, setCurrentLocation, mode, map2DType } = useContext(MapContext);
   const mapRef = useRef();
   const mapInstance = useRef();
   const isMapInitialized = useRef(false);
@@ -29,11 +28,7 @@ const OpenLayersMap = () => {
 
     mapInstance.current = new Map({
       target: mapRef.current,
-      layers: [
-        new TileLayer({
-          source: new OSM(),
-        }),
-      ],
+      layers: [layers2D[map2DType] || layers2D.OSM],
       view: new View({
         center: [currentLocation.longitude, currentLocation.latitude],
         zoom: currentLocation.zoomLevel2D,
@@ -45,8 +40,6 @@ const OpenLayersMap = () => {
 
     window.mapInstance = mapInstance.current;
     isMapInitialized.current = true;
-
-    window.mapInstance = mapInstance.current;
 
     mapInstance.current.on('moveend', function(e) {
       const coords = transform(mapInstance.current.getView().getCenter(), mapInstance.current.getView().getProjection().getCode(), 'EPSG:4326');
@@ -60,6 +53,17 @@ const OpenLayersMap = () => {
     });
 
   }, [mode, setCurrentLocation]);
+
+  useEffect(() => {
+    if (isMapInitialized.current) {
+      const view = mapInstance.current.getView();
+      const center = view.getCenter();
+      const zoom = view.getZoom();
+      mapInstance.current.setLayers([layers2D[map2DType] || layers2D.OSM]);
+      view.setCenter(center);
+      view.setZoom(zoom);
+    }
+  }, [map2DType]);
 
   return (
     <div className="map-container">

@@ -1,5 +1,6 @@
 import React, { useEffect, useContext, useRef } from 'react';
 import { MapContext } from '../../../context/MapContext';
+import layers3D from '../../../common/constants/Tiles3D';
 
 function getHeightFromZoom(zoomLevel) {
   const EARTH_HALF_CIRCUMFERENCE = 20037508.5;
@@ -7,11 +8,10 @@ function getHeightFromZoom(zoomLevel) {
 }
 
 const ThreeDMap = () => {
-  const { is3DMapInitialized, setIs3DMapInitialized, currentLocation, setCurrentLocation, mode } = useContext(MapContext);
+  const { is3DMapInitialized, setIs3DMapInitialized, currentLocation, setCurrentLocation, mode, map3DType } = useContext(MapContext);
   const mapContainerRef = useRef(null);
 
   useEffect(() => {
-    
     const scriptSrc = 'https://cdn.xdworld.kr/latest/XDWorldEM.js';
 
     const loadScript = (src) => {
@@ -90,6 +90,17 @@ const ThreeDMap = () => {
     }
   }, [mode]);
 
+  useEffect(() => {
+    if (mode === '3D' && window.Module) {
+      const Module = window.Module;
+      const basemap = Module[map3DType]?.();
+      const { layerName, quality, zerolevelOffset } = layers3D[map3DType];
+      basemap.layername = layerName || 'default';
+      basemap.quality = quality || 'middle';
+      basemap.zerolevelOffset = zerolevelOffset || 1;
+    }
+  }, [map3DType, mode]);
+  
   return <div id="map" ref={mapContainerRef} className="map-container" />;
 };
 

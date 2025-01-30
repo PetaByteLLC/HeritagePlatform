@@ -7,7 +7,7 @@ export const MapProvider = ({ children }) => {
   const [mode, setMode] = useState('2D');
   const [is3DMapInitialized, setIs3DMapInitialized] = useState(false);
   const [map2DType, setMap2DType] = useState('OSM');
-  const [map3DType, setMap3DType] = useState('OpenStreetMap');
+  const [map3DType, setMap3DType] = useState('Default');
 
   return (
     <MapContext.Provider value={{ currentLocation, setCurrentLocation, mode, setMode, is3DMapInitialized, setIs3DMapInitialized, map2DType, setMap2DType, map3DType, setMap3DType }}>

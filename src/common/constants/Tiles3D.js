@@ -1,4 +1,9 @@
 const layers3D = {
+  Default: {
+    layerName: 'default',
+    quality: 'middle',
+    zerolevelOffset: 1,
+  },
   OpenStreetMap: {
     layerName: "normal",
     quality: "middle",

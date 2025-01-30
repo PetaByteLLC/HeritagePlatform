@@ -91,16 +91,37 @@ const ThreeDMap = () => {
   }, [mode]);
 
   useEffect(() => {
-    if (mode === '3D' && window.Module) {
-      const Module = window.Module;
-      const basemap = Module[map3DType]?.();
-      const { layerName, quality, zerolevelOffset } = layers3D[map3DType];
-      basemap.layername = layerName || 'default';
-      basemap.quality = quality || 'middle';
-      basemap.zerolevelOffset = zerolevelOffset || 1;
+    if (mode !== '3D' || !window.Module) return;
+  
+    const Module = window.Module;
+  
+    if (map3DType === 'Default') {
+      clearMap();
+    } else {
+      initializeMap(Module, map3DType);
     }
   }, [map3DType, mode]);
   
+  const clearMap = () => {
+    const Module = window.Module;
+    if (!Module) return;
+  
+    Object.keys(layers3D).forEach((key) => {
+      const baseMap = Module[key]?.();
+      baseMap?.clear?.();
+    });
+  };
+  
+  const initializeMap = (Module, map3DType) => {
+    const baseMap = Module[map3DType]?.();
+    if (!baseMap) return;
+  
+    const { layerName, quality, zerolevelOffset } = layers3D[map3DType];
+    baseMap.layername = layerName;
+    baseMap.quality = quality;
+    baseMap.zerolevelOffset = zerolevelOffset;
+  };
+
   return <div id="map" ref={mapContainerRef} className="map-container" />;
 };
 

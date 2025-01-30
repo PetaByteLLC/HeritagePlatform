@@ -15,10 +15,15 @@
     left: 0;
 }
 
+.menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+    height: 60px;
+}
+
 .close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
     background: none;
     border: none;
     color: white;
@@ -33,9 +38,11 @@
 
 .menu-title {
     color: white;
-    text-align: center;
-    font-size: 22px;
+    text-align: left;
+    margin: 0;
+    font-size: 24px;
     font-weight: bold;
+    line-height: 60px; /* Ensure the title is vertically centered */
 }
 
 .menu ul {

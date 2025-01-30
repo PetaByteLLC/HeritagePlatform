@@ -6,10 +6,12 @@ import './Menu.css';
 const Menu = ({ isOpen, onClose }) => {
     return (
         <nav className={`menu ${isOpen ? 'open' : ''}`}>
-            <button className="close-button" onClick={onClose}>
-                <FontAwesomeIcon icon={faTimes} />
-            </button>
-            <h2 className="menu-title">Menu</h2>
+            <div className="menu-header">
+                <h2 className="menu-title">Menu</h2>
+                <button className="close-button" onClick={onClose}>
+                    <FontAwesomeIcon icon={faTimes} />
+                </button>
+            </div>
             <ul>
                 <li><a href="#home1"><FontAwesomeIcon icon={faHome} className="icon" /> Home 1</a></li>
                 <li><a href="#home2"><FontAwesomeIcon icon={faHome} className="icon" /> Home 2</a></li>

@@ -1,12 +1,12 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faSearch, faLocationArrow, faDrawPolygon } from '@fortawesome/free-solid-svg-icons';
 import { faCircle, faSquare } from '@fortawesome/free-regular-svg-icons';
 import './SearchField.css';
-import { Draw, Modify, Snap } from 'ol/interaction';
+import { Draw } from 'ol/interaction';
 import GeoJSON from 'ol/format/GeoJSON';
 import VectorSource from 'ol/source/Vector';
-import { MapContext } from '../../../context/MapContext';
+import { createBox } from 'ol/interaction/Draw';
 
 const mockResults = [
   'Result 1',
@@ -17,7 +17,6 @@ const mockResults = [
 ];
 
 const SearchField = ({ onSearch }) => {
-  const { mapInstance } = useContext(MapContext);
   const [value, setValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [showNoData, setShowNoData] = useState(false);
@@ -45,13 +44,19 @@ const SearchField = ({ onSearch }) => {
 
   const addInteraction = (type) => {
     if (draw) {
-      mapInstance.removeInteraction(draw);
+      window.mapInstance.removeInteraction(draw);
+    }
+    let geometryFunction;
+    if (type === 'Box') {
+      type = 'Circle';
+      geometryFunction = createBox();
     }
     const newDraw = new Draw({
       source: new VectorSource(),
       type: type,
+      geometryFunction: geometryFunction,
     });
-    mapInstance.addInteraction(newDraw);
+    window.mapInstance.addInteraction(newDraw);
     setDraw(newDraw);
 
     newDraw.on('drawend', (event) => {
@@ -65,12 +70,12 @@ const SearchField = ({ onSearch }) => {
   const handleIconClick = (icon, type) => {
     if (selectedIcon === icon) {
       setSelectedIcon(null);
-      // if (draw) {
-      //   mapInstance.removeInteraction(draw);
-      // }
+      if (draw) {
+        window.mapInstance.removeInteraction(draw);
+      }
     } else {
       setSelectedIcon(icon);
-      // addInteraction(type);
+      addInteraction(type);
     }
   };
 

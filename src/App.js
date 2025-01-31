@@ -22,8 +22,7 @@ function AppContent() {
       <header className="App-header">
         <h1>Heritage Platform</h1>
       </header>
-      <SearchField onSearch={(query) => {}} 
-      />
+      <SearchField />
       <div className={`map-container-wrap ${mode === '2D' ? 'active' : ''}`}>
         <OpenLayersMap />
       </div>

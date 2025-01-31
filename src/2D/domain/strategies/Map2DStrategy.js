@@ -1,10 +1,14 @@
 import { MapStrategy } from '../../../common/domain/strategies/MapStrategy';
 import { Draw } from 'ol/interaction';
 import { createBox } from 'ol/interaction/Draw';
-import GeoJSON from 'ol/format/GeoJSON';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { fromLonLat } from 'ol/proj';
+import { toLonLat } from 'ol/proj';
+import Feature from 'ol/Feature';
+import Polygon from 'ol/geom/Polygon';
+import { get2DBbox } from '../../../common/domain/utils/2DBbox';
+import { DEFAULT_SRS } from '../../../common/constants/GeoserverConfig';
 
 export class Map2DStrategy extends MapStrategy {
 	constructor(map2D) {
@@ -21,7 +25,7 @@ export class Map2DStrategy extends MapStrategy {
 		return { vectorSource, vectorLayer };
 	}
 
-	addInteraction(type, vectorSource, setDraw) {
+	addInteraction(type, vectorSource, setDraw, setCurrentSpatial) {
 		let geometryFunction;
 
 		if (type === 'Box') {
@@ -38,6 +42,7 @@ export class Map2DStrategy extends MapStrategy {
 		setDraw(newDraw);
 
 		newDraw.on('drawstart', function () {
+			setCurrentSpatial(null);
 			vectorSource.clear();
 		});
 
@@ -45,24 +50,21 @@ export class Map2DStrategy extends MapStrategy {
 			const feature = event.feature;
 			let geometry = feature.getGeometry();
 			if (geometry.getType() === 'Circle') {
-				const center = geometry.getCenter();
+				const center = toLonLat(geometry.getCenter());
 				const radius = geometry.getRadius();
-				const circumferencePoint = [center[0] + radius, center[1]];
-				const points = {
-					center: center,
-					circumferencePoint: circumferencePoint,
-				};
-				console.log(points);
+				setCurrentSpatial({ center: center, radius: radius });
 			} else {
-				const geojson = new GeoJSON().writeFeature(feature);
-				console.log(geojson);
+				let newFeature = feature.clone();;
+				newFeature.setGeometry(newFeature.getGeometry().transform(this.map2D.getView().getProjection().getCode(), DEFAULT_SRS));
+				setCurrentSpatial(newFeature);
 			}
 		});
 
 		this.map2D.addInteraction(newDraw);
 	}
 
-	handleIconClick(icon, type, selectedIcon, setSelectedIcon, draw, setDraw, vectorSource) {
+	handleIconClick(icon, type, selectedIcon, setSelectedIcon, draw, setDraw, vectorSource, setCurrentSpatial) {
+		setCurrentSpatial(null);
 		vectorSource.clear();
 		if (draw) {
 			this.map2D.removeInteraction(draw);
@@ -73,7 +75,11 @@ export class Map2DStrategy extends MapStrategy {
 			return;
 		}
 		setSelectedIcon(icon);
-		this.addInteraction(type, vectorSource, setDraw);
+		if (icon === 'location') {
+			setCurrentSpatial({bbox: get2DBbox(this.map2D)});
+			return;
+		}
+		this.addInteraction(type, vectorSource, setDraw, setCurrentSpatial);
 	}
 
 	handleZoomIn() {
@@ -98,5 +104,17 @@ export class Map2DStrategy extends MapStrategy {
 				duration: 1500,
 			});
 		});
+	}
+
+	getBbox() {
+		return get2DBbox(this.map2D);
+	}
+
+	_convertCoordinatesToLonLat(coordinates) {
+		if (Array.isArray(coordinates[0])) {
+			return coordinates.map(coord => this._convertCoordinatesToLonLat(coord));
+		} else {
+			return toLonLat(coordinates);
+		}
 	}
 }

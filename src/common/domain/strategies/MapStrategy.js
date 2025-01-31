@@ -18,4 +18,8 @@ export class MapStrategy {
 	handleCurrentLocation() {
 		throw new Error('Method not implemented');
 	}
+
+	getBbox() {
+		throw new Error('Method not implemented');
+	}
 }

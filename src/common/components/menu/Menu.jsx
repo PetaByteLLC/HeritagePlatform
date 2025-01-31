@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faHome } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faHome, faUser, faCog, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import './Menu.css';
 
 const Menu = ({ isOpen, onClose }) => {
@@ -13,10 +13,10 @@ const Menu = ({ isOpen, onClose }) => {
                 </button>
             </div>
             <ul>
-                <li><a href="#home1"><FontAwesomeIcon icon={faHome} className="icon" /> Home 1</a></li>
-                <li><a href="#home2"><FontAwesomeIcon icon={faHome} className="icon" /> Home 2</a></li>
-                <li><a href="#home3"><FontAwesomeIcon icon={faHome} className="icon" /> Home 3</a></li>
-                <li><a href="#home4"><FontAwesomeIcon icon={faHome} className="icon" /> Home 4</a></li>
+                <li><a href="#home"><FontAwesomeIcon icon={faHome} className="icon" /> Home</a></li>
+                <li><a href="#profile"><FontAwesomeIcon icon={faUser} className="icon" /> Profile</a></li>
+                <li><a href="#settings"><FontAwesomeIcon icon={faCog} className="icon" /> Settings</a></li>
+                <li><a href="#about"><FontAwesomeIcon icon={faInfoCircle} className="icon" /> About</a></li>
             </ul>
         </div>
     );

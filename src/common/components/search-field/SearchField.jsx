@@ -54,6 +54,7 @@ const SearchField = () => {
     };
 
     const handleSearchClick = async () => {
+        strategy.removePOILayer();
         let spatial = currentSpatial;
         if (selectedIcon === 'location') {
             spatial.bbox = strategy.getBbox();
@@ -63,6 +64,7 @@ const SearchField = () => {
             const searchResult = await searchPOIBySpatial(value, selectedIcon, spatial);
             setResult(searchResult);
             setShowNoData(searchResult?.totalFeatures === 0);
+            if (searchResult?.totalFeatures > 0) strategy.addGeoJSONToMap(searchResult);
         } catch (error) {
             console.error('Failed to search POI:', error);
         }

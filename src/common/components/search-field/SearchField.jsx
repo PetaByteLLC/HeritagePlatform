@@ -4,9 +4,9 @@ import { faBars, faSearch, faLocationArrow, faDrawPolygon } from '@fortawesome/f
 import { faCircle, faSquare } from '@fortawesome/free-regular-svg-icons';
 import './SearchField.css';
 import { MapContext } from '../../../MapContext';
-import { handleSearch } from '../../domain/usecases/HandleSearch';
 import { Map2DStrategy } from '../../../2D/domain/strategies/Map2DStrategy';
 import Menu from '../menu/Menu';
+import { searchPOIBySpatial } from '../../domain/usecases/SearchPOIUseCase';
 
 const mockResults = [
     'Result 1',
@@ -16,7 +16,7 @@ const mockResults = [
     'Result 5',
 ];
 
-const SearchField = ({ onSearch }) => {
+const SearchField = () => {
     const { strategy } = useContext(MapContext);
     const [value, setValue] = useState('');
     const [isFocused, setIsFocused] = useState(false);
@@ -25,6 +25,8 @@ const SearchField = ({ onSearch }) => {
     const [selectedIcon, setSelectedIcon] = useState(null);
     const [vectorSource, setVectorSource] = useState(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [currentSpatial, setCurrentSpatial] = useState(null);
+    const [results, setResults] = useState([]);
 
     useEffect(() => {
         if (strategy instanceof Map2DStrategy) {
@@ -34,7 +36,7 @@ const SearchField = ({ onSearch }) => {
     }, [strategy]);
 
     const handleChange = (e) => {
-        handleSearch(e.target.value, setValue, onSearch, setShowNoData, isFocused);
+        setValue(e.target.value);
     };
 
     const handleFocus = () => {
@@ -51,12 +53,26 @@ const SearchField = ({ onSearch }) => {
         setIsMenuOpen(false);
     };
 
+    const handleSearchClick = async () => {
+        let spatial = currentSpatial;
+        if (selectedIcon === 'location') {
+            spatial.bbox = strategy.getBbox();
+            setCurrentSpatial(spatial);
+        }
+        try {
+            const searchResults = await searchPOIBySpatial(value, selectedIcon, spatial);
+            setResults(searchResults);
+        } catch (error) {
+            console.error('Failed to search POI:', error);
+        }
+    };
+
     return (
         <div className="search-field-wrapper">
             <div className="search-field-container">
-                <FontAwesomeIcon 
-                    icon={faBars} 
-                    className="icon-left" 
+                <FontAwesomeIcon
+                    icon={faBars}
+                    className="icon-left"
                     onClick={() => setIsMenuOpen(true)}
                 />
                 <input
@@ -68,7 +84,7 @@ const SearchField = ({ onSearch }) => {
                     onFocus={handleFocus}
                     onBlur={handleBlur}
                 />
-                <FontAwesomeIcon icon={faSearch} className="icon-right" />
+                <FontAwesomeIcon icon={faSearch} className="icon-right" onClick={handleSearchClick} />
             </div>
             {isFocused && value.trim().length > 0 && (
                 <div className="result-list">
@@ -90,28 +106,28 @@ const SearchField = ({ onSearch }) => {
                     <FontAwesomeIcon
                         icon={faLocationArrow}
                         className={`icon-button ${selectedIcon === 'location' ? 'selected' : ''}`}
-                        onClick={() => strategy.handleIconClick('location', null, selectedIcon, setSelectedIcon, draw, setDraw, vectorSource)}
+                        onClick={() => strategy.handleIconClick('location', null, selectedIcon, setSelectedIcon, draw, setDraw, vectorSource, setCurrentSpatial)}
                     />
                 </div>
                 <div className='icon-button-wrapper'>
                     <FontAwesomeIcon
                         icon={faCircle}
                         className={`icon-button ${selectedIcon === 'circle' ? 'selected' : ''}`}
-                        onClick={() => strategy.handleIconClick('circle', 'Circle', selectedIcon, setSelectedIcon, draw, setDraw, vectorSource)}
+                        onClick={() => strategy.handleIconClick('circle', 'Circle', selectedIcon, setSelectedIcon, draw, setDraw, vectorSource, setCurrentSpatial)}
                     />
                 </div>
                 <div className='icon-button-wrapper'>
                     <FontAwesomeIcon
                         icon={faSquare}
                         className={`icon-button ${selectedIcon === 'square' ? 'selected' : ''}`}
-                        onClick={() => strategy.handleIconClick('square', 'Box', selectedIcon, setSelectedIcon, draw, setDraw, vectorSource)}
+                        onClick={() => strategy.handleIconClick('square', 'Box', selectedIcon, setSelectedIcon, draw, setDraw, vectorSource, setCurrentSpatial)}
                     />
                 </div>
                 <div className='icon-button-wrapper'>
                     <FontAwesomeIcon
                         icon={faDrawPolygon}
                         className={`icon-button ${selectedIcon === 'polygon' ? 'selected' : ''}`}
-                        onClick={() => strategy.handleIconClick('polygon', 'Polygon', selectedIcon, setSelectedIcon, draw, setDraw, vectorSource)}
+                        onClick={() => strategy.handleIconClick('polygon', 'Polygon', selectedIcon, setSelectedIcon, draw, setDraw, vectorSource, setCurrentSpatial)}
                     />
                 </div>
             </div>

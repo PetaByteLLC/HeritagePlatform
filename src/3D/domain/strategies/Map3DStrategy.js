@@ -188,9 +188,12 @@ export class Map3DStrategy extends MapStrategy {
 	handleCurrentLocation() {
 		if (!navigator.geolocation) return;
 		navigator.geolocation.getCurrentPosition((position) => {
-			console.log(position);
 			const { latitude, longitude } = position.coords;
 			this.map3D.getViewCamera().moveOval(new this.map3D.JSVector3D(longitude, latitude, 500.0), 90, 0, 0.1);
 		});
+	}
+
+	getBbox() {
+		console.log('Not implemented yet');
 	}
 }

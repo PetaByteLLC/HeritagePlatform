@@ -5,8 +5,6 @@ import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { fromLonLat } from 'ol/proj';
 import { toLonLat } from 'ol/proj';
-import Feature from 'ol/Feature';
-import Polygon from 'ol/geom/Polygon';
 import { get2DBbox } from '../../../common/domain/utils/2DBbox';
 import { DEFAULT_SRS } from '../../../common/constants/GeoserverConfig';
 

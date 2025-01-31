@@ -22,10 +22,10 @@ export class Map3DStrategy extends MapStrategy {
 				this.initRectangleEvent(this.map3D.canvas);
                 break;
 			case 'location':
-				this.getBbox();
+				console.log('Bbox: ', this.getBbox());
 				break;
             default:
-                console.log('3D icon click logic not implemented yet');
+				console.log('Bbox: ', this.getBbox());
         }
     }
 
@@ -85,7 +85,7 @@ export class Map3DStrategy extends MapStrategy {
     }
 
 	getBbox() {
-		var camera = this.map3D.getViewCamera();
+		const camera = this.map3D.getViewCamera()
 		var center = camera.getLocation();
 		var viewHeight = center.altitude;
 		var zeroHeight = this.map3D.getMap().getTerrHeight(center.longitude, center.latitude);
@@ -97,41 +97,15 @@ export class Map3DStrategy extends MapStrategy {
 			distance = this.maxBboxDistance;
 		}
 		
-		this.x = window.innerWidth / 2;
-		this.y = window.innerHeight / 2;
-		var newCenter = this.map3D.getMap().ScreenToMapPointEX(new this.map3D.JSVector2D(this.x, this.y));
+		var newCenter = this.map3D.getMap().ScreenToMapPointEX(new this.map3D.JSVector2D(window.innerWidth / 2, window.innerHeight / 2));
 	
 		if (newCenter === null) {
 			alert('Please change the view of camera');
 			return;
 		}
 	
-		var line = this.map3D.createLineString("MY_LINE");
-	
-		var topLeft = this.addDistanceToCoordinates(newCenter.latitude, newCenter.longitude, distance, -45);
 		var topRight = this.addDistanceToCoordinates(newCenter.latitude, newCenter.longitude, distance, 45);
 		var bottomLeft = this.addDistanceToCoordinates(newCenter.latitude, newCenter.longitude, distance, -135);
-		var bottomRight = this.addDistanceToCoordinates(newCenter.latitude, newCenter.longitude, distance, 135);
-	
-		line.createbyJson({
-			coordinates: {
-				coordinate: [
-					[bottomLeft.longitude, bottomLeft.latitude, this.map3D.getMap().getTerrHeight(bottomLeft.longitude, bottomLeft.latitude) + 5],
-					[topLeft.longitude, topLeft.latitude, this.map3D.getMap().getTerrHeight(topLeft.longitude, topLeft.latitude) + 5],
-					[topRight.longitude, topRight.latitude, this.map3D.getMap().getTerrHeight(topRight.longitude, topRight.latitude) + 5],
-					[bottomRight.longitude, bottomRight.latitude, this.map3D.getMap().getTerrHeight(bottomRight.longitude, bottomRight.latitude) + 5],
-					[bottomLeft.longitude, bottomLeft.latitude, this.map3D.getMap().getTerrHeight(bottomLeft.longitude, bottomLeft.latitude) + 5],
-				],
-				style: 'XYZ'
-			},
-			type: 0,
-			union: false,
-			depth: true,
-			color: new this.map3D.JSColor(0, 0, 0),
-			width: 2,
-		});
-
-		console.log('Bbox: ', line.coordinates);
 	
 		return {
 			maxX: Math.max(bottomLeft.longitude, topRight.longitude),
@@ -191,9 +165,5 @@ export class Map3DStrategy extends MapStrategy {
 			const { latitude, longitude } = position.coords;
 			this.map3D.getViewCamera().moveOval(new this.map3D.JSVector3D(longitude, latitude, 500.0), 90, 0, 0.1);
 		});
-	}
-
-	getBbox() {
-		console.log('Not implemented yet');
 	}
 }

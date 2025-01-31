@@ -6,6 +6,7 @@ import './SearchField.css';
 import { MapContext } from '../../../MapContext';
 import { handleSearch } from '../../domain/usecases/HandleSearch';
 import { Map2DStrategy } from '../../../2D/domain/strategies/Map2DStrategy';
+import Menu from '../menu/Menu';
 
 const mockResults = [
     'Result 1',
@@ -24,6 +25,7 @@ const SearchField = ({ onSearch }) => {
     const [selectedIcon, setSelectedIcon] = useState(null);
     const [currentFeature, setCurrentFeature] = useState(null);
     const [vectorSource, setVectorSource] = useState(null);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     useEffect(() => {
         if (strategy instanceof Map2DStrategy) {
@@ -46,10 +48,18 @@ const SearchField = ({ onSearch }) => {
         setShowNoData(false);
     };
 
+    const handleCloseMenu = () => {
+        setIsMenuOpen(false);
+    };
+
     return (
         <div className="search-field-wrapper">
             <div className="search-field-container">
-                <FontAwesomeIcon icon={faBars} className="icon-left" />
+                <FontAwesomeIcon 
+                    icon={faBars} 
+                    className="icon-left" 
+                    onClick={() => setIsMenuOpen(true)}
+                />
                 <input
                     type="text"
                     className="search-field"
@@ -106,6 +116,7 @@ const SearchField = ({ onSearch }) => {
                     />
                 </div>
             </div>
+            <Menu isOpen={isMenuOpen} onClose={handleCloseMenu} />
         </div>
     );
 };

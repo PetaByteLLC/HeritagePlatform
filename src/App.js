@@ -3,7 +3,7 @@ import OpenLayersMap from './2D/components/map/Map2D';
 import ThreeDMap from './3D/components/map/Map3D';
 import { MapProvider, MapContext } from './MapContext';
 import { useContext } from 'react';
-import Toolbar from './common/components/toolbar/Toolbar'
+import Toolbar from './common/components/toolbar/Toolbar';
 import SearchField from './common/components/search-field/SearchField';
 
 function App() {

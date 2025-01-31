@@ -17,13 +17,12 @@ const mockResults = [
 ];
 
 const SearchField = ({ onSearch }) => {
-    const { strategy, mode } = useContext(MapContext);
+    const { strategy } = useContext(MapContext);
     const [value, setValue] = useState('');
     const [isFocused, setIsFocused] = useState(false);
     const [showNoData, setShowNoData] = useState(false);
     const [draw, setDraw] = useState(null);
     const [selectedIcon, setSelectedIcon] = useState(null);
-    const [currentFeature, setCurrentFeature] = useState(null);
     const [vectorSource, setVectorSource] = useState(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -91,28 +90,28 @@ const SearchField = ({ onSearch }) => {
                     <FontAwesomeIcon
                         icon={faLocationArrow}
                         className={`icon-button ${selectedIcon === 'location' ? 'selected' : ''}`}
-                        onClick={() => strategy.handleIconClick('location', null, selectedIcon, setSelectedIcon, draw, setDraw, vectorSource, currentFeature, setCurrentFeature)}
+                        onClick={() => strategy.handleIconClick('location', null, selectedIcon, setSelectedIcon, draw, setDraw, vectorSource)}
                     />
                 </div>
                 <div className='icon-button-wrapper'>
                     <FontAwesomeIcon
                         icon={faCircle}
                         className={`icon-button ${selectedIcon === 'circle' ? 'selected' : ''}`}
-                        onClick={() => strategy.handleIconClick('circle', 'Circle', selectedIcon, setSelectedIcon, draw, setDraw, vectorSource, currentFeature, setCurrentFeature)}
+                        onClick={() => strategy.handleIconClick('circle', 'Circle', selectedIcon, setSelectedIcon, draw, setDraw, vectorSource)}
                     />
                 </div>
                 <div className='icon-button-wrapper'>
                     <FontAwesomeIcon
                         icon={faSquare}
                         className={`icon-button ${selectedIcon === 'square' ? 'selected' : ''}`}
-                        onClick={() => strategy.handleIconClick('square', 'Box', selectedIcon, setSelectedIcon, draw, setDraw, vectorSource, currentFeature, setCurrentFeature)}
+                        onClick={() => strategy.handleIconClick('square', 'Box', selectedIcon, setSelectedIcon, draw, setDraw, vectorSource)}
                     />
                 </div>
                 <div className='icon-button-wrapper'>
                     <FontAwesomeIcon
                         icon={faDrawPolygon}
                         className={`icon-button ${selectedIcon === 'polygon' ? 'selected' : ''}`}
-                        onClick={() => strategy.handleIconClick('polygon', 'Polygon', selectedIcon, setSelectedIcon, draw, setDraw, vectorSource, currentFeature, setCurrentFeature)}
+                        onClick={() => strategy.handleIconClick('polygon', 'Polygon', selectedIcon, setSelectedIcon, draw, setDraw, vectorSource)}
                     />
                 </div>
             </div>

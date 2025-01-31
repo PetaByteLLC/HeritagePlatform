@@ -6,83 +6,88 @@ export class Map3DStrategy extends MapStrategy {
 		this.map3D = map3D;
 	}
 
-    addInteraction(icon) {
-        this.clearMeasurements();
-        switch (icon) {
-            case 'circle':
-                this.setMouseState('radius');
-				this.initRadiusEvent(this.map3D.canvas);
-                break;
-            case 'polygon':
-                this.setMouseState('polygon');
+	addInteraction(icon, setCurrentSpatial) {
+		this.clearMeasurements();
+		let coordinate = null;
+		switch (icon) {
+			case 'circle':
+				this.initRadiusEvent(this.map3D.canvas).then((result) => {
+					setCurrentSpatial(result);
+				});
+				return;
+			case 'polygon':
 				this.initAreaEvent();
-                break;
-            case 'square':
-                this.setMouseState('rect');
-				this.initRectangleEvent(this.map3D.canvas);
-                break;
-			case 'location':
-				console.log('Bbox: ', this.getBbox());
 				break;
-            default:
-				console.log('Bbox: ', this.getBbox());
-        }
-    }
+			case 'square':
+				this.initRectangleEvent();
+                break;
+			default:
+				coordinate = this.getBbox();
+		}
+		setCurrentSpatial(coordinate);
+	}
 
-    handleIconClick(icon, type, selectedIcon, setSelectedIcon, draw, setDraw, vectorSource) {
-        if (this.activeIcon === icon) {
-            this.activeIcon = null;
-            setSelectedIcon(null);
-            this.clearMeasurements();
-            return;
-        }
-
-        if (this.activeIcon) {
-            this.clearMeasurements();
-        }
-
-        this.activeIcon = icon;
-        setSelectedIcon(icon);
-        this.addInteraction(icon);
-    }
+	handleIconClick(icon, type, selectedIcon, setSelectedIcon, draw, setDraw, vectorSource, setCurrentSpatial) {
+		setCurrentSpatial(null);
+		if (selectedIcon === icon) {
+			setSelectedIcon(null);
+			this.clearMeasurements();
+			return;
+		}
+		setSelectedIcon(icon);
+		if (icon === 'location') {
+			setCurrentSpatial({bbox: this.getBbox()});
+			return;
+		}
+		this.addInteraction(icon, setCurrentSpatial);
+	}
 
 	initRadiusEvent(canvas) {
-		canvas.addEventListener("Fire_EventAddRadius", function (e) {
-			if (e.dTotalDistance > 0) {
-				console.log(e.dMidLon, e.dMidLat, e.dMidAlt, "Radius: " + e.dTotalDistance);
-			}
+		this.setMouseState('circle');
+		return new Promise((resolve) => {
+			canvas.addEventListener("Fire_EventAddRadius", function (e) {
+				if (e.dTotalDistance > 0) {
+					resolve({
+						center: [e.dLon, e.dLat],
+						radius: e.dTotalDistance
+					});
+				}
+			});
 		});
+		
 	}
 
 	initAreaEvent() {
+		this.setMouseState('polygon');
 		function addPoint(e) {
 			console.log("coordinates: ", e.dLon, e.dLat, e.dAlt);
 		}
 		this.map3D.getOption().callBackAddPoint(addPoint);
 	}
 
-	initRectangleEvent(canvas) {
-		canvas.addEventListener("Fire_EventAddAreaPoint", function (e) {
-			console.log("coordinates: ", e);
-		});
+	initRectangleEvent() {
+		this.setMouseState('square');
+		function addPoint(e) {
+			console.log("coordinates: ", e.dLon, e.dLat, e.dAlt);
+		}
+		this.map3D.getOption().callBackAddPoint(addPoint);
 	}
 
-    setMouseState(state) {
-        if (!this.activeIcon) return;
-
-        const mouseStates = {
-            rect: this.map3D.MML_INPUT_RECT,
-            polygon: this.map3D.MML_ANALYS_AREA_PLANE,
+	setMouseState(state) {
+		const mouseStates = {
+			square: this.map3D.MML_INPUT_RECT,
+			polygon: this.map3D.MML_INPUT_AREA,
             radius: this.map3D.MML_ANALYS_AREA_CIRCLE,
         };
 
         const mouseState = mouseStates[state];
         if (mouseState) {
             this.map3D.XDSetMouseState(mouseState);
-        } else {
-            console.warn(`Unknown mouse state: ${state}`);
-        }
-    }
+			console.log(`Mouse state set to: ${state}`);
+		} else {
+			console.warn(`Unknown mouse state: ${state}`);
+		}
+	}
 
 	getBbox() {
 		const camera = this.map3D.getViewCamera()
@@ -107,12 +112,12 @@ export class Map3DStrategy extends MapStrategy {
 		var topRight = this.addDistanceToCoordinates(newCenter.latitude, newCenter.longitude, distance, 45);
 		var bottomLeft = this.addDistanceToCoordinates(newCenter.latitude, newCenter.longitude, distance, -135);
 	
-		return {
-			maxX: Math.max(bottomLeft.longitude, topRight.longitude),
-			maxY: Math.max(bottomLeft.latitude, topRight.latitude),
-			minX: Math.min(bottomLeft.longitude, topRight.longitude),
-			minY: Math.min(bottomLeft.latitude, topRight.latitude)
-		};
+		return [
+			Math.min(bottomLeft.longitude, topRight.longitude),
+			Math.min(bottomLeft.latitude, topRight.latitude),
+			Math.max(bottomLeft.longitude, topRight.longitude),
+			Math.max(bottomLeft.latitude, topRight.latitude)
+		];
 	}
 	
 	addDistanceToCoordinates(latitude, longitude, distance, bearing) {

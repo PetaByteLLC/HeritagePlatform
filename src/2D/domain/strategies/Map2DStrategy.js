@@ -8,7 +8,7 @@ import VectorLayer from 'ol/layer/Vector';
 import { fromLonLat } from 'ol/proj';
 
 export class Map2DStrategy extends MapStrategy {
-	constructor(map2D, contex) {
+	constructor(map2D) {
 		super();
 		this.map2D = map2D;
 	}
@@ -23,40 +23,61 @@ export class Map2DStrategy extends MapStrategy {
 	}
 
 	addInteraction(type, vectorSource, setDraw, setCurrentFeature) {
-		if (this.draw) {
-			this.map2D.removeInteraction(this.draw);
-		}
-		if (this.currentFeature) {
-			vectorSource.removeFeature(this.currentFeature);
-			setCurrentFeature(null);
-		}
 		let geometryFunction;
 		if (type === 'Box') {
 			type = 'Circle';
 			geometryFunction = createBox();
 		}
+		
 		const newDraw = new Draw({
 			source: vectorSource,
 			type: type,
 			geometryFunction: geometryFunction,
 		});
-		this.map2D.addInteraction(newDraw);
-		setDraw(newDraw);
-
+	
 		newDraw.on('drawend', (event) => {
-			if (this.currentFeature) {
-				vectorSource.removeFeature(this.currentFeature);
-			}
-			const feature = event.feature;
-			setCurrentFeature(feature);
-			let geometry = feature.getGeometry();
-			if (geometry.getType() === 'Circle') {
-				geometry = fromCircle(geometry, 64);
-			}
-			const geojson = new GeoJSON().writeGeometry(geometry);
-			console.log(geojson);
+			console.log(this);
+			this.map2D.removeInteraction(newDraw);
 		});
+	
+		this.map2D.addInteraction(newDraw);
 	}
+
+	// addInteraction(type, vectorSource, setDraw, setCurrentFeature) {
+	// 	if (this.draw) {
+	// 		this.map2D.removeInteraction(this.draw);
+	// 	}
+	// 	if (this.currentFeature) {
+	// 		vectorSource.removeFeature(this.currentFeature);
+	// 		setCurrentFeature(null);
+	// 	}
+	// 	let geometryFunction;
+	// 	if (type === 'Box') {
+	// 		type = 'Circle';
+	// 		geometryFunction = createBox();
+	// 	}
+	// 	const newDraw = new Draw({
+	// 		source: vectorSource,
+	// 		type: type,
+	// 		geometryFunction: geometryFunction,
+	// 	});
+	// 	this.map2D.addInteraction(newDraw);
+	// 	setDraw(newDraw);
+
+	// 	newDraw.on('drawend', (event) => {
+	// 		if (this.currentFeature) {
+	// 			vectorSource.removeFeature(this.currentFeature);
+	// 		}
+	// 		const feature = event.feature;
+	// 		setCurrentFeature(feature);
+	// 		let geometry = feature.getGeometry();
+	// 		if (geometry.getType() === 'Circle') {
+	// 			geometry = fromCircle(geometry, 64);
+	// 		}
+	// 		const geojson = new GeoJSON().writeGeometry(geometry);
+	// 		console.log(geojson);
+	// 	});
+	// }
 
 	handleIconClick(icon, type, selectedIcon, setSelectedIcon, draw, setDraw, vectorSource, currentFeature, setCurrentFeature) {
 		if (selectedIcon === icon) {

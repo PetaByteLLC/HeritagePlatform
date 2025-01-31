@@ -26,7 +26,7 @@ const SearchField = () => {
     const [vectorSource, setVectorSource] = useState(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [currentSpatial, setCurrentSpatial] = useState(null);
-    const [results, setResults] = useState([]);
+    const [result, setResult] = useState([]);
 
     useEffect(() => {
         if (strategy instanceof Map2DStrategy) {
@@ -60,8 +60,9 @@ const SearchField = () => {
             setCurrentSpatial(spatial);
         }
         try {
-            const searchResults = await searchPOIBySpatial(value, selectedIcon, spatial);
-            setResults(searchResults);
+            const searchResult = await searchPOIBySpatial(value, selectedIcon, spatial);
+            setResult(searchResult);
+            setShowNoData(searchResult?.totalFeatures === 0);
         } catch (error) {
             console.error('Failed to search POI:', error);
         }
@@ -86,7 +87,7 @@ const SearchField = () => {
                 />
                 <FontAwesomeIcon icon={faSearch} className="icon-right" onClick={handleSearchClick} />
             </div>
-            {isFocused && value.trim().length > 0 && (
+            {isFocused && result?.totalFeatures > 0 && (
                 <div className="result-list">
                     {mockResults.map((result, index) => (
                         <div key={index} className="result-item">

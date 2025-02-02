@@ -1,4 +1,7 @@
-import { MapStrategy } from '../../../common/domain/strategies/MapStrategy';
+import {MapStrategy} from '../../../common/domain/strategies/MapStrategy';
+import Feature from "ol/Feature";
+import Polygon from "ol/geom/Polygon";
+import {fromLonLat} from "ol/proj";
 
 export class Map3DStrategy extends MapStrategy {
 	constructor(map3D) {
@@ -14,12 +17,14 @@ export class Map3DStrategy extends MapStrategy {
 		let coordinate = null;
 		switch (icon) {
 			case 'circle':
-				this.initRadiusEvent(this.map3D.canvas).then((result) => {
-					setCurrentSpatial(result);
+				this.initRadiusEvent(this.map3D.canvas).then((coords) => {
+					setCurrentSpatial(coords);
 				});
 				return;
 			case 'polygon':
-				this.initAreaEvent();
+				this.initAreaEvent().then((coords) => {
+					setCurrentSpatial(coords);
+				});
 				break;
 			case 'square':
 				this.initRectangleEvent();
@@ -31,6 +36,7 @@ export class Map3DStrategy extends MapStrategy {
 	}
 
 	handleIconClick(icon, type, selectedIcon, setSelectedIcon, draw, setDraw, vectorSource, setCurrentSpatial) {
+		this.clearPreviousShapes();
 		setCurrentSpatial(null);
 		if (selectedIcon === icon) {
 			setSelectedIcon(null);
@@ -62,13 +68,18 @@ export class Map3DStrategy extends MapStrategy {
 	initAreaEvent() {
 		this.setMouseState('polygon');
 		this.createMeasureLayer();
-		this.map3D.getOption().SetAreaMeasurePolygonDepthBuffer(true);
 
-		this.map3D.getOption().callBackAddPoint((e) => {
-			this.clearPreviousShapes();
-			this.addPoint(e);
+		return new Promise((resolve) => {
+			this.map3D.getOption().callBackAddPoint((e) => {
+				this.clearPreviousShapes();
+				this.addPoint(e);
+			});
+
+			this.map3D.getOption().callBackCompletePoint(() => {
+				const polygonCoords = this.endPoint();
+				resolve(polygonCoords);
+			});
 		});
-		this.map3D.getOption().callBackCompletePoint(() => this.endPoint());
 	}
 
 	createMeasureLayer() {
@@ -101,8 +112,8 @@ export class Map3DStrategy extends MapStrategy {
 
 	endPoint() {
 		const polygonCoords = this.createPolygon();
-		console.log('polygonCoords:', polygonCoords);
 		this.m_mercount++;
+		return polygonCoords;
 	}
 
 	createPOI(position) {
@@ -121,18 +132,15 @@ export class Map3DStrategy extends MapStrategy {
 		let inputPointCount = inputPoints.count();
 
 		if (inputPointCount < 3) {
-			console.warn("Недостаточно точек для создания полигона.");
+			console.warn("Not enough points to create a polygon.");
 			return null;
 		}
 
 		let layerList = new this.map3D.JSLayerList(true);
-		let layer = layerList.nameAtLayer("POLYGON_LAYER") || layerList.createLayer("POLYGON_LAYER", this.map3D.ELT_POLYHEDRON);
+		let layer = layerList.nameAtLayer("POLYGON_LAYER") ||
+			layerList.createLayer("POLYGON_LAYER", this.map3D.ELT_POLYHEDRON);
 
 		let polygon = this.map3D.createPolygon("POLYGON");
-		if (!polygon) {
-			console.error("Не удалось создать объект полигона.");
-			return null;
-		}
 
 		let part = new this.map3D.Collection();
 		part.add(inputPointCount);
@@ -152,11 +160,36 @@ export class Map3DStrategy extends MapStrategy {
 		}
 
 		polygon.setPartCoordinates(vertex, part);
+
+		polygon.setStyle(this.getPolygonStyle());
+
 		layer.addObject(polygon, 0);
+
 		map.clearInputPoint();
 		this.map3D.XDClearDistanceMeasurement();
 
-		return JSON.stringify(coordinates);
+		return this.convertToFeature(coordinates);
+	}
+
+	getPolygonStyle() {
+		const polyStyle = new this.map3D.JSPolygonStyle();
+		polyStyle.setFill(true);
+		polyStyle.setFillColor(new this.map3D.JSColor(100, 0, 0, 255)); // Полупрозрачный красный
+		polyStyle.setOutLine(true);
+		polyStyle.setOutLineColor(new this.map3D.JSColor(255, 255, 255, 0)); // Белый контур без прозрачности
+
+		return polyStyle;
+	}
+
+	convertToFeature(coords) {
+		if (!Array.isArray(coords) || coords.length < 3) return null;
+
+		const closedCoords = [...coords, coords[0]];
+		const transformedCoords = closedCoords.map(coord => fromLonLat([coord.longitude, coord.latitude]));
+
+		return new Feature({
+			geometry: new Polygon([transformedCoords])
+		});
 	}
 
 	initRectangleEvent() {

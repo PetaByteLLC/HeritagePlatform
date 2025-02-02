@@ -6,7 +6,8 @@ import VectorLayer from 'ol/layer/Vector';
 import { fromLonLat } from 'ol/proj';
 import { toLonLat } from 'ol/proj';
 import { get2DBbox } from '../../../common/domain/utils/2DBbox';
-import { DEFAULT_SRS } from '../../../common/constants/GeoserverConfig';
+import { DEFAULT_SRS, POI_LAYER_NAME } from '../../../common/constants/GeoserverConfig';
+import { addGeoJSONToMap, removeLayerFromMap, moveToSingleFeature } from '../../utils/Map2DUtils';
 
 export class Map2DStrategy extends MapStrategy {
 	constructor(map2D) {
@@ -106,6 +107,18 @@ export class Map2DStrategy extends MapStrategy {
 
 	getBbox() {
 		return get2DBbox(this.map2D);
+	}
+
+	addGeoJSONToMap(geojson) {
+		addGeoJSONToMap(this.map2D, geojson);
+	}
+
+	removePOILayer() {
+		removeLayerFromMap(this.map2D, POI_LAYER_NAME);
+	}
+
+	moveToSingleFeature(feature) {
+		moveToSingleFeature(this.map2D, feature);
 	}
 
 	_convertCoordinatesToLonLat(coordinates) {

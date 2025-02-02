@@ -77,19 +77,22 @@
 }
 
 .result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 10px;
     border-bottom: 1px solid #ccc;
     cursor: pointer;
 }
 
-.result-item h3 {
+.result-item-text h3 {
     font-size: 14px;
     padding: 0px;
     margin: 0px;
     margin-bottom: 5px;
 }
 
-.result-item p {
+.result-item-text p {
     font-size: 10px;
     padding: 0px;
     margin: 0px;
@@ -141,4 +144,96 @@
 .icon-button.selected {
     background-color: white;
     color: #282c34;
+}
+
+.poi-details-sidebar {
+    position: absolute;
+    top: 11vh;
+    left: calc(17vw + 1vw);
+    width: 20vw;
+    height: auto;
+    max-height: 80vh;
+    background-color: #282c34;
+    color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    overflow-y: auto;
+    z-index: 2;
+}
+
+.poi-details-sidebar h2 {
+    font-size: 16px;
+    margin: 0 0 10px 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ccc;
+    color: white;
+}
+
+.poi-details-sidebar p {
+    font-size: 13px;
+    margin: 5px 0;
+    line-height: 1.5;
+    color: white;
+}
+
+.poi-details-sidebar .detail-item:hover {
+    background-color: #595454;
+    border-radius: 4px;
+    padding: 8px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.poi-details-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.poi-details-sidebar::-webkit-scrollbar-track {
+    background: #282c34;
+}
+
+.poi-details-sidebar::-webkit-scrollbar-thumb {
+    background: #595454;
+    border-radius: 3px;
+}
+
+.poi-details-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 3;
+}
+
+.close-btn:hover {
+    color: #ccc;
+}
+
+.result-item-buttons {
+    padding-right: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+}
+
+.result-item-icon {
+    font-size: 17px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.result-item-icon:hover {
+    color: #c7c7c7;
 }

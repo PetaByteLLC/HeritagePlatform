@@ -39,4 +39,16 @@ export class Map3DStrategy extends MapStrategy {
 	getBbox() {
 		console.log('Not implemented yet');
 	}
+
+	addGeoJSONToMap(geojson) {
+		console.log('Not implemented yet');
+	}
+
+	removePOILayer() {
+		console.log('Not implemented yet');
+	}
+
+	moveToSingleFeature(feature) {
+		console.log('Not implemented yet');
+	}
 }

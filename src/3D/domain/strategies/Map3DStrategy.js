@@ -53,6 +53,17 @@ export class Map3DStrategy extends MapStrategy {
 
 	initRadiusEvent(canvas) {
 		this.setMouseState('circle');
+
+		let layerList = new this.map3D.JSLayerList(true);
+		let POILayer = layerList.createLayer("MEASURE_POI", this.map3D.ELT_3DPOINT);
+		POILayer.setMaxDistance(20000.0);
+		POILayer.setSelectable(false);
+
+		let WallLayer = layerList.createLayer("MEASURE_WALL", this.map3D.ELT_POLYHEDRON);
+		WallLayer.setMaxDistance(20000.0);
+		WallLayer.setSelectable(false);
+		WallLayer.setEditable(true);
+
 		return new Promise((resolve) => {
 			canvas.addEventListener("Fire_EventAddRadius", function (e) {
 				if (e.dTotalDistance > 0) {
@@ -96,7 +107,7 @@ export class Map3DStrategy extends MapStrategy {
 
 		this.clearLayer(layerList, "POLYGON_LAYER");
 		this.clearLayer(layerList, "MEASURE_POI");
-		this.clearLayer(layerList, "CIRCLE_LAYER");
+		this.clearLayer(layerList, "MEASURE_WALL");
 	}
 
 	clearLayer(layerList, layerName) {

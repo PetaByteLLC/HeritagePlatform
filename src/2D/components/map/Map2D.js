@@ -6,10 +6,10 @@ import { MapContext } from '../../../MapContext';
 import { transform } from 'ol/proj';
 import layers2D from '../../../common/constants/Tiles2D';
 import { POI_LAYER_NAME } from '../../../common/constants/GeoserverConfig';
-import { moveToFeature } from '../../utils/Map2DUtils';
+import { moveToFeature, setSelectedPOIOnMap } from '../../utils/Map2DUtils';
 
 const Map2D = () => {
-	const { currentLocation, setCurrentLocation, mode, map2DType, setMap2D } = useContext(MapContext);
+	const { currentLocation, setCurrentLocation, mode, map2DType, setMap2D, setSelectedPOI } = useContext(MapContext);
 	const mapRef = useRef();
 	const mapInstance = useRef();
 	const isMapInitialized = useRef(false);
@@ -43,10 +43,12 @@ const Map2D = () => {
 		// TODO вынести в модуль
 		mapInstance.current.on('click', (event) => {
 			mapInstance.current.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
+				if (!layer || !feature) return;
 				// TODO click registering
 				if (layer.get('name') === POI_LAYER_NAME) {
 					const features = feature.get('features');
 					moveToFeature(mapInstance.current, features);
+					setSelectedPOIOnMap(features, setSelectedPOI);
 				}
 			});
 		});

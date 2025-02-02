@@ -5,6 +5,7 @@ import Cluster from 'ol/source/Cluster';
 import { getCenter, extend, createEmpty } from 'ol/extent';
 import { Style, Icon, Circle as CircleStyle, Text, Fill, Stroke } from 'ol/style';
 import { DEFAULT_SRS, POI_LAYER_NAME } from '../../common/constants/GeoserverConfig';
+import { fromLonLat } from 'ol/proj';
 
 export const addGeoJSONToMap = (map, geojson) => {
 
@@ -76,6 +77,15 @@ export const removeLayerFromMap = (map, name) => {
     }
 }
 
+export const moveToSingleFeature = (map, feature) => {
+    const coordinates = fromLonLat(feature.geometry.coordinates);
+    map.getView().animate({
+        center: coordinates,
+        zoom: 18,
+        duration: 700,
+    });
+}
+
 export const moveToFeature = (map, features) => {
     var extent = createEmpty();
     features.forEach(function (f) {
@@ -99,4 +109,12 @@ export const moveToFeature = (map, features) => {
         zoom: 18,
         duration: 700,
     });
+}
+
+export const setSelectedPOIOnMap = (features, setSelectedPOI) => {
+    if (features.length > 1) return;
+    const feature = features[0];
+    const geojsonFormat = new GeoJSON();
+    const geojson = geojsonFormat.writeFeatureObject(feature);
+    setSelectedPOI(geojson.properties);
 }

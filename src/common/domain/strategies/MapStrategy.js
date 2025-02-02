@@ -30,4 +30,8 @@ export class MapStrategy {
 	removePOILayer() {
 		throw new Error('Method not implemented');
 	}
+	
+	moveToSingleFeature(feature) {
+		throw new Error('Method not implemented');
+	}
 }

@@ -47,4 +47,8 @@ export class Map3DStrategy extends MapStrategy {
 	removePOILayer() {
 		console.log('Not implemented yet');
 	}
+
+	moveToSingleFeature(feature) {
+		console.log('Not implemented yet');
+	}
 }

@@ -7,7 +7,7 @@ import { fromLonLat } from 'ol/proj';
 import { toLonLat } from 'ol/proj';
 import { get2DBbox } from '../../../common/domain/utils/2DBbox';
 import { DEFAULT_SRS, POI_LAYER_NAME } from '../../../common/constants/GeoserverConfig';
-import { addGeoJSONToMap, removeLayerFromMap } from '../../utils/Map2DUtils';
+import { addGeoJSONToMap, removeLayerFromMap, moveToSingleFeature } from '../../utils/Map2DUtils';
 
 export class Map2DStrategy extends MapStrategy {
 	constructor(map2D) {
@@ -115,6 +115,10 @@ export class Map2DStrategy extends MapStrategy {
 
 	removePOILayer() {
 		removeLayerFromMap(this.map2D, POI_LAYER_NAME);
+	}
+
+	moveToSingleFeature(feature) {
+		moveToSingleFeature(this.map2D, feature);
 	}
 
 	_convertCoordinatesToLonLat(coordinates) {

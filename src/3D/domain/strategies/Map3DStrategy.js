@@ -4,10 +4,13 @@ export class Map3DStrategy extends MapStrategy {
 	constructor(map3D) {
 		super();
 		this.map3D = map3D;
+		this.m_mercount = 0;
+		this.m_objcount = 0;
 	}
 
 	addInteraction(icon, setCurrentSpatial) {
 		this.clearMeasurements();
+		this.clearPreviousShapes();
 		let coordinate = null;
 		switch (icon) {
 			case 'circle':
@@ -20,7 +23,7 @@ export class Map3DStrategy extends MapStrategy {
 				break;
 			case 'square':
 				this.initRectangleEvent();
-                break;
+				break;
 			default:
 				coordinate = this.getBbox();
 		}
@@ -54,15 +57,106 @@ export class Map3DStrategy extends MapStrategy {
 				}
 			});
 		});
-		
 	}
 
 	initAreaEvent() {
 		this.setMouseState('polygon');
-		function addPoint(e) {
-			console.log("coordinates: ", e.dLon, e.dLat, e.dAlt);
+		this.createMeasureLayer();
+		this.map3D.getOption().SetAreaMeasurePolygonDepthBuffer(true);
+
+		this.map3D.getOption().callBackAddPoint((e) => {
+			this.clearPreviousShapes();
+			this.addPoint(e);
+		});
+		this.map3D.getOption().callBackCompletePoint(() => this.endPoint());
+	}
+
+	createMeasureLayer() {
+		let layerList = new this.map3D.JSLayerList(true);
+		let layer = layerList.createLayer("MEASURE_POI", this.map3D.ELT_3DPOINT);
+		layer.setMaxDistance(20000.0);
+		layer.setSelectable(false);
+	}
+
+	clearPreviousShapes() {
+		this.m_mercount = 0;
+		this.m_objcount = 0;
+		let layerList = new this.map3D.JSLayerList(true);
+
+		this.clearLayer(layerList, "POLYGON_LAYER");
+		this.clearLayer(layerList, "MEASURE_POI");
+		this.clearLayer(layerList, "CIRCLE_LAYER");
+	}
+
+	clearLayer(layerList, layerName) {
+		let layer = layerList.nameAtLayer(layerName);
+		if (layer) {
+			layer.removeAll();
 		}
-		this.map3D.getOption().callBackAddPoint(addPoint);
+	}
+
+	addPoint(e) {
+		this.createPOI(new this.map3D.JSVector3D(e?.dLon, e?.dLat, e?.dAlt));
+	}
+
+	endPoint() {
+		const polygonCoords = this.createPolygon();
+		console.log('polygonCoords:', polygonCoords);
+		this.m_mercount++;
+	}
+
+	createPOI(position) {
+		let layerList = new this.map3D.JSLayerList(true);
+		let layer = layerList.nameAtLayer("MEASURE_POI");
+
+		let poi = this.map3D.createPoint(`${this.m_mercount}_POI_${this.m_objcount}`);
+		poi.setPosition(position);
+		layer.addObject(poi, 0);
+		this.m_objcount++;
+	}
+
+	createPolygon() {
+		let map = this.map3D.getMap();
+		let inputPoints = map.getInputPoints();
+		let inputPointCount = inputPoints.count();
+
+		if (inputPointCount < 3) {
+			console.warn("Недостаточно точек для создания полигона.");
+			return null;
+		}
+
+		let layerList = new this.map3D.JSLayerList(true);
+		let layer = layerList.nameAtLayer("POLYGON_LAYER") || layerList.createLayer("POLYGON_LAYER", this.map3D.ELT_POLYHEDRON);
+
+		let polygon = this.map3D.createPolygon("POLYGON");
+		if (!polygon) {
+			console.error("Не удалось создать объект полигона.");
+			return null;
+		}
+
+		let part = new this.map3D.Collection();
+		part.add(inputPointCount);
+
+		let vertex = new this.map3D.JSVec3Array();
+		let coordinates = [];
+
+		for (let i = 0; i < inputPointCount; i++) {
+			let point = inputPoints.get(i);
+			let coord = {
+				longitude: point.Longitude,
+				latitude: point.Latitude,
+				altitude: point.Altitude + 10.0
+			};
+			coordinates.push(coord);
+			vertex.push(new this.map3D.JSVector3D(coord.longitude, coord.latitude, coord.altitude));
+		}
+
+		polygon.setPartCoordinates(vertex, part);
+		layer.addObject(polygon, 0);
+		map.clearInputPoint();
+		this.map3D.XDClearDistanceMeasurement();
+
+		return JSON.stringify(coordinates);
 	}
 
 	initRectangleEvent() {
@@ -76,8 +170,8 @@ export class Map3DStrategy extends MapStrategy {
 	setMouseState(state) {
 		const mouseStates = {
 			square: this.map3D.MML_INPUT_RECT,
-			polygon: this.map3D.MML_INPUT_AREA,
-            radius: this.map3D.MML_ANALYS_AREA_CIRCLE,
+			polygon: this.map3D.MML_ANALYS_DISTANCE,
+            circle: this.map3D.MML_ANALYS_AREA_CIRCLE,
         };
 
         const mouseState = mouseStates[state];

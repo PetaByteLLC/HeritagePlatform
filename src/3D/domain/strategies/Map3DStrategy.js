@@ -11,25 +11,20 @@ export class Map3DStrategy extends MapStrategy {
 	}
 
 	addInteraction(icon, setCurrentSpatial) {
+		console.log('draw');
 		this.clearMeasurements();
 		this.clearPreviousShapes();
 		let coordinate = null;
 		switch (icon) {
 			case 'circle':
-				this.initRadiusEvent(this.map3D.canvas).then((coords) => {
-					setCurrentSpatial(coords);
-				});
+				this.initRadiusEvent(this.map3D.canvas, setCurrentSpatial);
 				return;
 			case 'polygon':
-				this.initAreaEvent().then((coords) => {
-					setCurrentSpatial(coords);
-				});
-				break;
+				this.initAreaEvent(setCurrentSpatial);
+				return;
 			case 'square':
-				this.initRectangleEvent().then((coords) => {
-					setCurrentSpatial(coords);
-				});
-				break;
+				this.initRectangleEvent(setCurrentSpatial);
+				return;
 			default:
 				coordinate = this.getBbox();
 		}
@@ -52,7 +47,7 @@ export class Map3DStrategy extends MapStrategy {
 		this.addInteraction(icon, setCurrentSpatial);
 	}
 
-	initRadiusEvent(canvas) {
+	initRadiusEvent(canvas, setCurrentSpatial) {
 		this.setMouseState('circle');
 
 		let layerList = new this.map3D.JSLayerList(true);
@@ -65,32 +60,27 @@ export class Map3DStrategy extends MapStrategy {
 		WallLayer.setSelectable(false);
 		WallLayer.setEditable(true);
 
-		return new Promise((resolve) => {
-			canvas.addEventListener("Fire_EventAddRadius", function (e) {
-				if (e.dTotalDistance > 0) {
-					resolve({
-						center: [e.dLon, e.dLat],
-						radius: e.dTotalDistance
-					});
-				}
-			});
+		canvas.addEventListener("Fire_EventAddRadius", function (e) {
+			if (e.dTotalDistance > 0) {
+				setCurrentSpatial({
+					center: [e.dLon, e.dLat],
+					radius: e.dTotalDistance
+				});
+			}
 		});
 	}
 
-	initAreaEvent() {
+	initAreaEvent(setCurrentSpatial) {
 		this.setMouseState('polygon');
 		this.createMeasureLayer();
+		this.map3D.getOption().callBackAddPoint((e) => {
+			this.clearPreviousShapes();
+			this.addPoint(e);
+		});
 
-		return new Promise((resolve) => {
-			this.map3D.getOption().callBackAddPoint((e) => {
-				this.clearPreviousShapes();
-				this.addPoint(e);
-			});
-
-			this.map3D.getOption().callBackCompletePoint(() => {
-				const polygonCoords = this.endPoint();
-				resolve(polygonCoords);
-			});
+		this.map3D.getOption().callBackCompletePoint(() => {
+			const polygonCoords = this.endPoint();
+			setCurrentSpatial(polygonCoords);
 		});
 	}
 
@@ -203,40 +193,40 @@ export class Map3DStrategy extends MapStrategy {
 		});
 	}
 
-	initRectangleEvent() {
-		return new Promise((resolve) => {
-			if (this.map3D.XDGetMouseState() === this.map3D.MML_INPUT_RECT) return;
+	initRectangleEvent(setCurrentSpatial) {
+		this.setMouseState('square');
+		this.clickHandlerRef = (event)=> {
+			if (event.target.tagName !== 'CANVAS') return;
+			setCurrentSpatial(this.clickHandler(event));
+			this.removeClickHandler();
+		};
 
-			this.setMouseState('square');
-			this.clickHandlerRef = (event) => this.clickHandler(event, resolve);
-
-			document.body.addEventListener('click', this.clickHandlerRef);
-		});
+		document.body.addEventListener('click', (event) => this.clickHandlerRef(event));
 	}
 
-	clickHandler(event, resolve) {
-		if (event.target.tagName !== 'CANVAS') return;
-		const coordinates = this.getSquareCoordinates();
-		this.removeClickHandler();
-		resolve(coordinates);
+	clickHandler(event) {
+		return this.getSquareCoordinates();
 	}
 
 	removeClickHandler() {
+		console.log(this.clickHandlerRef)
 		if (this.clickHandlerRef) {
 			document.body.removeEventListener('click', this.clickHandlerRef);
-			this.clickHandlerRef = null;
 		}
 	}
 
 	getSquareCoordinates() {
-		var a = this.map3D.getMap().getInputPointList().item(1);
-		var b = this.map3D.getMap().getInputPointList().item(2);
-		var c = this.map3D.getMap().getInputPointList().item(3);
-		var d = this.map3D.getMap().getInputPointList().item(4);
+		var map = this.map3D.getMap();
+		var inputPoints = map.getInputPoints();
+		if (inputPoints.count() < 4) return;
+		var a = map.getInputPointList().item(1);
+		var b = map.getInputPointList().item(2);
+		var c = map.getInputPointList().item(3);
+		var d = map.getInputPointList().item(4);
 
-		let inputPoints = [a, b, c, d];
+		let inputPointsArr = [a, b, c, d];
 
-		let coordinates = inputPoints.map(point => ({
+		let coordinates = inputPointsArr.map(point => ({
 			longitude: point.Longitude,
 			latitude: point.Latitude
 		}));

@@ -4,7 +4,7 @@ import VectorLayer from 'ol/layer/Vector';
 import Cluster from 'ol/source/Cluster';
 import { getCenter, extend, createEmpty } from 'ol/extent';
 import { Style, Icon, Circle as CircleStyle, Text, Fill, Stroke } from 'ol/style';
-import { DEFAULT_SRS, POI_LAYER_NAME } from '../../common/constants/GeoserverConfig';
+import { DEFAULT_SRS, POI_LAYER_NAME, TILE_LAYER_NAME } from '../../common/constants/GeoserverConfig';
 import { fromLonLat } from 'ol/proj';
 
 export const addGeoJSONToMap = (map, geojson) => {
@@ -117,4 +117,12 @@ export const setSelectedPOIOnMap = (features, setSelectedPOI) => {
     const geojsonFormat = new GeoJSON();
     const geojson = geojsonFormat.writeFeatureObject(feature);
     setSelectedPOI(geojson.properties);
+}
+
+export const removeLayerByName = (map, name) => {
+    map.getLayers().forEach(layer => {
+        if (layer && layer.get('name') && layer.get('name') === name) {
+            map.removeLayer(layer)
+        }
+    });
 }

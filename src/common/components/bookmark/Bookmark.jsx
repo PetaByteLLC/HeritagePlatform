@@ -10,7 +10,7 @@ import { MapContext } from '../../../MapContext';
 import './Bookmark.css';
 
 const geoServerConfig = {
-    baseUrl: process.env.GEOSERVER_URL,
+    baseUrl: process.env.REACT_APP_GEOSERVER_URL,
     wfsParams: {
         service: "WFS",
         version: "1.1.0",

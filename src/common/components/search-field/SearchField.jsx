@@ -126,12 +126,12 @@ const SearchField = () => {
                 </div>
             )}
 
-
             {showNoData && (
                 <div className="no-data-container">
-                    <p>No data available</p>
+                    <p>No data available...</p>
                 </div>
             )}
+
             {selectedPOI && (
                 <div className="poi-details-sidebar">
                     <button className="close-btn" onClick={() => setSelectedPOI(null)}>x</button>

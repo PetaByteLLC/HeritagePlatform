@@ -15,14 +15,14 @@ const Menu = ({ isOpen, onClose }) => {
                 </button>
             </div>
             <ul className='d-flex flex-column'>
-                <li>
-                    <p data-bs-toggle="offcanvas" data-bs-target="#layersMenu" aria-controls="layersMenu" className='d-flex align-items-center gap-2 p-0 m-0'>
+                <li data-bs-toggle="offcanvas" data-bs-target="#layersMenu" aria-controls="layersMenu" role="button">
+                    <p className='d-flex align-items-center gap-2 p-0 m-0'>
                         <FontAwesomeIcon icon={faLayerGroup} className="icon" fixedWidth/>
                         Layers
                     </p>
                 </li>
-                <li>
-                    <p data-bs-toggle="offcanvas" data-bs-target="#bookmarkMenu" aria-controls="bookmarkMenu" className='d-flex align-items-center gap-2 p-0 m-0'>
+                <li data-bs-toggle="offcanvas" data-bs-target="#bookmarkMenu" aria-controls="bookmarkMenu" role="button">
+                    <p className='d-flex align-items-center gap-2 p-0 m-0'>
                         <FontAwesomeIcon icon={faBookmark} className="icon" fixedWidth/>
                         Bookmarks
                     </p>

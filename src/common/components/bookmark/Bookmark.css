@@ -1,0 +1,93 @@
+.bookmark {
+    display: none;
+    background: #282c34;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 350px;
+    height: 100vh;
+    z-index: 1001;
+    border: 1px solid gray;
+}
+
+.bookmark.open {
+    display: block;
+}
+
+.bookmark-header {
+    color: #fff;
+}
+
+button.close-button {
+    position: absolute;
+    top: 8px;
+    right: 0;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    margin-inline-start: 0.83em;
+    margin-inline-end: 0.83em;
+}
+
+h2.bookmark-title {
+    margin-inline-start: 0.83em;
+    margin-inline-end: 0.83em;
+}
+
+.bookmark-actions {
+    padding: 15px 5px;
+}
+
+.bookmark-search {
+    padding: 3px;
+}
+
+.bookmark-search-input {
+    font-size: 1em;
+    padding: 5px;
+    width: 75%;
+}
+
+.bookmark-search-button {
+    font-size: 1em;
+    padding: 5px;
+}
+
+.bookmark-items {
+    padding: 5px;
+}
+
+.bookmark-item {
+    padding: 5px;
+    color: #fff;
+    border: 1px solid gray;
+    margin-bottom: 5px;
+    cursor: pointer;
+    position: relative;
+}
+
+.bookmark-item-body {
+    width: 100%;
+}
+
+.bookmark-item-icon {
+    display: inline-block;
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    line-height: 35px;
+}
+
+.bookmark-item-name {
+    display: inline-block;
+    width: calc(100% - 55px);
+    padding: 5px;
+}
+
+.bookmark-item-action {
+    display: inline-block;
+    width: 15px;
+    position: absolute;
+    right: 5px;
+    top: 12px;
+    text-align: center;
+}

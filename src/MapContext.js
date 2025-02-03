@@ -13,6 +13,7 @@ export const MapProvider = ({ children }) => {
     const [map2D, setMap2D] = useState(null);
     const [map3D, setMap3D] = useState(null);
     const [strategy, setStrategy] = useState(null);
+    const [selectedPOI, setSelectedPOI] = useState(null);
 
     useEffect(() => {
         if (mode === '2D' && map2D) {
@@ -32,6 +33,7 @@ export const MapProvider = ({ children }) => {
                 map3DType, setMap3DType,
                 map2D, setMap2D,
                 map3D, setMap3D,
+                selectedPOI, setSelectedPOI,
                 strategy
             }}>
             {children}

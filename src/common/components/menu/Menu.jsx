@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faHome, faUser, faCog, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faBookmark, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
+import Bookmark from './../bookmark'
 import './Menu.css';
 
 const Menu = ({ isOpen, onClose }) => {
-    return (
+
+    return (<>
         <div className={`menu ${isOpen ? 'open' : ''}`}>
             <div className="menu-header">
                 <h2 className="menu-title">Menu</h2>
@@ -12,13 +14,23 @@ const Menu = ({ isOpen, onClose }) => {
                     <FontAwesomeIcon icon={faTimes} />
                 </button>
             </div>
-            <ul>
-                <li><a href="#home"><FontAwesomeIcon icon={faHome} className="icon" /> Home</a></li>
-                <li><a href="#profile"><FontAwesomeIcon icon={faUser} className="icon" /> Profile</a></li>
-                <li><a href="#settings"><FontAwesomeIcon icon={faCog} className="icon" /> Settings</a></li>
-                <li><a href="#about"><FontAwesomeIcon icon={faInfoCircle} className="icon" /> About</a></li>
+            <ul className='d-flex flex-column'>
+                <li data-bs-toggle="offcanvas" data-bs-target="#layersMenu" aria-controls="layersMenu" role="button">
+                    <p className='d-flex align-items-center gap-2 p-0 m-0'>
+                        <FontAwesomeIcon icon={faLayerGroup} className="icon" fixedWidth/>
+                        Layers
+                    </p>
+                </li>
+                <li data-bs-toggle="offcanvas" data-bs-target="#bookmarkMenu" aria-controls="bookmarkMenu" role="button">
+                    <p className='d-flex align-items-center gap-2 p-0 m-0'>
+                        <FontAwesomeIcon icon={faBookmark} className="icon" fixedWidth/>
+                        Bookmarks
+                    </p>
+                </li>
             </ul>
         </div>
+        <Bookmark />
+    </>
     );
 };
 

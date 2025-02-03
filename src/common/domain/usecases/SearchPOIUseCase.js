@@ -1,6 +1,5 @@
 import { fetchPOIByBbox, fetchPOIByRadius, fetchPOIByPolygon, fetchAllPOI } from "../../data/repositories/GeoserverRepository";
 import WKT from 'ol/format/WKT';
-import GeoJSON from 'ol/format/GeoJSON';
 
 export const searchPOIBySpatial = async (keyword, spatialType, spatial) => {
     if (keyword === null || keyword === undefined || keyword.trim().length === 0) return;

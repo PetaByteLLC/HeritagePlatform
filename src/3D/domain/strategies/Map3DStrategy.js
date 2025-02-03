@@ -1,7 +1,6 @@
 import {MapStrategy} from '../../../common/domain/strategies/MapStrategy';
 import Feature from "ol/Feature";
 import Polygon from "ol/geom/Polygon";
-import {fromLonLat} from "ol/proj";
 
 export class Map3DStrategy extends MapStrategy {
 	constructor(map3D) {
@@ -197,7 +196,7 @@ export class Map3DStrategy extends MapStrategy {
 		if (!Array.isArray(coords) || coords.length < 3) return null;
 
 		const closedCoords = [...coords, coords[0]];
-		const transformedCoords = closedCoords.map(coord => fromLonLat([coord.longitude, coord.latitude]));
+		const transformedCoords = closedCoords.map(coord => [coord.longitude, coord.latitude]);
 
 		return new Feature({
 			geometry: new Polygon([transformedCoords])
@@ -218,8 +217,6 @@ export class Map3DStrategy extends MapStrategy {
 	clickHandler(event, resolve) {
 		if (event.target.tagName !== 'CANVAS') return;
 		const coordinates = this.getSquareCoordinates();
-
-		console.log('GeoJson', coordinates);
 		resolve(coordinates);
 	}
 
@@ -235,9 +232,6 @@ export class Map3DStrategy extends MapStrategy {
 			longitude: point.Longitude,
 			latitude: point.Latitude
 		}));
-
-		console.log('coordinates', coordinates);
-
 		return this.convertToFeature(coordinates);
 	}
 

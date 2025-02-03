@@ -14,6 +14,11 @@ export class Map3DStrategy extends MapStrategy {
 		console.log('draw');
 		this.clearMeasurements();
 		this.clearPreviousShapes();
+		this.removeRectangleEvent();
+		if (this.map3D.canvas) {
+			this.map3D.canvas.removeEventListener("Fire_EventAddRadius", this.radiusListener);
+			this.radiusListener = null;
+		}
 		let coordinate = null;
 		switch (icon) {
 			case 'circle':
@@ -60,14 +65,16 @@ export class Map3DStrategy extends MapStrategy {
 		WallLayer.setSelectable(false);
 		WallLayer.setEditable(true);
 
-		canvas.addEventListener("Fire_EventAddRadius", function (e) {
+		this.radiusListener = function (e) {
 			if (e.dTotalDistance > 0) {
 				setCurrentSpatial({
 					center: [e.dLon, e.dLat],
-					radius: e.dTotalDistance
+					radius: e.dTotalDistance,
 				});
 			}
-		});
+		};
+
+		canvas.addEventListener("Fire_EventAddRadius", this.radiusListener);
 	}
 
 	initAreaEvent(setCurrentSpatial) {
@@ -195,24 +202,19 @@ export class Map3DStrategy extends MapStrategy {
 
 	initRectangleEvent(setCurrentSpatial) {
 		this.setMouseState('square');
-		this.clickHandlerRef = (event)=> {
-			if (event.target.tagName !== 'CANVAS') return;
-			setCurrentSpatial(this.clickHandler(event));
-			this.removeClickHandler();
+
+		this.handleClickEvent = (event) => {
+			const coordinates = this.getSquareCoordinates();
+			if (coordinates) {
+				setCurrentSpatial(coordinates);
+			}
 		};
 
-		document.body.addEventListener('click', (event) => this.clickHandlerRef(event));
+		document.body.addEventListener('click', this.handleClickEvent);
 	}
 
-	clickHandler(event) {
-		return this.getSquareCoordinates();
-	}
-
-	removeClickHandler() {
-		console.log(this.clickHandlerRef)
-		if (this.clickHandlerRef) {
-			document.body.removeEventListener('click', this.clickHandlerRef);
-		}
+	removeRectangleEvent() {
+		document.body.removeEventListener('click', this.handleClickEvent);
 	}
 
 	getSquareCoordinates() {
@@ -309,7 +311,6 @@ export class Map3DStrategy extends MapStrategy {
 		this.map3D.XDClearDistanceMeasurement();
 		this.map3D.XDClearAreaMeasurement();
 		this.map3D.XDClearCircleMeasurement();
-		this.removeClickHandler();
     }
 
 	handleZoomIn() {

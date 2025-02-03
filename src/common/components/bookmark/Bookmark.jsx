@@ -1,40 +1,40 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-    faPlus,
-    faMinus,
-    faTimes,
-    faBookmark, faEllipsisV, faSearch, faAdd
-} from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faMinus, faTimes, faBookmark, faSearch, faAdd } from '@fortawesome/free-solid-svg-icons';
 import { MapContext } from '../../../MapContext';
+import { fetchAllBookmarks, addBookmark, editBookmark, deleteBookmark } from "../../data/repositories/GeoserverRepository";
 import './Bookmark.css';
 
-const geoServerConfig = {
-    baseUrl: process.env.REACT_APP_GEOSERVER_URL,
-    wfsParams: {
-        service: "WFS",
-        version: "1.1.0",
-        request: "GetFeature",
-        typeName: "myworkspace:my_layer",
-        outputFormat: "application/json",
-    }
-}
+const Bookmark = () => {
+    const [error, setError] = useState(null);
+    const [error2, setError2] = useState(null);
+    const [bookmarks, setBookmarks] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
 
-const Bookmark = ({ isOpen, onClose }) => {
+    useEffect(() => {
+        loadBookmarks(null);
+    }, []);
 
-    let initBookmarks = [];
-    for (var i = 1; i <= 100; i++) {
-       initBookmarks.push({
-           id: i,
-           name: "Bookmark name " + i
-       });
-    }
-
-    const [bookmarks, setBookmarks] = useState(initBookmarks);
+    const loadBookmarks = async (keyword) => {
+        try {
+            const data = await fetchAllBookmarks(keyword);
+            setBookmarks(data.features);
+        }
+        catch (error) {
+            setError('Failed to load bookmarks');
+            console.error(error);
+        }
+    };
 
     // Удаление закладки
-    const removeBookmark = (index) => {
-        setBookmarks(bookmarks.filter((_, i) => i !== index));
+    const removeBookmark = (bookmark) => {
+        deleteBookmark(bookmark)
+            .then(resp => {
+                setBookmarks(bookmarks.filter((bm, i) => bm.id !== bookmark.id));
+            })
+            .catch(err => {
+                setError2(err);
+            })
     };
 
     return (
@@ -47,9 +47,13 @@ const Bookmark = ({ isOpen, onClose }) => {
             <div className="offcanvas-body">
                 <div className="bookmark-actions">
                     <div className="hstack gap-3">
-                        <input className="form-control me-auto" type="text" placeholder="Search bookmark..."
-                               aria-label="Search bookmark..." />
-                        <button type="button" className="btn btn-secondary">
+                        <input className="form-control me-auto" type="text"
+                               placeholder="Search bookmark..."
+                               aria-label="Search bookmark..."
+                               value={searchQuery}
+                               onChange={(e) => setSearchQuery(e.target.value)}/>
+                        <button type="button" className="btn btn-secondary"
+                                onClick={() => loadBookmarks(searchQuery)}>
                             <FontAwesomeIcon icon={faSearch} />
                         </button>
                         <div className="vr"></div>
@@ -59,17 +63,21 @@ const Bookmark = ({ isOpen, onClose }) => {
                     </div>
                 </div>
                 <div className="bookmark-items">
-                    {bookmarks.map((bookmark, index) => (
+                    {error2 ? (<p style={{ color: 'red' }}>{error2}</p>) : ''}
+                    {error ? (
+                        <p style={{ color: 'red' }}>{error}</p>
+                    )
+                    : bookmarks.map((bookmark, index) => (
                     <div key={bookmark.id} className="bookmark-item">
                         <div className="bookmark-item-body">
                             <div className="bookmark-item-icon">
                                 <FontAwesomeIcon icon={faBookmark} />
                             </div>
                             <div className="bookmark-item-name">
-                                {bookmark.name}
+                                {bookmark.properties.name}
                             </div>
                         </div>
-                        <div className="bookmark-item-action" onClick={() => removeBookmark(index)}>
+                        <div className="bookmark-item-action" onClick={() => removeBookmark(bookmark)}>
                             <FontAwesomeIcon icon={faTimes} />
                         </div>
                     </div>

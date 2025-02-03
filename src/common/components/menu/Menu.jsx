@@ -5,11 +5,6 @@ import Bookmark from './../bookmark'
 import './Menu.css';
 
 const Menu = ({ isOpen, onClose }) => {
-    const [isBookmarkOpen, setIsBookmarkOpen] = useState(false);
-
-    const handleCloseBookmark = () => {
-        setIsBookmarkOpen(false);
-    };
 
     return (<>
             <div className={`menu ${isOpen ? 'open' : ''}`}>
@@ -27,7 +22,7 @@ const Menu = ({ isOpen, onClose }) => {
                     <li><a href="#about"><FontAwesomeIcon icon={faInfoCircle} className="icon" /> About</a></li>
                 </ul>
             </div>
-            <Bookmark isOpen={isBookmarkOpen} onClose={handleCloseBookmark} />
+            <Bookmark />
         </>
     );
 };

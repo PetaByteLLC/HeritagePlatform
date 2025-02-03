@@ -1,29 +1,36 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faHome, faUser, faBookmark, faCog, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faBookmark, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 import Bookmark from './../bookmark'
 import './Menu.css';
 
 const Menu = ({ isOpen, onClose }) => {
 
     return (<>
-            <div className={`menu ${isOpen ? 'open' : ''}`}>
-                <div className="menu-header">
-                    <h2 className="menu-title">Menu</h2>
-                    <button className="close-button" onClick={onClose}>
-                        <FontAwesomeIcon icon={faTimes} />
-                    </button>
-                </div>
-                <ul>
-                    <li><a href="#home"><FontAwesomeIcon icon={faHome} className="icon" /> Home</a></li>
-                    <li><a href="#profile"><FontAwesomeIcon icon={faUser} className="icon" /> Profile</a></li>
-                    <li><a href="#bookmark" type="button" data-bs-toggle="offcanvas" data-bs-target="#bookmarkMenu" aria-controls="bookmarkMenu"><FontAwesomeIcon icon={faBookmark} className="icon" /> Bookmarks</a></li>
-                    <li><a href="#settings"><FontAwesomeIcon icon={faCog} className="icon" /> Settings</a></li>
-                    <li><a href="#about"><FontAwesomeIcon icon={faInfoCircle} className="icon" /> About</a></li>
-                </ul>
+        <div className={`menu ${isOpen ? 'open' : ''}`}>
+            <div className="menu-header">
+                <h2 className="menu-title">Menu</h2>
+                <button className="close-button" onClick={onClose}>
+                    <FontAwesomeIcon icon={faTimes} />
+                </button>
             </div>
-            <Bookmark />
-        </>
+            <ul className='d-flex flex-column'>
+                <li>
+                    <p data-bs-toggle="offcanvas" data-bs-target="#layersMenu" aria-controls="layersMenu" className='d-flex align-items-center gap-2 p-0 m-0'>
+                        <FontAwesomeIcon icon={faLayerGroup} className="icon" fixedWidth/>
+                        Layers
+                    </p>
+                </li>
+                <li>
+                    <p data-bs-toggle="offcanvas" data-bs-target="#bookmarkMenu" aria-controls="bookmarkMenu" className='d-flex align-items-center gap-2 p-0 m-0'>
+                        <FontAwesomeIcon icon={faBookmark} className="icon" fixedWidth/>
+                        Bookmarks
+                    </p>
+                </li>
+            </ul>
+        </div>
+        <Bookmark />
+    </>
     );
 };
 

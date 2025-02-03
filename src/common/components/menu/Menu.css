@@ -59,17 +59,6 @@
     align-items: center;
 }
 
-.menu li a {
-    color: white;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-    font-weight: 500;
-    transition: color 0.3s ease;
-    gap: 10px;
-}
-
 .menu li:hover {
     background-color: #3c3f41;
 }

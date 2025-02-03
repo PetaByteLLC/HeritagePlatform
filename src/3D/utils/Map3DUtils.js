@@ -29,11 +29,11 @@ const _createPOIFromGeoJSON = (map, geojson, layer) => {
 
             var coords = feature.geometry.coordinates;
 
-            var poi = map.createPoint("POI");
+            var poi = map.createPoint(feature.id);
             poi.setPosition(new map.JSVector3D(coords[0], coords[1], map.getMap().getTerrHeight(coords[0], coords[1])));
             poi.setImage(ctx.getImageData(0, 0, 30, 30).data, 30, 30);
-
             poi.setText(feature.properties.title);
+            poi.setDescription(JSON.stringify(feature.properties));
 
             layer.addObject(poi, 0);
         };
@@ -77,6 +77,14 @@ export const getBboxFromGeojson = (geojson) => {
     const bbox = boundingExtent(extents);
 
     return bbox;
+}
+
+export const setSelectedPOIOnMap = (map, id, setSelectedPOI) => {
+    const layerList = new map.JSLayerList(true);
+    const poiLayer = layerList.nameAtLayer(POI_LAYER_NAME);
+    const object = poiLayer.keyAtObject(id);
+    const properties = JSON.parse(object.getDescription())
+    setSelectedPOI(properties);
 }
 
 const _extendBBox = (bbox, meters) => {

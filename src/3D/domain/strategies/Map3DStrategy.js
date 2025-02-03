@@ -22,7 +22,7 @@ export class Map3DStrategy extends MapStrategy {
 		let coordinate = null;
 		switch (icon) {
 			case 'circle':
-				this.initRadiusEvent(this.map3D.canvas, setCurrentSpatial);
+				this.initRadiusEvent(setCurrentSpatial);
 				return;
 			case 'polygon':
 				this.initAreaEvent(setCurrentSpatial);
@@ -46,13 +46,14 @@ export class Map3DStrategy extends MapStrategy {
 		}
 		setSelectedIcon(icon);
 		if (icon === 'location') {
+			this.clearMeasurements();
 			setCurrentSpatial({bbox: this.getBbox()});
 			return;
 		}
 		this.addInteraction(icon, setCurrentSpatial);
 	}
 
-	initRadiusEvent(canvas, setCurrentSpatial) {
+	initRadiusEvent(setCurrentSpatial) {
 		this.setMouseState('circle');
 
 		let layerList = new this.map3D.JSLayerList(true);
@@ -74,7 +75,7 @@ export class Map3DStrategy extends MapStrategy {
 			}
 		};
 
-		canvas.addEventListener("Fire_EventAddRadius", this.radiusListener);
+		this.map3D.canvas.addEventListener("Fire_EventAddRadius", this.radiusListener);
 	}
 
 	initAreaEvent(setCurrentSpatial) {

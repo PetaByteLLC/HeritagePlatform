@@ -27,7 +27,9 @@ export class Map3DStrategy extends MapStrategy {
 				});
 				break;
 			case 'square':
-				this.initRectangleEvent();
+				this.initRectangleEvent().then((coords) => {
+					setCurrentSpatial(coords);
+				});
 				break;
 			default:
 				coordinate = this.getBbox();
@@ -184,10 +186,9 @@ export class Map3DStrategy extends MapStrategy {
 
 	getPolygonStyle() {
 		const polyStyle = new this.map3D.JSPolygonStyle();
-		polyStyle.setFill(true);
-		polyStyle.setFillColor(new this.map3D.JSColor(100, 0, 0, 255)); // Полупрозрачный красный
+		polyStyle.setFill(false);
 		polyStyle.setOutLine(true);
-		polyStyle.setOutLineColor(new this.map3D.JSColor(255, 255, 255, 0)); // Белый контур без прозрачности
+		polyStyle.setOutLineColor(new this.map3D.JSColor(255, 255, 255, 0));
 
 		return polyStyle;
 	}
@@ -204,11 +205,40 @@ export class Map3DStrategy extends MapStrategy {
 	}
 
 	initRectangleEvent() {
-		this.setMouseState('square');
-		function addPoint(e) {
-			console.log("coordinates: ", e.dLon, e.dLat, e.dAlt);
-		}
-		this.map3D.getOption().callBackAddPoint(addPoint);
+		return new Promise((resolve, reject) => {
+			if (this.map3D.XDGetMouseState() === this.map3D.MML_INPUT_RECT) return;
+
+			this.setMouseState('square');
+			this.clickHandlerRef = (event) => this.clickHandler(event, resolve);
+
+			document.body.addEventListener('click', this.clickHandlerRef);
+		});
+	}
+
+	clickHandler(event, resolve) {
+		if (event.target.tagName !== 'CANVAS') return;
+		const coordinates = this.getSquareCoordinates();
+
+		console.log('GeoJson', coordinates);
+		resolve(coordinates);
+	}
+
+	getSquareCoordinates() {
+		var a = this.map3D.getMap().getInputPointList().item(1);
+		var b = this.map3D.getMap().getInputPointList().item(2);
+		var c = this.map3D.getMap().getInputPointList().item(3);
+		var d = this.map3D.getMap().getInputPointList().item(4);
+
+		let inputPoints = [a, b, c, d];
+
+		let coordinates = inputPoints.map(point => ({
+			longitude: point.Longitude,
+			latitude: point.Latitude
+		}));
+
+		console.log('coordinates', coordinates);
+
+		return this.convertToFeature(coordinates);
 	}
 
 	setMouseState(state) {
@@ -216,6 +246,7 @@ export class Map3DStrategy extends MapStrategy {
 			square: this.map3D.MML_INPUT_RECT,
 			polygon: this.map3D.MML_ANALYS_DISTANCE,
             circle: this.map3D.MML_ANALYS_AREA_CIRCLE,
+			default: this.map3D.MML_MOVE_GRAB,
         };
 
         const mouseState = mouseStates[state];

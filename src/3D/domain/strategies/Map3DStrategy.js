@@ -204,7 +204,7 @@ export class Map3DStrategy extends MapStrategy {
 	}
 
 	initRectangleEvent() {
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve) => {
 			if (this.map3D.XDGetMouseState() === this.map3D.MML_INPUT_RECT) return;
 
 			this.setMouseState('square');
@@ -217,7 +217,15 @@ export class Map3DStrategy extends MapStrategy {
 	clickHandler(event, resolve) {
 		if (event.target.tagName !== 'CANVAS') return;
 		const coordinates = this.getSquareCoordinates();
+		this.removeClickHandler();
 		resolve(coordinates);
+	}
+
+	removeClickHandler() {
+		if (this.clickHandlerRef) {
+			document.body.removeEventListener('click', this.clickHandlerRef);
+			this.clickHandlerRef = null;
+		}
 	}
 
 	getSquareCoordinates() {
@@ -253,7 +261,7 @@ export class Map3DStrategy extends MapStrategy {
 	}
 
 	getBbox() {
-		const camera = this.map3D.getViewCamera()
+		const camera = this.map3D.getViewCamera();
 		var center = camera.getLocation();
 		var viewHeight = center.altitude;
 		var zeroHeight = this.map3D.getMap().getTerrHeight(center.longitude, center.latitude);
@@ -311,20 +319,25 @@ export class Map3DStrategy extends MapStrategy {
 		this.map3D.XDClearDistanceMeasurement();
 		this.map3D.XDClearAreaMeasurement();
 		this.map3D.XDClearCircleMeasurement();
+		this.removeClickHandler();
     }
 
 	handleZoomIn() {
-		this.map3D.getViewCamera().ZoomIn();
-		this.map3D.getViewCamera().ZoomIn();
-		this.map3D.getViewCamera().ZoomIn();
-		this.map3D.getViewCamera().ZoomIn();
+		this.zoom(4);
 	}
 
 	handleZoomOut() {
-		this.map3D.getViewCamera().ZoomOut();
-		this.map3D.getViewCamera().ZoomOut();
-		this.map3D.getViewCamera().ZoomOut();
-		this.map3D.getViewCamera().ZoomOut();
+		this.zoom(-4);
+	}
+
+	zoom(steps) {
+		for (let i = 0; i < Math.abs(steps); i++) {
+			if (steps > 0) {
+				this.map3D.getViewCamera().ZoomIn();
+			} else {
+				this.map3D.getViewCamera().ZoomOut();
+			}
+		}
 	}
 
 	handleCurrentLocation() {

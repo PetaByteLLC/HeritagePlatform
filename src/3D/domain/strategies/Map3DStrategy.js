@@ -81,14 +81,24 @@ export class Map3DStrategy extends MapStrategy {
 	initAreaEvent(setCurrentSpatial) {
 		this.setMouseState('polygon');
 		this.createMeasureLayer();
-		this.map3D.getOption().callBackAddPoint((e) => {
-			this.clearPreviousShapes();
-			this.addPoint(e);
-		});
+
+		this.handlePolygonClick = (event) => {
+			const mapPoint = this.map3D.getMap().ScreenToMapPointEX(
+				new this.map3D.JSVector2D(event.clientX, event.clientY)
+			);
+
+			if (mapPoint) {
+				this.addPolygonPoint(mapPoint);
+			}
+		};
+
+		document.body.addEventListener('click', this.handlePolygonClick);
 
 		this.map3D.getOption().callBackCompletePoint(() => {
+			this.clearPreviousShapes();
 			const polygonCoords = this.endPoint();
 			setCurrentSpatial(polygonCoords);
+			this.removePolygonClickEvent();
 		});
 	}
 
@@ -116,8 +126,12 @@ export class Map3DStrategy extends MapStrategy {
 		}
 	}
 
-	addPoint(e) {
-		this.createPOI(new this.map3D.JSVector3D(e?.dLon, e?.dLat, e?.dAlt));
+	addPolygonPoint(mapPoint) {
+		this.createPOI(new this.map3D.JSVector3D(mapPoint.Longitude, mapPoint.Latitude, mapPoint.Altitude));
+	}
+
+	removePolygonClickEvent() {
+		document.body.removeEventListener('click', this.handlePolygonClick);
 	}
 
 	endPoint() {

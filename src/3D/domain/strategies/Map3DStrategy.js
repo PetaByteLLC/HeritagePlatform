@@ -1,7 +1,6 @@
 import { MapStrategy } from '../../../common/domain/strategies/MapStrategy';
 import { addGeoJSONToMap, removeLayerFromMap, moveToSingleFeature } from '../../utils/Map3DUtils';
 import { POI_LAYER_NAME } from '../../../common/constants/GeoserverConfig';
-import {MapStrategy} from '../../../common/domain/strategies/MapStrategy';
 import Feature from "ol/Feature";
 import Polygon from "ol/geom/Polygon";
 
@@ -14,14 +13,10 @@ export class Map3DStrategy extends MapStrategy {
 	}
 
 	addInteraction(icon, setCurrentSpatial) {
-		console.log('draw');
 		this.clearMeasurements();
 		this.clearPreviousShapes();
 		this.removeRectangleEvent();
-		if (this.map3D.canvas) {
-			this.map3D.canvas.removeEventListener("Fire_EventAddRadius", this.radiusListener);
-			this.radiusListener = null;
-		}
+		this.removeRadiusEvent();
 		let coordinate = null;
 		switch (icon) {
 			case 'circle':
@@ -79,6 +74,10 @@ export class Map3DStrategy extends MapStrategy {
 		};
 
 		this.map3D.canvas.addEventListener("Fire_EventAddRadius", this.radiusListener);
+	}
+
+	removeRadiusEvent() {
+		this.map3D.canvas.removeEventListener("Fire_EventAddRadius", this.radiusListener);
 	}
 
 	initAreaEvent(setCurrentSpatial) {
@@ -187,7 +186,6 @@ export class Map3DStrategy extends MapStrategy {
 		}
 
 		polygon.setPartCoordinates(vertex, part);
-
 		polygon.setStyle(this.getPolygonStyle());
 
 		layer.addObject(polygon, 0);
@@ -239,6 +237,7 @@ export class Map3DStrategy extends MapStrategy {
 		var map = this.map3D.getMap();
 		var inputPoints = map.getInputPoints();
 		if (inputPoints.count() < 4) return;
+
 		var a = map.getInputPointList().item(1);
 		var b = map.getInputPointList().item(2);
 		var c = map.getInputPointList().item(3);
@@ -355,10 +354,6 @@ export class Map3DStrategy extends MapStrategy {
 			const { latitude, longitude } = position.coords;
 			this.map3D.getViewCamera().moveOval(new this.map3D.JSVector3D(longitude, latitude, 500.0), 90, 0, 0.1);
 		});
-	}
-
-	getBbox() {
-		console.log('Not implemented yet');
 	}
 
 	addGeoJSONToMap(geojson) {

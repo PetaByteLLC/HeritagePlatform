@@ -65,6 +65,7 @@ export const addGeoJSONToMap = (map, geojson) => {
         source: clusterSource,
         style: styleFunction,
         name: POI_LAYER_NAME,
+        zIndex: 2,
     });
 
     map.addLayer(vectorLayer);
@@ -117,12 +118,4 @@ export const setSelectedPOIOnMap = (features, setSelectedPOI) => {
     const geojsonFormat = new GeoJSON();
     const geojson = geojsonFormat.writeFeatureObject(feature);
     setSelectedPOI(geojson.properties);
-}
-
-export const removeLayerByName = (map, name) => {
-    map.getLayers().forEach(layer => {
-        if (layer && layer.get('name') && layer.get('name') === name) {
-            map.removeLayer(layer)
-        }
-    });
 }

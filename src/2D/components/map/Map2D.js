@@ -6,7 +6,7 @@ import { MapContext } from '../../../MapContext';
 import { transform } from 'ol/proj';
 import layers2D from '../../../common/constants/Tiles2D';
 import { POI_LAYER_NAME, TILE_LAYER_NAME } from '../../../common/constants/GeoserverConfig';
-import { moveToFeature, setSelectedPOIOnMap, removeLayerByName } from '../../utils/Map2DUtils';
+import { moveToFeature, setSelectedPOIOnMap, removeLayerFromMap } from '../../utils/Map2DUtils';
 
 const Map2D = () => {
 	const { currentLocation, setCurrentLocation, mode, map2DType, setMap2D, setSelectedPOI } = useContext(MapContext);
@@ -84,7 +84,7 @@ const Map2D = () => {
 			const center = view.getCenter();
 			const zoom = view.getZoom();
 
-			removeLayerByName(mapInstance.current, TILE_LAYER_NAME);
+			removeLayerFromMap(mapInstance.current, TILE_LAYER_NAME);
 			const tileLayer = layers2D[map2DType] || layers2D.OSM;
 			tileLayer.set('name', TILE_LAYER_NAME);
 			

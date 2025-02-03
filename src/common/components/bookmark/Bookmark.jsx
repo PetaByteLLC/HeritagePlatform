@@ -22,28 +22,15 @@ const geoServerConfig = {
 
 const Bookmark = ({ isOpen, onClose }) => {
 
-    const [bookmarks, setBookmarks] = useState([
-        {
-            id: 1,
-            name: "Bookmark name 1"
-        },
-        {
-            id: 2,
-            name: "Bookmark name 2"
-        },
-        {
-            id: 3,
-            name: "Bookmark name 3"
-        },
-        {
-            id: 4,
-            name: "Bookmark name 4"
-        },
-        {
-            id: 5,
-            name: "Bookmark name 5"
-        }
-    ]);
+    let initBookmarks = [];
+    for (var i = 1; i <= 100; i++) {
+       initBookmarks.push({
+           id: i,
+           name: "Bookmark name " + i
+       });
+    }
+
+    const [bookmarks, setBookmarks] = useState(initBookmarks);
 
     // Удаление закладки
     const removeBookmark = (index) => {

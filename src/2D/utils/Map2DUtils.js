@@ -65,7 +65,7 @@ export const addGeoJSONToMap = (map, geojson) => {
         source: clusterSource,
         style: styleFunction,
         name: POI_LAYER_NAME,
-        zIndex: 2,
+        zIndex: 101,
     });
 
     map.addLayer(vectorLayer);

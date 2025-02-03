@@ -19,7 +19,7 @@ export class Map2DStrategy extends MapStrategy {
 		const vectorSource = new VectorSource();
 		const vectorLayer = new VectorLayer({
 			source: vectorSource,
-			zIndex: 1,
+			zIndex: 100,
 		});
 		this.map2D.addLayer(vectorLayer);
 		return { vectorSource, vectorLayer };

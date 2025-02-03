@@ -67,7 +67,6 @@ const SearchField = () => {
 
     const handleResultClick = (feature) => {
         strategy.moveToSingleFeature(feature);
-        console.log(feature.properties);
         setSelectedPOI(feature.properties);
     };
 

@@ -18,4 +18,20 @@ export class MapStrategy {
 	handleCurrentLocation() {
 		throw new Error('Method not implemented');
 	}
+
+	getBbox() {
+		throw new Error('Method not implemented');
+	}
+
+	addGeoJSONToMap(geojson) {
+		throw new Error('Method not implemented');
+	}
+
+	removePOILayer() {
+		throw new Error('Method not implemented');
+	}
+	
+	moveToSingleFeature(feature) {
+		throw new Error('Method not implemented');
+	}
 }

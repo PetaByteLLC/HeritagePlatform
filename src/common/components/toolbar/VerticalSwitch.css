@@ -1,82 +1,84 @@
-/* filepath: /Users/blaque/Documents/Coding/EGIS/heritage/src/common/components/vertical-switch/VerticalSwitch.css */
 .vertical-switch {
-  position: relative;
-  width: 100%;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #282c34;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
+	position: relative;
+	width: 100%;
+	height: 60px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #282c34;
+	border-radius: 5px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+	cursor: pointer;
 }
 
 .vertical-switch-checkbox {
-  display: none;
+	display: none;
 }
 
-.vertical-switch-label {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
+vertical-switch-label {
+	position: relative;
+	display: block;
+	padding: 3px;
+	width: 100%;
+	height: 100%;
+	cursor: pointer;
 }
 
 .vertical-switch-inner {
-  position: absolute;
-  top: 3.3px;
-  left: 3.3px;
-  width: 80%;
-  height: 40%;
-  background-color: #ffffff;
-  border-radius: 5px;
-  transition: all 0.3s;
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	width: 32px;
+	height: 40%;
+	background-color: #ffffff;
+	border-radius: 5px;
+	transition: all 0.3s;
 }
 
-.vertical-switch-checkbox:checked + .vertical-switch-label .vertical-switch-inner {
-  top: 54%;
-  background-color: #f0f0f0;
+
+.vertical-switch-checkbox:checked+.vertical-switch-label .vertical-switch-inner {
+	top: 54%;
+	background-color: #f0f0f0;
 }
 
 .vertical-switch-text {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: max-content;
-  text-align: center;
-  font-size: 10px;
-  font-weight: bold;
-  color: white;
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	width: max-content;
+	text-align: center;
+	font-size: 10px;
+	font-weight: bold;
+	color: white;
+	cursor: pointer;
 }
 
 .top-text {
-  top: 8px;
+	top: 8px;
 }
 
 .bottom-text {
-  bottom: 8px;
+	bottom: 8px;
 }
 
-.vertical-switch-checkbox:checked + .vertical-switch-label .top-text {
-  color: white;
+.vertical-switch-checkbox:checked+.vertical-switch-label .top-text {
+	color: white;
 }
 
-.vertical-switch-checkbox:checked + .vertical-switch-label .bottom-text {
-  color: #333;
+.vertical-switch-checkbox:checked+.vertical-switch-label .bottom-text {
+	color: #333;
 }
 
-.vertical-switch-checkbox:not(:checked) + .vertical-switch-label .top-text {
-  color: #333;
-  transition: all 0.3s;
+.vertical-switch-checkbox:not(:checked)+.vertical-switch-label .top-text {
+	color: #333;
+	transition: all 0.3s;
 }
 
-.vertical-switch-checkbox:not(:checked) + .vertical-switch-label .bottom-text {
-  color: white;
-  transition: all 0.3s;
+.vertical-switch-checkbox:not(:checked)+.vertical-switch-label .bottom-text {
+	color: white;
+	transition: all 0.3s;
 }
 
 .vertical-switch-switch {
-  display: none;
+	display: none;
 }

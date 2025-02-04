@@ -2,7 +2,7 @@ import React, { useEffect, useContext, useRef } from 'react';
 import { MapContext } from '../../../MapContext';
 import layers3D from '../../../common/constants/Tiles3D';
 import { POI_LAYER_NAME } from '../../../common/constants/GeoserverConfig';
-import { setSelectedPOIOnMap, moveToSingleFeature } from '../../utils/Map3DUtils';
+import { setSelectedPOIOnMap, moveToSingleFeature, updateWmsLayers } from '../../utils/Map3DUtils';
 
 function getHeightFromZoom(zoomLevel) {
 	const EARTH_HALF_CIRCUMFERENCE = 20037508.5;
@@ -10,7 +10,7 @@ function getHeightFromZoom(zoomLevel) {
 }
 
 const Map3D = () => {
-	const { is3DMapInitialized, setIs3DMapInitialized, currentLocation, setCurrentLocation, mode, map3DType, setMap3D, setSelectedPOI } = useContext(MapContext);
+	const { is3DMapInitialized, setIs3DMapInitialized, currentLocation, setCurrentLocation, mode, map3DType, setMap3D, setSelectedPOI, wmsLayers } = useContext(MapContext);
 	const mapContainerRef = useRef(null);
 
 	useEffect(() => {
@@ -60,6 +60,8 @@ const Map3D = () => {
 					const zoomLevel = Module.getViewCamera().getMapZoomLevel();
 					setCurrentLocation({ longitude: location.longitude, latitude: location.latitude, zoomLevel3D: zoomLevel, zoomLevel2D: zoomLevel + 3 });
 				});
+
+				updateWmsLayers(window.Module, wmsLayers);
 			},
 		};
 
@@ -81,7 +83,7 @@ const Map3D = () => {
 			const pick = poiLayer.pick(e.offsetX, e.offsetY);
 			if (!pick) return;
 			const id = pick.objectKey;
-			moveToSingleFeature(window.Module, { geometry: { coordinates: [ pick.position.longitude, pick.position.latitude ] } });
+			moveToSingleFeature(window.Module, { geometry: { coordinates: [pick.position.longitude, pick.position.latitude] } });
 			setSelectedPOIOnMap(window.Module, id, setSelectedPOI);
 		}
 
@@ -116,6 +118,10 @@ const Map3D = () => {
 			initializeMap(Module, map3DType);
 		}
 	}, [map3DType]);
+
+	useEffect(() => {
+		updateWmsLayers(window.Module, wmsLayers);
+	}, [wmsLayers]);
 
 	const clearMap = () => {
 		const Module = window.Module;

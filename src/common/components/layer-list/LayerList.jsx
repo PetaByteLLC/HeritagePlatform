@@ -1,23 +1,16 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { MapContext } from '../../../MapContext';
 import './LayerList.css';
 
-const initialLayers = [
-    { id: 1, name: 'Roads', visible: true },
-    { id: 2, name: 'Buildings', visible: false },
-    { id: 3, name: 'Water Bodies', visible: true },
-    { id: 4, name: 'Parks', visible: false }
-];
-
 const LayerList = () => {
-    const [layers, setLayers] = useState(initialLayers);
+    const { wmsLayers, setWmsLayers } = useContext(MapContext);
 
-    const toggleVisibility = (id) => {
-        var newLayers = layers.map(layer =>
-            layer.id === id ? { ...layer, visible: !layer.visible } : layer
+    const toggleVisibility = (name) => {
+        var newLayers = wmsLayers.map(layer =>
+            layer.layerName === name ? { ...layer, visible: !layer.visible } : layer
         );
-        console.log(newLayers);
-        setLayers(newLayers);
+        setWmsLayers(newLayers);
     };
 
     return (
@@ -29,17 +22,17 @@ const LayerList = () => {
             </div>
             <div className="offcanvas-body p-3">
                 <ul className="list-group">
-                    {layers.map((layer) => (
-                        <li key={layer.id} className="list-group-item d-flex justify-content-between align-items-center">
-                            <span className="fw-medium">{layer.name}</span>
+                    {wmsLayers.map((layer) => (
+                        <li key={layer.layerName} className="list-group-item d-flex justify-content-between align-items-center">
+                            <span className="fw-medium">{layer.title}</span>
                             <div className="form-check form-switch">
                                 <input
                                     className="form-check-input"
                                     type="checkbox"
                                     role="switch"
-                                    id={`layerSwitch-${layer.id}`}
+                                    id={`layerSwitch-${layer.layerName}`}
                                     checked={layer.visible}
-                                    onChange={() => toggleVisibility(layer.id)}
+                                    onChange={() => toggleVisibility(layer.layerName)}
                                 />
                             </div>
                         </li>

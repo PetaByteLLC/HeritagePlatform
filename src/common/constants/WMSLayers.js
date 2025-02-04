@@ -1,6 +1,5 @@
 export const WMSLayers = [
-    { id: 1, name: 'Roads', visible: true },
-    { id: 2, name: 'Buildings', visible: false },
-    { id: 3, name: 'Water Bodies', visible: true },
-    { id: 4, name: 'Parks', visible: false }
+    { title: 'Districts', workspace: 'Heritage', layerName: 'heritage_district_layer', tiled: true, visible: false},
+    { title: 'Villages', workspace: 'Heritage', layerName: 'heritage_village_layer', tiled: true, visible: false},
+    { title: 'Heritage protection', workspace: 'Heritage', layerName: 'heritage_protection_layer', tiled: true, visible: false},
 ];

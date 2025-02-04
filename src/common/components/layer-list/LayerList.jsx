@@ -28,7 +28,8 @@ const LayerList = () => {
                 <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div className="offcanvas-body p-3">
-                <ul className="list-group">
+                <p className='ps-1 mb-2'>WMS layers</p>
+                <ul className="list-group mb-4">
                     {wmsLayers.map((layer) => (
                         <li key={layer.layerName} className="list-group-item d-flex justify-content-between align-items-center">
                             <span className="fw-medium">{layer.title}</span>
@@ -45,6 +46,7 @@ const LayerList = () => {
                         </li>
                     ))}
                 </ul>
+                <p className='ps-1 mb-2'>WFS layers</p>
                 <ul className="list-group">
                     {wfsLayers.map((layer) => (
                         <li key={layer.layerName} className="list-group-item d-flex justify-content-between align-items-center">

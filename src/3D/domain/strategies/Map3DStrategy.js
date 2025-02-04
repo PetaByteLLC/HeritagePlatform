@@ -1,4 +1,6 @@
 import { MapStrategy } from '../../../common/domain/strategies/MapStrategy';
+import { addGeoJSONToMap, removeLayerFromMap, moveToSingleFeature } from '../../utils/Map3DUtils';
+import { POI_LAYER_NAME } from '../../../common/constants/GeoserverConfig';
 
 export class Map3DStrategy extends MapStrategy {
 	constructor(map3D) {
@@ -41,15 +43,15 @@ export class Map3DStrategy extends MapStrategy {
 	}
 
 	addGeoJSONToMap(geojson) {
-		console.log('Not implemented yet');
+		addGeoJSONToMap(this.map3D, geojson);
 	}
 
 	removePOILayer() {
-		console.log('Not implemented yet');
+		removeLayerFromMap(this.map3D, POI_LAYER_NAME);
 	}
 
 	moveToSingleFeature(feature) {
-		console.log('Not implemented yet');
+		moveToSingleFeature(this.map3D, feature);
 	}
 
 	createBookmark(name, color = "#c8ff00"): object {

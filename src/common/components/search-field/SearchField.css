@@ -56,9 +56,10 @@
 }
 
 .no-data-container p {
-    font-size: 14px;
-    padding-left: 10px;
-    color: white;
+    font-size: 14px!important;
+    padding-left: 10px!important;
+    color: white!important;
+    margin: 10px 10px;
 }
 
 .result-list {

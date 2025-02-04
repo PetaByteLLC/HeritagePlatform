@@ -4,7 +4,7 @@ import VectorLayer from 'ol/layer/Vector';
 import Cluster from 'ol/source/Cluster';
 import { getCenter, extend, createEmpty } from 'ol/extent';
 import { Style, Icon, Circle as CircleStyle, Text, Fill, Stroke } from 'ol/style';
-import { DEFAULT_SRS, POI_LAYER_NAME } from '../../common/constants/GeoserverConfig';
+import { DEFAULT_SRS, POI_LAYER_NAME, TILE_LAYER_NAME } from '../../common/constants/GeoserverConfig';
 import { fromLonLat } from 'ol/proj';
 
 export const addGeoJSONToMap = (map, geojson) => {
@@ -65,6 +65,7 @@ export const addGeoJSONToMap = (map, geojson) => {
         source: clusterSource,
         style: styleFunction,
         name: POI_LAYER_NAME,
+        zIndex: 101,
     });
 
     map.addLayer(vectorLayer);

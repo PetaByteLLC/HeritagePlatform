@@ -9,6 +9,8 @@ import { get2DBbox } from '../../../common/domain/utils/2DBbox';
 import { DEFAULT_SRS, POI_LAYER_NAME } from '../../../common/constants/GeoserverConfig';
 import { addGeoJSONToMap, removeLayerFromMap, moveToSingleFeature } from '../../utils/Map2DUtils';
 import Overlay from 'ol/Overlay';
+import Feature from "ol/Feature";
+import { LineString, Point } from "ol/geom";
 
 export class Map2DStrategy extends MapStrategy {
 	constructor(map2D) {
@@ -131,166 +133,95 @@ export class Map2DStrategy extends MapStrategy {
 		}
 	}
 
-	handleMeasureArea() {
-		this.map2D.getLayers().forEach(layer => {
-			if (layer instanceof VectorLayer) {
-				layer.getSource().clear();
-			}
-		});
-		this.map2D.getInteractions().forEach(interaction => {
-			if (interaction instanceof Draw) {
-				this.map2D.removeInteraction(interaction);
-			}
-		});
-		this.map2D.getOverlays().clear(); // Clear overlays when switching tools
-		const vectorSource = new VectorSource();
-		const vectorLayer = new VectorLayer({
-			source: vectorSource,
-			zIndex: 100,
-		});
-		this.map2D.addLayer(vectorLayer);
+    clearPreviousMeasurements() {
+        this.map2D.getLayers().forEach(layer => {
+            if (layer instanceof VectorLayer) layer.getSource().clear();
+        });
+        this.map2D.getOverlays().clear();
+        document.querySelectorAll('.measurement-popup').forEach(popup => popup.remove());
+    }
 
-		const draw = new Draw({
-			source: vectorSource,
-			type: 'Polygon',
-		});
+    removeExistingDrawInteractions() {
+        this.map2D.getInteractions().forEach(interaction => {
+            if (interaction instanceof Draw) this.map2D.removeInteraction(interaction);
+        });
+    }
 
-		draw.on('drawstart', () => {
-			vectorSource.clear();
-			this.map2D.getOverlays().clear(); // Clear overlays on redraw
-		});
+    displayMeasurement(coordinates, value, unit) {
+        const popup = document.createElement('div');
+        popup.className = 'measurement-popup';
+        popup.style.color = 'red';
+        popup.innerHTML = `<strong>${value.toFixed(2)} ${unit}</strong>`;
+        document.body.appendChild(popup);
 
-		draw.on('drawend', (event) => {
-			const feature = event.feature;
-			const geometry = feature.getGeometry();
-			const area = geometry.getArea();
-			console.log('Measured Area:', area);
+        const overlay = new Overlay({ position: coordinates, element: popup, offset: [0, -15], positioning: 'center-center' });
+        this.map2D.addOverlay(overlay);
+    }
 
-			// Display the measured area on the screen
-			const coordinates = geometry.getInteriorPoint().getCoordinates();
-			const overlay = new Overlay({
-				position: coordinates,
-				element: document.createElement('div'),
-				offset: [0, -15],
-				positioning: 'center-center'
-			});
-			overlay.getElement().innerHTML = `
-				<div style="background: rgba(255, 255, 255, 0.8); padding: 5px; border-radius: 4px; border: 1px solid black; font-size: 12px;">
-					${area.toFixed(2)} m²
-				</div>`;
-			this.map2D.addOverlay(overlay);
-		});
+    handleMeasureDistance() {
+        this.clearPreviousMeasurements();
+        this.removeExistingDrawInteractions();
+        const { vectorSource } = this.createVectorLayer();
 
-		this.map2D.addInteraction(draw);
-	}
+        const draw = new Draw({ source: vectorSource, type: 'LineString' });
+        draw.on('drawstart', () => {
+            vectorSource.clear();
+            this.map2D.getOverlays().clear();
+        });
+        draw.on('drawend', (event) => {
+            const length = event.feature.getGeometry().getLength();
+            this.displayMeasurement(event.feature.getGeometry().getLastCoordinate(), length, 'm');
+        });
 
-	handleMeasureDistance() {
-		this.map2D.getLayers().forEach(layer => {
-			if (layer instanceof VectorLayer) {
-				layer.getSource().clear();
-			}
-		});
-		this.map2D.getInteractions().forEach(interaction => {
-			if (interaction instanceof Draw) {
-				this.map2D.removeInteraction(interaction);
-			}
-		});
-		this.map2D.getOverlays().clear(); // Clear overlays when switching tools
-		const vectorSource = new VectorSource();
-		const vectorLayer = new VectorLayer({
-			source: vectorSource,
-			zIndex: 100,
-		});
-		this.map2D.addLayer(vectorLayer);
+        this.map2D.addInteraction(draw);
+    }
 
-		const draw = new Draw({
-			source: vectorSource,
-			type: 'LineString',
-		});
+    handleMeasureArea() {
+        this.clearPreviousMeasurements();
+        this.removeExistingDrawInteractions();
+        const { vectorSource } = this.createVectorLayer();
 
-		draw.on('drawstart', () => {
-			vectorSource.clear();
-			this.map2D.getOverlays().clear(); // Clear overlays on redraw
-		});
+        const draw = new Draw({ source: vectorSource, type: 'Polygon' });
+        draw.on('drawstart', () => {
+            vectorSource.clear();
+            this.map2D.getOverlays().clear();
+        });
+        draw.on('drawend', (event) => {
+            const area = event.feature.getGeometry().getArea();
+            this.displayMeasurement(event.feature.getGeometry().getInteriorPoint().getCoordinates(), area, 'm²');
+        });
 
-		draw.on('drawend', (event) => {
-			const feature = event.feature;
-			const geometry = feature.getGeometry();
-			const length = geometry.getLength();
-			console.log('Measured Distance:', length);
+        this.map2D.addInteraction(draw);
+    }
 
-			// Display the measured distance on the screen
-			const coordinates = geometry.getLastCoordinate();
-			const overlay = new Overlay({
-				position: coordinates,
-				element: document.createElement('div'),
-				offset: [0, -15],
-				positioning: 'center-center'
-			});
-			overlay.getElement().innerHTML = `
-				<div style="background: rgba(255, 255, 255, 0.8); padding: 5px; border-radius: 4px; border: 1px solid black; font-size: 12px;">
-					${length.toFixed(2)} m
-				</div>`;
-			this.map2D.addOverlay(overlay);
-		});
+    handleMeasureRadius() {
+        this.clearPreviousMeasurements();
+        this.removeExistingDrawInteractions();
+        const { vectorSource } = this.createVectorLayer();
 
-		this.map2D.addInteraction(draw);
-	}
+        const draw = new Draw({ source: vectorSource, type: 'Circle' });
+        draw.on('drawstart', () => {
+            vectorSource.clear();
+            this.map2D.getOverlays().clear();
+        });
+        draw.on('drawend', (event) => {
+            const feature = event.feature;
+            const geometry = feature.getGeometry();
+            const radius = geometry.getRadius();
+            const center = geometry.getCenter();
+            const radiusLine = new Feature(new LineString([center, [center[0] + radius, center[1]]]));
+            vectorSource.addFeature(radiusLine);
+            const centerPoint = new Feature(new Point(center));
+            vectorSource.addFeature(centerPoint);
+            const midPoint = [(center[0] + (center[0] + radius)) / 2, center[1]];
+            this.displayMeasurement(midPoint, radius, 'm');
+        });
 
-	handleMeasureRadius() {
-		this.map2D.getLayers().forEach(layer => {
-			if (layer instanceof VectorLayer) {
-				layer.getSource().clear();
-			}
-		});
-		this.map2D.getInteractions().forEach(interaction => {
-			if (interaction instanceof Draw) {
-				this.map2D.removeInteraction(interaction);
-			}
-		});
-		this.map2D.getOverlays().clear(); // Clear overlays when switching tools
-		const vectorSource = new VectorSource();
-		const vectorLayer = new VectorLayer({
-			source: vectorSource,
-			zIndex: 100,
-		});
-		this.map2D.addLayer(vectorLayer);
-
-		const draw = new Draw({
-			source: vectorSource,
-			type: 'Circle',
-		});
-
-		draw.on('drawstart', () => {
-			vectorSource.clear(); // Clear old figures on redraw
-			this.map2D.getOverlays().clear(); // Clear overlays on redraw
-		});
-
-		draw.on('drawend', (event) => {
-			const feature = event.feature;
-			const geometry = feature.getGeometry();
-			const radius = geometry.getRadius();
-			console.log('Measured Radius:', radius);
-
-			// Display the measured radius on the screen
-			const coordinates = geometry.getCenter();
-			const overlay = new Overlay({
-				position: coordinates,
-				element: document.createElement('div'),
-				offset: [0, -15],
-				positioning: 'center-center'
-			});
-			overlay.getElement().innerHTML = `
-				<div style="background: rgba(255, 255, 255, 0.8); padding: 5px; border-radius: 4px; border: 1px solid black; font-size: 12px;">
-					${radius.toFixed(2)} m
-				</div>`;
-			this.map2D.addOverlay(overlay);
-		});
-
-		this.map2D.addInteraction(draw);
-	}
+        this.map2D.addInteraction(draw);
+    }
 
     handleMeasureAltitude() {
-        console.log('Measure Altitude');
+        alert('Height measurement is not possible on a 2D map. Use a 3D map or external height services.');
+        console.log('Measuring height on a 2D map is not possible.');
     }
 }

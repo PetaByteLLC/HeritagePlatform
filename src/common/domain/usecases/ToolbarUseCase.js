@@ -27,9 +27,9 @@ export const useToolbarActions = () => {
         handleZoomIn: () => handleZoomInRef.current(),
         handleZoomOut: () => handleZoomOutRef.current(),
         handleCurrentLocation: () => handleCurrentLocationRef.current(),
-        handleMeasureAltitude: () => handleMeasureAltitudeRef.current(),
-        handleMeasureRadius: () => handleMeasureRadiusRef.current(),
-        handleMeasureDistance: () => handleMeasureDistanceRef.current(),
-        handleMeasureArea: () => handleMeasureAreaRef.current(),
+        handleMeasureAltitude: (selectedIcon) => handleMeasureAltitudeRef.current(selectedIcon),
+        handleMeasureRadius: (selectedIcon) => handleMeasureRadiusRef.current(selectedIcon),
+        handleMeasureDistance: (selectedIcon) => handleMeasureDistanceRef.current(selectedIcon),
+        handleMeasureArea: (selectedIcon) => handleMeasureAreaRef.current(selectedIcon),
     };
 };

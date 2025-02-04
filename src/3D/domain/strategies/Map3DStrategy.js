@@ -13,6 +13,7 @@ export class Map3DStrategy extends MapStrategy {
         this.endDistancePoint = this.endDistancePoint.bind(this);
         this.addAreaPoint = this.addAreaPoint.bind(this);
         this.endAreaPoint = this.endAreaPoint.bind(this);
+        this.activeButton = null;
 	}
 
 	addInteraction(icon, setCurrentSpatial) {
@@ -380,7 +381,14 @@ export class Map3DStrategy extends MapStrategy {
 		moveToSingleFeature(this.map3D, feature);
 	}
 
-    handleMeasureAltitude() {
+    handleMeasureAltitude(selectedIcon) {
+        if (selectedIcon !== 'measureAltitude') {
+            this.clearEvents();
+            this.clearPreviousShapes();
+            this.removeAltitudeEvent();
+            this.setMouseState('default');
+            return;
+        }
         this.clearEvents();
         this.setMouseState('altitude');
         this.altitudeSymbol = this.map3D.getSymbol();
@@ -520,7 +528,14 @@ export class Map3DStrategy extends MapStrategy {
         }
     }
 
-    handleMeasureRadius() {
+    handleMeasureRadius(selectedIcon) {
+        if (selectedIcon !== 'measureRadius') {
+            this.clearEvents();
+            this.clearPreviousShapes();
+            this.removeRadiusMeasureEvent();
+            this.setMouseState('default');
+            return;
+        }
         this.clearEvents();
         this.setMouseState('circle');
         this.radiusSymbol = this.map3D.getSymbol();
@@ -643,7 +658,14 @@ export class Map3DStrategy extends MapStrategy {
         this.radiusWallLayer.removeAll();
     }
 
-    handleMeasureArea() {
+    handleMeasureArea(selectedIcon) {
+        if (selectedIcon !== 'measureArea') {
+            this.clearEvents();
+            this.clearPreviousShapes();
+            this.removeAreaMeasureEvent();
+            this.setMouseState('default');
+            return;
+        }
         this.clearEvents();
         this.setMouseState('area');
         this.createAreaMeasureLayer();
@@ -774,7 +796,14 @@ export class Map3DStrategy extends MapStrategy {
         this.m_mercount = 0;
     }
 
-    handleMeasureDistance() {
+    handleMeasureDistance(selectedIcon) {
+        if (selectedIcon !== 'measureDistance') {
+            this.clearEvents();
+            this.clearPreviousShapes();
+            this.removeDistanceMeasureEvent();
+            this.setMouseState('default');
+            return;
+        }
         this.clearEvents();
         this.setMouseState('distance');
 
@@ -827,5 +856,16 @@ export class Map3DStrategy extends MapStrategy {
 
     removeDistanceMeasureEvent() {
         // document.body.removeEventListener('click', this.distanceMeasureListener);
+    }
+
+    setActiveButton(buttonName) {
+        this.activeButton = buttonName;
+        if (!buttonName) {
+            this.setMouseState('default');
+        }
+    }
+
+    getActiveButton() {
+        return this.activeButton;
     }
 }

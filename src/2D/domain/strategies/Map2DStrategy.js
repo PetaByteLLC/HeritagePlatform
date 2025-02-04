@@ -16,6 +16,18 @@ export class Map2DStrategy extends MapStrategy {
 	constructor(map2D) {
 		super();
 		this.map2D = map2D;
+		this.activeButton = null;
+	}
+
+	setActiveButton(buttonName) {
+		this.activeButton = buttonName;
+		if (!buttonName) {
+            this.map2D.getTargetElement().style.cursor = 'default';
+		}
+	}
+
+	getActiveButton() {
+		return this.activeButton;
 	}
 
 	createVectorLayer() {
@@ -162,7 +174,13 @@ export class Map2DStrategy extends MapStrategy {
         this.map2D.addOverlay(overlay);
     }
 
-    handleMeasureDistance() {
+    handleMeasureDistance(selectedIcon) {
+        if (selectedIcon !== 'measureDistance') {
+            this.removeExistingDrawInteractions();
+            this.clearPreviousMeasurements();
+            this.map2D.getTargetElement().style.cursor = 'default';
+            return;
+        }
         this.clearPreviousMeasurements();
         this.removeExistingDrawInteractions();
         const { vectorSource } = this.createVectorLayer();
@@ -180,7 +198,13 @@ export class Map2DStrategy extends MapStrategy {
         this.map2D.addInteraction(draw);
     }
 
-    handleMeasureArea() {
+    handleMeasureArea(selectedIcon) {
+        if (selectedIcon !== 'measureArea') {
+            this.removeExistingDrawInteractions();
+            this.clearPreviousMeasurements();
+            this.map2D.getTargetElement().style.cursor = 'default';
+            return;
+        }
         this.clearPreviousMeasurements();
         this.removeExistingDrawInteractions();
         const { vectorSource } = this.createVectorLayer();
@@ -198,7 +222,13 @@ export class Map2DStrategy extends MapStrategy {
         this.map2D.addInteraction(draw);
     }
 
-    handleMeasureRadius() {
+    handleMeasureRadius(selectedIcon) {
+        if (selectedIcon !== 'measureRadius') {
+            this.removeExistingDrawInteractions();
+            this.clearPreviousMeasurements();
+            this.map2D.getTargetElement().style.cursor = 'default';
+            return;
+        }
         this.clearPreviousMeasurements();
         this.removeExistingDrawInteractions();
         const { vectorSource } = this.createVectorLayer();
@@ -224,7 +254,9 @@ export class Map2DStrategy extends MapStrategy {
         this.map2D.addInteraction(draw);
     }
 
-    handleMeasureAltitude() {
+    handleMeasureAltitude(selectedIcon) {
+        this.clearPreviousMeasurements();
+        if (selectedIcon !== 'measureAltitude') return;
         alert('Height measurement is not possible on a 2D map. Use a 3D map or external height services.');
         console.log('Measuring height on a 2D map is not possible.');
     }

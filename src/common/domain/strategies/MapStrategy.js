@@ -35,19 +35,19 @@ export class MapStrategy {
 		throw new Error('Method not implemented');
 	}
 
-    handleMeasureArea() {
+    handleMeasureArea(activeButton, setActiveButton) {
         throw new Error('Method not implemented');
     }
 
-    handleMeasureDistance() {
+    handleMeasureDistance(activeButton, setActiveButton) {
         throw new Error('Method not implemented');
     }
 
-    handleMeasureAltitude() {
+    handleMeasureAltitude(activeButton, setActiveButton) {
         throw new Error('Method not implemented');
     }
 
-    handleMeasureRadius() {
+    handleMeasureRadius(activeButton, setActiveButton) {
         throw new Error('Method not implemented');
     }
 }

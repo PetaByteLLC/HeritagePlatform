@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import VerticalSwitch from './VerticalSwitch';
 import TileSwitcher from './TileSwitcher';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,7 +11,20 @@ import { faCircle } from "@fortawesome/free-regular-svg-icons";
 const Toolbar = () => {
     const { map2DType, setMap2DType } = useContext(MapContext);
     const { handleZoomIn, handleZoomOut, handleCurrentLocation, handleMeasureArea,
-        handleMeasureDistance, handleMeasureAltitude, handleMeasureRadius } = useToolbarActions();
+        handleMeasureDistance, handleMeasureAltitude, handleMeasureRadius, setActiveButton } = useToolbarActions();
+    const [activeButton, setActiveButtonState] = useState(null);
+
+    const handleButtonClick = (buttonName, action) => {
+        if (activeButton === buttonName) {
+            setActiveButtonState(null);
+            setActiveButton(null);
+            action(null);
+        } else {
+            setActiveButtonState(buttonName);
+            setActiveButton(buttonName);
+            action(buttonName);
+        }
+    };
 
     return (
         <div className="toolbar">
@@ -26,16 +39,16 @@ const Toolbar = () => {
             </button>
             <TileSwitcher map2DType={map2DType} setMap2DType={setMap2DType}/>
             <VerticalSwitch/>
-            <button className="toolbar-button" onClick={handleMeasureArea}>
+            <button className={`toolbar-button ${activeButton === 'measureArea' ? 'active' : ''}`} onClick={() => handleButtonClick('measureArea', handleMeasureArea)}>
                 <FontAwesomeIcon icon={faRoute}/>
             </button>
-            <button className="toolbar-button" onClick={handleMeasureDistance}>
+            <button className={`toolbar-button ${activeButton === 'measureDistance' ? 'active' : ''}`} onClick={() => handleButtonClick('measureDistance', handleMeasureDistance)}>
                 <FontAwesomeIcon icon={faRulerHorizontal}/>
             </button>
-            <button className="toolbar-button" onClick={handleMeasureRadius}>
+            <button className={`toolbar-button ${activeButton === 'measureRadius' ? 'active' : ''}`} onClick={() => handleButtonClick('measureRadius', handleMeasureRadius)}>
                 <FontAwesomeIcon icon={faCircle}/>
             </button>
-            <button className="toolbar-button" onClick={handleMeasureAltitude}>
+            <button className={`toolbar-button ${activeButton === 'measureAltitude' ? 'active' : ''}`} onClick={() => handleButtonClick('measureAltitude', handleMeasureAltitude)}>
                 <FontAwesomeIcon icon={faRulerVertical}/>
             </button>
         </div>

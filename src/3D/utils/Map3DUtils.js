@@ -1,10 +1,9 @@
-import { POI_LAYER_NAME } from "../../common/constants/GeoserverConfig";
+import {POI_LAYER_NAME, WFS_VERSION} from "../../common/constants/GeoserverConfig";
 import GeoJSON from 'ol/format/GeoJSON';
 import { boundingExtent } from 'ol/extent';
 import { DEFAULT_SRS, WMS_VERSION, } from "../../common/constants/GeoserverConfig";
 import { GEOSERVER_BASE_URL } from "../../common/constants/ApiUrl";
 import { PIN_PNG_URL } from "../../common/constants/GeneralConfig";
-import { DEFAULT_SRS } from "../../common/constants/GeoserverConfig";
 import Feature from "ol/Feature";
 import Polygon from "ol/geom/Polygon";
 

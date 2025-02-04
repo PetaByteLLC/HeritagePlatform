@@ -29,6 +29,8 @@ export class Map2DStrategy extends MapStrategy {
 	}
 
 	addInteraction(type, vectorSource, setDraw, setCurrentSpatial) {
+		this.clearPreviousMeasurements();
+		this.removeExistingDrawInteractions();
 		let geometryFunction;
 
 		if (type === 'Box') {
@@ -67,6 +69,8 @@ export class Map2DStrategy extends MapStrategy {
 	}
 
 	handleIconClick(icon, type, selectedIcon, setSelectedIcon, draw, setDraw, vectorSource, setCurrentSpatial) {
+		this.clearPreviousMeasurements();
+		this.removeExistingDrawInteractions();
 		setCurrentSpatial(null);
 		vectorSource.clear();
 		if (draw) {

@@ -140,6 +140,7 @@ const SearchField = () => {
                                 <div className='result-item-text'>
                                     <h3>{feature.properties.title}</h3>
                                     <p>{feature.properties.address}</p>
+                                    <p>Level: {feature.properties.level}</p>
                                 </div>
                                 <div className='result-item-buttons'>
                                     <FontAwesomeIcon

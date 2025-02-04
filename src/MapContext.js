@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect } from 'react';
 import { Map2DStrategy } from './2D/domain/strategies/Map2DStrategy';
 import { Map3DStrategy } from './3D/domain/strategies/Map3DStrategy';
 import { WMSLayers } from './common/constants/WMSLayers';
+import { WFSLayers } from './common/constants/WFSLayers';
 
 export const MapContext = createContext();
 
@@ -16,6 +17,7 @@ export const MapProvider = ({ children }) => {
     const [strategy, setStrategy] = useState(null);
     const [selectedPOI, setSelectedPOI] = useState(null);
     const [wmsLayers, setWmsLayers] = useState(WMSLayers);
+    const [wfsLayers, setWfsLayers] = useState(WFSLayers);
 
     useEffect(() => {
         if (mode === '2D' && map2D) {
@@ -37,6 +39,7 @@ export const MapProvider = ({ children }) => {
                 map3D, setMap3D,
                 selectedPOI, setSelectedPOI,
                 wmsLayers, setWmsLayers,
+                wfsLayers, setWfsLayers,
                 strategy
             }}>
             {children}

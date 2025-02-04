@@ -128,4 +128,16 @@ export class Map2DStrategy extends MapStrategy {
 			return toLonLat(coordinates);
 		}
 	}
+
+	createBookmark(name, color = "#c8ff00") : object {
+
+	}
+
+	showBookmark(feature) {
+		super.showBookmark(feature);
+	}
+
+	removeBookmark() {
+		super.removeBookmark();
+	}
 }

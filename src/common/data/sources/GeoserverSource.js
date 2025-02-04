@@ -70,7 +70,7 @@ export const fetchAllBookmarks = async (keyword) => {
     const workspace = 'Heritage';
     const layer = 'heritage_bookmark_layer';
     const maxFeatures = 50;
-    const cqlFilter = keyword && `&CQL_FILTER=${encodeURIComponent(`name like '%${keyword}%'`)}` || '';
+    const cqlFilter = keyword && `&CQL_FILTER=${encodeURIComponent(`strToLowerCase(name) like '%${keyword.toLowerCase()}%'`)}` || '';
 
     const url = `${GEOSERVER_BASE_URL}/Heritage/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${workspace}:${layer}&maxFeatures=${maxFeatures}&outputFormat=application/json${cqlFilter}`;
 

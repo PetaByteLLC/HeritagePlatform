@@ -34,4 +34,16 @@ export class MapStrategy {
 	moveToSingleFeature(feature) {
 		throw new Error('Method not implemented');
 	}
+
+	createBookmark(name, color = "#c8ff00"): object {
+		throw new Error('Method not implemented');
+	}
+
+	showBookmark(feature) {
+		throw new Error('Method not implemented');
+	}
+
+	removeBookmark() {
+		throw new Error('Method not implemented');
+	}
 }

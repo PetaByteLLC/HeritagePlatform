@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faMinus, faTimes, faBookmark, faSearch, faAdd } from '@fortawesome/free-solid-svg-icons';
+import {faPlus, faMinus, faTimes, faBookmark, faSearch, faAdd, faTrash} from '@fortawesome/free-solid-svg-icons';
 import { MapContext } from '../../../MapContext';
 import { fetchAllBookmarks, addBookmark, editBookmark, deleteBookmark } from "../../data/repositories/GeoserverRepository";
 import './Bookmark.css';
 
 const Bookmark = () => {
+    const { strategy } = useContext(MapContext);
     const [error, setError] = useState(null);
     const [error2, setError2] = useState(null);
     const [bookmarks, setBookmarks] = useState([]);
@@ -31,6 +32,7 @@ const Bookmark = () => {
         deleteBookmark(bookmark)
             .then(resp => {
                 setBookmarks(bookmarks.filter((bm, i) => bm.id !== bookmark.id));
+                bookmark.removeBookmark();
             })
             .catch(err => {
                 setError2(err);
@@ -69,7 +71,7 @@ const Bookmark = () => {
                     )
                     : bookmarks.map((bookmark, index) => (
                     <div key={bookmark.id} className="bookmark-item">
-                        <div className="bookmark-item-body">
+                        <div className="bookmark-item-body" onClick={() => strategy.showBookmark(bookmark)}>
                             <div className="bookmark-item-icon">
                                 <FontAwesomeIcon icon={faBookmark} />
                             </div>
@@ -78,7 +80,7 @@ const Bookmark = () => {
                             </div>
                         </div>
                         <div className="bookmark-item-action" onClick={() => removeBookmark(bookmark)}>
-                            <FontAwesomeIcon icon={faTimes} />
+                            <FontAwesomeIcon icon={faTrash} />
                         </div>
                     </div>
                     ))}

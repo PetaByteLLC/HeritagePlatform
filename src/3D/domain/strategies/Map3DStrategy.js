@@ -51,4 +51,67 @@ export class Map3DStrategy extends MapStrategy {
 	moveToSingleFeature(feature) {
 		console.log('Not implemented yet');
 	}
+
+	createBookmark(name, color = "#c8ff00"): object {
+		let camera = this.map3D.getViewCamera();
+		let cameraPosition = camera.getPosition();
+
+		return {
+			"type": "Feature",
+			"id": null,
+			"geometry": {
+				"type": "Point",
+				"coordinates": [
+					cameraPosition.longitude,
+					cameraPosition.latitude
+				]
+			},
+			"geometry_name": "geom",
+			"properties": {
+				"name": name,
+				"level": camera.getMapZoomLevel(),
+				"direction": camera.getDirect(),
+				"tilt": camera.getTilt(),
+				"fox_x": camera.videoFovX,
+				"fov_y": camera.videoFovY,
+				"color": color || "#c8ff00",
+				"altitude": camera.getAltitude(),
+				"date":  Math.floor(new Date().getTime() / 1000)
+			}
+		};
+	}
+
+	showBookmark(feature) {
+		if (!this.layer) {
+			let layerList = new this.map3D.JSLayerList(true);
+			this.layer = layerList.createLayer("CCTV", this.map3D.ELT_POLYHEDRON);
+		}
+
+		if (!!this.frustum) {
+			this.layer.removeAtObject(this.frustum);
+		}
+
+		this.map3D.getViewCamera().setLocation(new this.map3D.JSVector3D(feature.geometry.coordinates[0], feature.geometry.coordinates[1], feature.properties.altitude + 700.0));
+
+		this.frustum = this.map3D.createViewFrustum("FRUSTUM");
+		this.frustum.createViewFrustum(
+			new this.map3D.JSVector3D(feature.geometry.coordinates[0], feature.geometry.coordinates[1], feature.properties.altitude),
+			feature.properties.direction, feature.properties.tilt,
+			feature.properties.fox_x, feature.properties.fov_y,
+			100
+		);
+		let color = new this.map3D.JSColor();
+		color.setHexCode(feature.properties.color+'50');
+		this.frustum.setColor(color);
+
+		this.layer.addObject(this.frustum, 0);
+
+		this.map3D.XDRenderData();
+	}
+
+	removeBookmark() {
+		if (!!this.layer && !!this.frustum) {
+			this.layer.removeAtObject(this.frustum);
+		}
+	}
 }

@@ -9,6 +9,8 @@ export class Map3DStrategy extends MapStrategy {
 		this.m_mercount = 0;
 		this.m_objcount = 0;
         this.altIndex = 0;
+        this.addDistancePoint = this.addDistancePoint.bind(this);
+        this.endDistancePoint = this.endDistancePoint.bind(this);
 	}
 
 	addInteraction(icon, setCurrentSpatial) {
@@ -119,6 +121,7 @@ export class Map3DStrategy extends MapStrategy {
         this.clearLayer(layerList, "MEASURE_RADIUS_POI");
         this.clearLayer(layerList, "MEASURE_RADIUS_WALL");
         this.clearLayer(layerList, "MEASURE_AREA_POI");
+        this.clearLayer(layerList, "MEASURE_DISTANCE_POI");
 	}
 
 	clearLayer(layerList, layerName) {
@@ -248,6 +251,8 @@ export class Map3DStrategy extends MapStrategy {
             circle: this.map3D.MML_ANALYS_AREA_CIRCLE,
 			default: this.map3D.MML_MOVE_GRAB,
             altitude: this.map3D.MML_ANALYS_ALTITUDE,
+            distance: this.map3D.MML_ANALYS_DISTANCE_STRAIGHT,
+            area: this.map3D.MML_ANALYS_AREA_PLANE,
         };
 
         const mouseState = mouseStates[state];
@@ -329,6 +334,7 @@ export class Map3DStrategy extends MapStrategy {
         this.removeAltitudeEvent();
         this.removeRadiusMeasureEvent();
         this.removeAreaMeasureEvent();
+        this.removeDistanceMeasureEvent();
         this.clearAltitudeAnalysis();
         this.clearRadiusAnalysis();
         this.clearAreaAnalysis();
@@ -582,10 +588,10 @@ export class Map3DStrategy extends MapStrategy {
 
         if (_balloonType) {
             this.drawBalloon(ctx, height*0.5, width, height, 5, height*0.25, _color);
-            this.setTextArea(ctx, width*0.5, height*0.2, _value);
+            this.setTextRadius(ctx, width*0.5, height*0.2, _value);
         } else {
             this.drawRoundRect(ctx, 0, height*0.3, width, height*0.25, 5, _color);
-            this.setTextArea(ctx, width*0.5, height*0.5, _value);
+            this.setTextRadius(ctx, width*0.5, height*0.5, _value);
         }
 
         return ctx.getImageData(0, 0, _canvas.width, _canvas.height).data;
@@ -625,22 +631,6 @@ export class Map3DStrategy extends MapStrategy {
         _ctx.fillStyle = "rgb(0, 0, 0)";
 
         _ctx.fillText(strText, _posX, _posY);
-    }
-
-    setTextArea(_ctx, _posX, _posY, _value) {
-        var strText = typeof _value === 'number' ? this.setTextComma(_value.toFixed(2)) + '㎡' : 'Invalid value';
-
-        _ctx.font = "bold 16px sans-serif";
-        _ctx.textAlign = "center";
-        _ctx.fillStyle = "rgb(0, 0, 0)";
-
-        // Draw text
-        _ctx.fillText(strText, _posX, _posY);
-    }
-
-    setTextComma(str) {
-        str = String(str);
-        return str.replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
     }
 
     clearRadiusAnalysis() {
@@ -701,10 +691,10 @@ export class Map3DStrategy extends MapStrategy {
         let key = this.m_mercount + "_POI";
         layer.removeAtKey(key);
 
-        let poi = this.map3D.createPoint(this.m_mercount + "_POI");
-        poi.setPosition(_position);
-        poi.setImage(imageData, drawCanvas.width, drawCanvas.height);
-        layer.addObject(poi, 0);
+        this.poi = this.map3D.createPoint(this.m_mercount + "_POI");
+        this.poi.setPosition(_position);
+        this.poi.setImage(imageData, drawCanvas.width, drawCanvas.height);
+        layer.addObject(this.poi, 0);
     }
 
     clearAreaAnalysis() {
@@ -713,6 +703,57 @@ export class Map3DStrategy extends MapStrategy {
     }
 
     handleMeasureDistance() {
-        console.log('Method not implemented');
+        this.clearEvents();
+        this.setMouseState('distance');
+
+        let layerList = new this.map3D.JSLayerList(true);
+        this.distanceLayer = layerList.createLayer("MEASURE_DISTANCE_POI", this.map3D.ELT_3DPOINT);
+        this.distanceLayer.setMaxDistance(20000.0);
+        this.distanceLayer.setSelectable(false);
+
+        this.map3D.getOption().SetDistanceMeasureLineDepthBuffer(false);
+        this.map3D.getOption().callBackAddPoint(this.addDistancePoint);
+        this.map3D.getOption().callBackCompletePoint(this.endDistancePoint);
+        this.removeDistanceMeasureEvent();
+    }
+
+    addDistancePoint(e) {
+        let partDistance = e.dDistance,
+            totalDistance = e.dTotalDistance;
+
+        if (partDistance === 0 && totalDistance === 0) {
+            this.m_objcount = 0;
+            this.createDistancePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt), "rgba(255, 204, 198, 0.8)", "Start", true);
+        } else {
+            if (e.dDistance > 0.01) {
+                this.createDistancePOI(new this.map3D.JSVector3D(e.dMidLon, e.dMidLat, e.dMidAlt), "rgba(255, 255, 0, 0.8)", e.dDistance, false);
+            }
+            this.createDistancePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt), "rgba(255, 204, 198, 0.8)", e.dTotalDistance, true);
+        }
+    }
+
+    endDistancePoint(e) {
+        this.m_mercount++;
+    }
+
+    createDistancePOI(_position, _color, _value, _balloonType) {
+        var drawCanvas = document.createElement('canvas');
+        drawCanvas.width = 100;
+        drawCanvas.height = 100;
+
+        let imageData = this.drawIconRadiusArea(drawCanvas, _color, _value, _balloonType);
+
+        let layerList = new this.map3D.JSLayerList(true);
+        this.distanceLayer = layerList.nameAtLayer("MEASURE_DISTANCE_POI");
+
+        let poi = this.map3D.createPoint(this.m_mercount + "_POI_" + this.m_objcount);
+        poi.setPosition(_position);
+        poi.setImage(imageData, drawCanvas.width, drawCanvas.height);
+        this.distanceLayer.addObject(poi, 0);
+        this.m_objcount++;
+    }
+
+    removeDistanceMeasureEvent() {
+        // document.body.removeEventListener('click', this.distanceMeasureListener);
     }
 }

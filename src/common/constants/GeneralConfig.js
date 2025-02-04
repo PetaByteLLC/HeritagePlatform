@@ -1,0 +1,1 @@
+export const PIN_PNG_URL = "https://e7.pngegg.com/pngimages/93/226/png-clipart-pin-pin-thumbnail.png";

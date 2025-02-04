@@ -2,7 +2,7 @@ import React, { useEffect, useContext, useRef } from 'react';
 import { MapContext } from '../../../MapContext';
 import layers3D from '../../../common/constants/Tiles3D';
 import { POI_LAYER_NAME } from '../../../common/constants/GeoserverConfig';
-import { setSelectedPOIOnMap, moveToSingleFeature } from '../../utils/Map3DUtils';
+import { setSelectedPOIOnMap, moveToSingleFeature, updateWmsLayers, updateWfsLayers } from '../../utils/Map3DUtils';
 
 function getHeightFromZoom(zoomLevel) {
 	const EARTH_HALF_CIRCUMFERENCE = 20037508.5;
@@ -10,7 +10,7 @@ function getHeightFromZoom(zoomLevel) {
 }
 
 const Map3D = () => {
-	const { is3DMapInitialized, setIs3DMapInitialized, currentLocation, setCurrentLocation, mode, map3DType, setMap3D, setSelectedPOI } = useContext(MapContext);
+	const { is3DMapInitialized, setIs3DMapInitialized, currentLocation, setCurrentLocation, mode, map3DType, setMap3D, setSelectedPOI, wmsLayers, wfsLayers } = useContext(MapContext);
 	const mapContainerRef = useRef(null);
 
 	useEffect(() => {
@@ -60,6 +60,9 @@ const Map3D = () => {
 					const zoomLevel = Module.getViewCamera().getMapZoomLevel();
 					setCurrentLocation({ longitude: location.longitude, latitude: location.latitude, zoomLevel3D: zoomLevel, zoomLevel2D: zoomLevel + 3 });
 				});
+
+				updateWmsLayers(window.Module, wmsLayers);
+				updateWfsLayers(window.Module, wfsLayers);
 			},
 		};
 
@@ -81,7 +84,7 @@ const Map3D = () => {
 			const pick = poiLayer.pick(e.offsetX, e.offsetY);
 			if (!pick) return;
 			const id = pick.objectKey;
-			moveToSingleFeature(window.Module, { geometry: { coordinates: [ pick.position.longitude, pick.position.latitude ] } });
+			moveToSingleFeature(window.Module, { geometry: { coordinates: [pick.position.longitude, pick.position.latitude] } });
 			setSelectedPOIOnMap(window.Module, id, setSelectedPOI);
 		}
 
@@ -105,6 +108,7 @@ const Map3D = () => {
 		}
 	}, [mode]);
 
+
 	useEffect(() => {
 		if (mode !== '3D' || !window.Module) return;
 
@@ -116,6 +120,17 @@ const Map3D = () => {
 			initializeMap(Module, map3DType);
 		}
 	}, [map3DType]);
+
+
+	useEffect(() => {
+		updateWmsLayers(window.Module, wmsLayers);
+	}, [wmsLayers]);
+
+
+	useEffect(() => {
+		updateWfsLayers(window.Module, wfsLayers);
+	}, [wfsLayers]);
+
 
 	const clearMap = () => {
 		const Module = window.Module;

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faBookmark, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 import Bookmark from './../bookmark'
+import LayerList from '../layer-list/LayerList';
 import './Menu.css';
 
 const Menu = ({ isOpen, onClose }) => {
@@ -29,6 +30,7 @@ const Menu = ({ isOpen, onClose }) => {
                 </li>
             </ul>
         </div>
+        <LayerList />
         <Bookmark />
     </>
     );

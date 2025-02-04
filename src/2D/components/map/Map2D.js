@@ -6,10 +6,10 @@ import { MapContext } from '../../../MapContext';
 import { transform } from 'ol/proj';
 import layers2D from '../../../common/constants/Tiles2D';
 import { POI_LAYER_NAME, TILE_LAYER_NAME } from '../../../common/constants/GeoserverConfig';
-import { moveToFeature, setSelectedPOIOnMap, removeLayerFromMap } from '../../utils/Map2DUtils';
+import { moveToFeature, setSelectedPOIOnMap, removeLayerFromMap, updateWmsLayers } from '../../utils/Map2DUtils';
 
 const Map2D = () => {
-	const { currentLocation, setCurrentLocation, mode, map2DType, setMap2D, setSelectedPOI } = useContext(MapContext);
+	const { currentLocation, setCurrentLocation, mode, map2DType, setMap2D, setSelectedPOI, wmsLayers } = useContext(MapContext);
 	const mapRef = useRef();
 	const mapInstance = useRef();
 	const isMapInitialized = useRef(false);
@@ -93,6 +93,10 @@ const Map2D = () => {
 			view.setZoom(zoom);
 		}
 	}, [map2DType]);
+
+	useEffect(() => {
+		updateWmsLayers(mapInstance.current, wmsLayers);
+	}, [wmsLayers])
 
 	return (
 		<div className="map-container">

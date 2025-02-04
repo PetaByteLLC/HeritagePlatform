@@ -5,7 +5,10 @@ import Cluster from 'ol/source/Cluster';
 import { getCenter, extend, createEmpty } from 'ol/extent';
 import { Style, Icon, Circle as CircleStyle, Text, Fill, Stroke } from 'ol/style';
 import { DEFAULT_SRS, POI_LAYER_NAME, TILE_LAYER_NAME } from '../../common/constants/GeoserverConfig';
+import { GEOSERVER_BASE_URL } from '../../common/constants/ApiUrl';
 import { fromLonLat } from 'ol/proj';
+import TileLayer from 'ol/layer/Tile';
+import { TileWMS } from 'ol/source';
 
 export const addGeoJSONToMap = (map, geojson) => {
 
@@ -118,4 +121,37 @@ export const setSelectedPOIOnMap = (features, setSelectedPOI) => {
     const geojsonFormat = new GeoJSON();
     const geojson = geojsonFormat.writeFeatureObject(feature);
     setSelectedPOI(geojson.properties);
+}
+
+export const updateWmsLayers = (map, wmsLayers) => {
+    wmsLayers.forEach((wmsLayer) => {
+        var current = map.getLayers().getArray().find(layer => layer.get('name') === wmsLayer.layerName);
+        if (wmsLayer.visible) {
+            if (current) current.setVisible(true);
+            else createWmsLayer(map, wmsLayer);
+        } else {
+            if (current) current.setVisible(false);
+        }
+    });
+}
+
+export const createWmsLayer = (map, wmsLayerJson) => {
+    const layer = new TileLayer({
+        source: new TileWMS({
+            url: `${GEOSERVER_BASE_URL}/wms`,
+            params: { 
+                'LAYERS': `${wmsLayerJson.workspace}:${wmsLayerJson.layerName}`, 
+                'TILED': wmsLayerJson.tiled, 
+                'STYLES': wmsLayerJson.style
+            },
+            serverType: 'geoserver',
+            transition: 0,
+        }),
+        visible: true,
+        zIndex: wmsLayerJson.zIndex,
+        minZoom: wmsLayerJson.min,
+        maxZoom: wmsLayerJson.max + 3,
+    });
+    layer.set('name', wmsLayerJson.layerName);
+    map.addLayer(layer);
 }

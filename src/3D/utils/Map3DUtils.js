@@ -1,7 +1,8 @@
 import { POI_LAYER_NAME } from "../../common/constants/GeoserverConfig";
 import GeoJSON from 'ol/format/GeoJSON';
 import { boundingExtent } from 'ol/extent';
-import { DEFAULT_SRS } from "../../common/constants/GeoserverConfig";
+import { DEFAULT_SRS, WMS_VERSION, } from "../../common/constants/GeoserverConfig";
+import { GEOSERVER_BASE_URL } from "../../common/constants/ApiUrl";
 
 
 export const addGeoJSONToMap = (map, geojson) => {
@@ -85,6 +86,46 @@ export const setSelectedPOIOnMap = (map, id, setSelectedPOI) => {
     const object = poiLayer.keyAtObject(id);
     const properties = JSON.parse(object.getDescription())
     setSelectedPOI(properties);
+}
+
+export const updateWmsLayers = (map, wmsLayers) => {
+    if (!map || typeof map.JSLayerList !== 'function') return;
+    let layerList = new map.JSLayerList(false);
+    wmsLayers.forEach((layer) => {
+        const wmslayer = layerList.nameAtLayer(layer.layerName);
+        if (layer.visible) {
+            if (wmslayer) wmslayer.setVisible(true);
+            else createWmsLayer(map, layer);
+        } else {
+            if (wmslayer) wmslayer.setVisible(false);
+        }
+    });
+}
+
+export const createWmsLayer = (map, wmsLayerJson) => {
+    let layerList = new map.JSLayerList(false);
+    let options = {
+		url: `${GEOSERVER_BASE_URL}/wms?STYLES=${wmsLayerJson.style}&`,
+		layer: `${wmsLayerJson.workspace}:${wmsLayerJson.layerName}`,
+		minimumlevel: wmsLayerJson.min - 3,
+		maximumlevel: wmsLayerJson.max,
+		tilesize: wmsLayerJson.tileSize,
+		crs: DEFAULT_SRS,
+		parameters: {
+			version: WMS_VERSION,
+        }
+	};
+
+	const wmslayer = layerList.createWMSLayer(wmsLayerJson.layerName)
+	wmslayer.setWMSProvider(options);
+	wmslayer.setBBoxOrder(true);
+}
+
+export const removeWmsLayer = (map, name) => {
+    let layerList = new map.JSLayerList(false);
+    const wmslayer = layerList.nameAtLayer(name);
+	if(wmslayer != null) wmslayer.clearWMSCache();
+	layerList.delLayerAtName(name) 		
 }
 
 const _extendBBox = (bbox, meters) => {

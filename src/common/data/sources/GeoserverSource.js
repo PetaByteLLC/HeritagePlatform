@@ -72,7 +72,7 @@ export const fetchAllBookmarks = async (keyword) => {
     const maxFeatures = 50;
     const cqlFilter = keyword && `&CQL_FILTER=${encodeURIComponent(`strToLowerCase(name) like '%${keyword.toLowerCase()}%'`)}` || '';
 
-    const url = `${GEOSERVER_BASE_URL}/Heritage/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${workspace}:${layer}&maxFeatures=${maxFeatures}&outputFormat=application/json${cqlFilter}`;
+    const url = `${GEOSERVER_BASE_URL}/Heritage/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${workspace}:${layer}&maxFeatures=${maxFeatures}&outputFormat=application/json${cqlFilter}&sortBy=date D`;
 
     try {
         const response = await fetch(url, {
@@ -88,7 +88,7 @@ export const fetchAllBookmarks = async (keyword) => {
         }
 
         var data = await response.json();
-        console.log("data", data);
+        // console.log("data", data);
         return data;
     } catch (error) {
         console.error('Error fetching feature collections:', error);
@@ -100,7 +100,7 @@ export const fetchAllBookmarks = async (keyword) => {
 }
 
 export const addBookmark = async (feature) => {
-    const xmlPayload = `<wfs:Transaction xmlns:wfs="http://www.opengis.net/wfs" xmlns:gml="http://www.opengis.net/gml" xmlns:Heritage="${GEOSERVER_BASE_URL}/Heritage">
+    const xmlPayload = `<wfs:Transaction xmlns:wfs="http://www.opengis.net/wfs" xmlns:gml="http://www.opengis.net/gml" xmlns:Heritage="http://localhost:8094/geoserver/Heritage">
       <wfs:Insert>
         <Heritage:heritage_bookmark_layer>
           <Heritage:geom>
@@ -108,7 +108,7 @@ export const addBookmark = async (feature) => {
               <gml:coordinates>${feature.geometry.coordinates.join(',')}</gml:coordinates>
             </gml:Point>
           </Heritage:geom>
-          ${feature.properties.map(([key, val]) => `
+          ${Object.entries(feature.properties).map(([key, val]) => `
             <Heritage:${key}>${val}</Heritage:${key}>
             `).join('')}
         </Heritage:heritage_bookmark_layer>
@@ -119,7 +119,7 @@ export const addBookmark = async (feature) => {
 }
 
 export const editBookmark = async (feature) => {
-    const xmlPayload = `<wfs:Transaction xmlns:wfs="http://www.opengis.net/wfs" xmlns:gml="http://www.opengis.net/gml" xmlns:Heritage="${GEOSERVER_BASE_URL}/Heritage">
+    const xmlPayload = `<wfs:Transaction xmlns:wfs="http://www.opengis.net/wfs" xmlns:gml="http://www.opengis.net/gml" xmlns:Heritage="http://localhost:8094/geoserver/Heritage">
       <wfs:Update typeName="Heritage:heritage_bookmark_layer">
         <wfs:Property>
           <wfs:Name>geom</wfs:Name>
@@ -129,7 +129,7 @@ export const editBookmark = async (feature) => {
             </gml:Point>
           </wfs:Value>
         </wfs:Property>
-        ${feature.properties.map(([key, val]) => `
+        ${Object.entries(feature.properties).map(([key, val]) => `
             <wfs:Property>
               <wfs:Name>${key}</wfs:Name>
               <wfs:Value>${val}</wfs:Value>
@@ -145,7 +145,7 @@ export const editBookmark = async (feature) => {
 }
 
 export const deleteBookmark = async (feature) => {
-    const xmlPayload = `<wfs:Transaction xmlns:wfs="http://www.opengis.net/wfs" xmlns:gml="http://www.opengis.net/gml" xmlns:Heritage="${GEOSERVER_BASE_URL}/Heritage">
+    const xmlPayload = `<wfs:Transaction xmlns:wfs="http://www.opengis.net/wfs" xmlns:gml="http://www.opengis.net/gml" xmlns:Heritage="http://localhost:8094/geoserver/Heritage">
       <wfs:Delete typeName="Heritage:heritage_bookmark_layer">
         <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
           <ogc:FeatureId fid="${feature.id}"/>
@@ -174,8 +174,9 @@ const executeWFSTransaction = async (xmlPayload) => {
         }
 
         const data = await response.text();
-        console.log('Transaction successful:', data);
-        return data;
+        //console.log('Transaction successful:', data);
+        const parser = new DOMParser();
+        return parser.parseFromString(data, "application/xml");
     } catch (error) {
         console.error('Error executing WFS-T transaction:', error);
         return null;

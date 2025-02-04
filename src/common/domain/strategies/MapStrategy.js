@@ -35,7 +35,7 @@ export class MapStrategy {
 		throw new Error('Method not implemented');
 	}
 
-	createBookmark(name, color = "#c8ff00"): object {
+	createBookmark(name, distance, color): object {
 		throw new Error('Method not implemented');
 	}
 

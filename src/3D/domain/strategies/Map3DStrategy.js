@@ -6,6 +6,7 @@ export class Map3DStrategy extends MapStrategy {
 	constructor(map3D) {
 		super();
 		this.map3D = map3D;
+		console.log("Map3DStrategy initialized");
 	}
 
 	addInteraction(type, vectorSource, setDraw, setCurrentFeature) {
@@ -54,9 +55,9 @@ export class Map3DStrategy extends MapStrategy {
 		moveToSingleFeature(this.map3D, feature);
 	}
 
-	createBookmark(name, color = "#c8ff00"): object {
+	createBookmark(name, distance, color): object {
 		let camera = this.map3D.getViewCamera();
-		let cameraPosition = camera.getPosition();
+		let cameraLocation = camera.getLocation();
 
 		return {
 			"type": "Feature",
@@ -64,8 +65,8 @@ export class Map3DStrategy extends MapStrategy {
 			"geometry": {
 				"type": "Point",
 				"coordinates": [
-					cameraPosition.longitude,
-					cameraPosition.latitude
+					cameraLocation.longitude,
+					cameraLocation.latitude
 				]
 			},
 			"geometry_name": "geom",
@@ -74,10 +75,11 @@ export class Map3DStrategy extends MapStrategy {
 				"level": camera.getMapZoomLevel(),
 				"direction": camera.getDirect(),
 				"tilt": camera.getTilt(),
-				"fox_x": camera.videoFovX,
+				"fov_x": camera.videoFovX,
 				"fov_y": camera.videoFovY,
 				"color": color || "#c8ff00",
 				"altitude": camera.getAltitude(),
+				"distance": distance,
 				"date":  Math.floor(new Date().getTime() / 1000)
 			}
 		};
@@ -94,17 +96,26 @@ export class Map3DStrategy extends MapStrategy {
 		}
 
 		this.map3D.getViewCamera().setLocation(new this.map3D.JSVector3D(feature.geometry.coordinates[0], feature.geometry.coordinates[1], feature.properties.altitude + 700.0));
+		this.map3D.getViewCamera().setTilt(85);
 
-		this.frustum = this.map3D.createViewFrustum("FRUSTUM");
-		this.frustum.createViewFrustum(
-			new this.map3D.JSVector3D(feature.geometry.coordinates[0], feature.geometry.coordinates[1], feature.properties.altitude),
-			feature.properties.direction, feature.properties.tilt,
-			feature.properties.fox_x, feature.properties.fov_y,
-			100
-		);
 		let color = new this.map3D.JSColor();
-		color.setHexCode(feature.properties.color+'50');
-		this.frustum.setColor(color);
+		color.setHexCode(feature.properties.color.replace('#', '#CC'));
+
+		let lineColor = new this.map3D.JSColor();
+		lineColor.setHexCode(feature.properties.color);
+
+		this.frustum = this._createViewFrustum({
+			position: new this.map3D.JSVector3D(feature.geometry.coordinates[0], feature.geometry.coordinates[1], feature.properties.altitude),
+			pan: feature.properties.direction,
+			tilt: feature.properties.tilt,
+			fov_x: feature.properties.fov_x,
+			fov_y: feature.properties.fov_y,
+			distance: feature.properties.distance,
+			color: color
+		});
+
+		// Create a line object perpendicular to the ground from the frustum starting position
+		this._createVerticalLine(this.frustum.getEyepos(), lineColor);
 
 		this.layer.addObject(this.frustum, 0);
 
@@ -115,5 +126,56 @@ export class Map3DStrategy extends MapStrategy {
 		if (!!this.layer && !!this.frustum) {
 			this.layer.removeAtObject(this.frustum);
 		}
+		if (!!this.lineLayer && !!this.line) {
+			this.lineLayer.removeAtObject(this.line);
+		}
+	}
+
+	_createViewFrustum(_options) {
+
+		let frustum = this.map3D.createViewFrustum("FRUSTUM");
+		frustum.createViewFrustum(
+			_options.position,
+			_options.pan, _options.tilt,
+			_options.fov_x, _options.fov_y,
+			_options.distance
+		);
+		frustum.setColor(_options.color);
+
+		return frustum;
+	}
+
+	_createVerticalLine(_position, color) {
+
+		if (!this.lineLayer) {
+			// Create line layer
+			let layerList = new this.map3D.JSLayerList(true);
+			this.lineLayer = layerList.createLayer("FRUSTUM_LINE_LAYER", this.map3D.ELT_3DLINE);
+		}
+
+		if (!!this.line) {
+			this.lineLayer.removeAtObject(this.line);
+		}
+
+		this.line = this.map3D.createLineString("FRUSTUM_LINE");
+
+		let vertices = new this.map3D.JSVec3Array();
+		vertices.push(_position);
+		_position.Altitude = 0.0;
+		vertices.push(_position);
+
+		let part = new this.map3D.Collection();
+		part.add(2);
+
+		this.line.setPartCoordinates(vertices, part);
+		this.line.setUnionMode(false);
+
+		// Set line color
+		let lineStyle = new this.map3D.JSPolyLineStyle();
+		lineStyle.setColor(color);
+		lineStyle.setWidth(2.0);
+		this.line.setStyle(lineStyle);
+
+		this.lineLayer.addObject(this.line, 0);
 	}
 }

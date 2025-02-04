@@ -3,6 +3,9 @@ import { Draw } from 'ol/interaction';
 import { createBox } from 'ol/interaction/Draw';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
+import { Feature } from 'ol';
+import { Point } from 'ol/geom';
+import { Style, Circle, Fill, Stroke } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
 import { toLonLat } from 'ol/proj';
 import { get2DBbox } from '../../../common/domain/utils/2DBbox';
@@ -13,6 +16,7 @@ export class Map2DStrategy extends MapStrategy {
 	constructor(map2D) {
 		super();
 		this.map2D = map2D;
+		this.eventHandler();
 	}
 
 	createVectorLayer() {
@@ -130,15 +134,90 @@ export class Map2DStrategy extends MapStrategy {
 		}
 	}
 
-	createBookmark(name, color = "#c8ff00") : object {
+	eventHandler() {
+		let self = this;
 
+		this.map2D.on('click', function (event) {
+			self.coordinate = toLonLat(event.coordinate);
+			self._showPoint(self.coordinate, 'red');
+		});
+	}
+
+	createBookmark(name, distance, color) : object {
+		let view = this.map2D.getView();
+		return {
+			"type": "Feature",
+			"id": null,
+			"geometry": {
+				"type": "Point",
+				"coordinates": this.coordinate
+			},
+			"geometry_name": "geom",
+			"properties": {
+				"name": name,
+				"level": Math.floor(view.getZoom()),
+				"direction": 90,
+				"tilt": 45,
+				"fov_x": 88,
+				"fov_y": 88,
+				"color": color || "#c8ff00",
+				"altitude": this._getZoomHeightMeters(),
+				"distance": distance,
+				"date":  Math.floor(new Date().getTime() / 1000)
+			}
+		};
 	}
 
 	showBookmark(feature) {
-		super.showBookmark(feature);
+		this._showPoint(feature.geometry.coordinates, feature.properties.color);
+
+		const view = this.map2D.getView();
+		view.animate({
+			center: fromLonLat(feature.geometry.coordinates),
+			zoom: feature.properties.level,
+			duration: 1500,
+		});
 	}
 
 	removeBookmark() {
-		super.removeBookmark();
+		let self = this;
+		if (!!self.vectorLayer) {
+			self.map2D.removeLayer(self.vectorLayer);
+		}
+	}
+
+	_showPoint(coordinate, color){
+		let self = this;
+
+		if (!!self.vectorLayer) {
+			self.map2D.removeLayer(self.vectorLayer);
+		}
+
+		const vectorSource = new VectorSource();
+		self.vectorLayer = new VectorLayer({
+			source: vectorSource,
+			style: new Style({
+				image: new Circle({
+					radius: 6,
+					fill: new Fill({ color: color }),
+					stroke: new Stroke({ color: 'white', width: 2 })
+				})
+			})
+		});
+
+		self.map2D.addLayer(self.vectorLayer);
+
+		let pointFeature = new Feature({
+			geometry: new Point(fromLonLat(coordinate))
+		});
+
+		vectorSource.addFeature(pointFeature);
+	}
+
+	_getZoomHeightMeters() {
+		const view = this.map2D.getView();
+		const resolution = view.getResolution();
+		const heightPixels = this.map2D.getSize()[1]; // Количество пикселей по высоте
+		return resolution * heightPixels;
 	}
 }

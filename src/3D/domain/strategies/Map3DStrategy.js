@@ -118,6 +118,7 @@ export class Map3DStrategy extends MapStrategy {
         this.clearLayer(layerList, "ALTITUDE_MEASURE_POI");
         this.clearLayer(layerList, "MEASURE_RADIUS_POI");
         this.clearLayer(layerList, "MEASURE_RADIUS_WALL");
+        this.clearLayer(layerList, "MEASURE_AREA_POI");
 	}
 
 	clearLayer(layerList, layerName) {
@@ -323,11 +324,14 @@ export class Map3DStrategy extends MapStrategy {
         this.clearMeasurements();
         this.clearPreviousShapes();
         this.removeRectangleEvent();
+        this.removePolygonClickEvent();
         this.removeRadiusEvent();
         this.removeAltitudeEvent();
         this.removeRadiusMeasureEvent();
+        this.removeAreaMeasureEvent();
         this.clearAltitudeAnalysis();
         this.clearRadiusAnalysis();
+        this.clearAreaAnalysis();
     }
 
 	handleZoomIn() {
@@ -543,7 +547,7 @@ export class Map3DStrategy extends MapStrategy {
         drawCanvas.width = 100;
         drawCanvas.height = 100;
 
-        var imageData = this.drawIconRadius(drawCanvas, _color, _value, _balloonType);
+        var imageData = this.drawIconRadiusArea(drawCanvas, _color, _value, _balloonType);
         if (this.radiusSymbol.insertIcon("Icon", imageData, drawCanvas.width, drawCanvas.height)) {
             var icon = this.radiusSymbol.getIcon("Icon");
 
@@ -569,20 +573,19 @@ export class Map3DStrategy extends MapStrategy {
         this.radiusSymbol.deleteIcon(icon.getId());
     }
 
-    drawIconRadius(_canvas, _color, _value, _balloonType) {
+    drawIconRadiusArea(_canvas, _color, _value, _balloonType) {
 
         var ctx = _canvas.getContext('2d'),
             width = _canvas.width,
-            height = _canvas.height
-        ;
+            height = _canvas.height;
         ctx.clearRect(0, 0, width, height);
 
         if (_balloonType) {
             this.drawBalloon(ctx, height*0.5, width, height, 5, height*0.25, _color);
-            this.setTextRadius(ctx, width*0.5, height*0.2, _value);
+            this.setTextArea(ctx, width*0.5, height*0.2, _value);
         } else {
             this.drawRoundRect(ctx, 0, height*0.3, width, height*0.25, 5, _color);
-            this.setTextRadius(ctx, width*0.5, height*0.5, _value);
+            this.setTextArea(ctx, width*0.5, height*0.5, _value);
         }
 
         return ctx.getImageData(0, 0, _canvas.width, _canvas.height).data;
@@ -624,11 +627,92 @@ export class Map3DStrategy extends MapStrategy {
         _ctx.fillText(strText, _posX, _posY);
     }
 
+    setTextArea(_ctx, _posX, _posY, _value) {
+        var strText = typeof _value === 'number' ? this.setTextComma(_value.toFixed(2)) + '㎡' : 'Invalid value';
+
+        _ctx.font = "bold 16px sans-serif";
+        _ctx.textAlign = "center";
+        _ctx.fillStyle = "rgb(0, 0, 0)";
+
+        // Draw text
+        _ctx.fillText(strText, _posX, _posY);
+    }
+
+    setTextComma(str) {
+        str = String(str);
+        return str.replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
+    }
+
     clearRadiusAnalysis() {
         this.map3D.XDClearCircleMeasurement();
 
         if (this.radiusWallLayer == null) return;
         this.clearIcon();
         this.radiusWallLayer.removeAll();
+    }
+
+    handleMeasureArea() {
+        this.clearEvents();
+        this.setMouseState('polygon');
+        this.createAreaMeasureLayer();
+
+        this.map3D.getOption().SetAreaMeasurePolygonDepthBuffer(false);
+
+        this.areaMeasureListener = (event) => {
+            const mapPoint = this.map3D.getMap().ScreenToMapPointEX(
+                new this.map3D.JSVector2D(event.clientX, event.clientY)
+            );
+
+            if (mapPoint) {
+                this.createAreaPOI(new this.map3D.JSVector3D(mapPoint.Longitude, mapPoint.Latitude, mapPoint.Altitude), "rgba(255, 204, 198, 0.8)", mapPoint.dArea, true);
+            }
+        };
+
+        document.body.addEventListener('click', this.areaMeasureListener);
+
+        this.map3D.getOption().callBackCompletePoint(() => {
+            this.clearPreviousShapes();
+            this.endPoint();
+            this.removeAreaMeasureEvent();
+        });
+    }
+
+    removeAreaMeasureEvent() {
+        document.body.removeEventListener('click', this.areaMeasureListener);
+    }
+
+    createAreaMeasureLayer() {
+        let layerList = new this.map3D.JSLayerList(true);
+        let layer = layerList.createLayer("MEASURE_AREA_POI", this.map3D.ELT_3DPOINT);
+        layer.setMaxDistance(20000.0);
+        layer.setSelectable(false);
+    }
+
+    createAreaPOI(_position, _color, _value, _balloonType) {
+        var drawCanvas = document.createElement('canvas');
+        drawCanvas.width = 100;
+        drawCanvas.height = 100;
+
+        let imageData = this.drawIconRadiusArea(drawCanvas, _color, _value, _balloonType);
+
+        let layerList = new this.map3D.JSLayerList(true);
+        let layer = layerList.nameAtLayer("MEASURE_AREA_POI");
+
+        let key = this.m_mercount + "_POI";
+        layer.removeAtKey(key);
+
+        let poi = this.map3D.createPoint(this.m_mercount + "_POI");
+        poi.setPosition(_position);
+        poi.setImage(imageData, drawCanvas.width, drawCanvas.height);
+        layer.addObject(poi, 0);
+    }
+
+    clearAreaAnalysis() {
+        this.map3D.XDClearAreaMeasurement();
+        this.m_mercount = 0;
+    }
+
+    handleMeasureDistance() {
+        console.log('Method not implemented');
     }
 }

@@ -50,11 +50,11 @@
 }
 
 .top-text {
-  top: 10px;
+  top: 8px;
 }
 
 .bottom-text {
-  bottom: 10px;
+  bottom: 8px;
 }
 
 .vertical-switch-checkbox:checked + .vertical-switch-label .top-text {

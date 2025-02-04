@@ -92,12 +92,11 @@ export const updateWmsLayers = (map, wmsLayers) => {
     if (!map || typeof map.JSLayerList !== 'function') return;
     let layerList = new map.JSLayerList(false);
     wmsLayers.forEach((layer) => {
+        const wmslayer = layerList.nameAtLayer(layer.layerName);
         if (layer.visible) {
-            const wmslayer = layerList.nameAtLayer(layer.layerName);
             if (wmslayer) wmslayer.setVisible(true);
             else createWmsLayer(map, layer);
         } else {
-            const wmslayer = layerList.nameAtLayer(layer.layerName);
             if (wmslayer) wmslayer.setVisible(false);
         }
     });

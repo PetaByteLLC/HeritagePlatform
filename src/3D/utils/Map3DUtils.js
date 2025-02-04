@@ -27,7 +27,7 @@ const _createPOIFromGeoJSON = (map, geojson, layer) => {
         img.src = PIN_PNG_URL;
         img.onload = function () {
             var canvas = document.createElement('canvas');
-            var ctx = canvas.getContext('2d');
+            var ctx = canvas.getContext('2d', { willReadFrequently: true });
             canvas.width = img.width;
             canvas.height = img.height;
             ctx.drawImage(img, 0, 0);
@@ -36,7 +36,7 @@ const _createPOIFromGeoJSON = (map, geojson, layer) => {
 
             var poi = map.createPoint(feature.id);
             poi.setPosition(new map.JSVector3D(coords[0], coords[1], map.getMap().getTerrHeight(coords[0], coords[1])));
-            poi.setImage(ctx.getImageData(0, 0, 30, 30).data, 30, 30);
+            poi.setImage(ctx.getImageData(0, 0, img.width, img.height).data, img.width, img.height);
             poi.setText(feature.properties.title);
             poi.setDescription(JSON.stringify(feature.properties));
 

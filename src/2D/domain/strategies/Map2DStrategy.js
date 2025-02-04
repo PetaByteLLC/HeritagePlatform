@@ -130,6 +130,14 @@ export class Map2DStrategy extends MapStrategy {
 		}
 	}
 
+    handleMeasureArea() {
+        console.log('Method not implemented');
+    }
+
+    handleMeasureDistance() {
+        console.log('Method not implemented');
+    }
+
     handleMeasureAltitude() {
         console.log('Method not implemented');
     }

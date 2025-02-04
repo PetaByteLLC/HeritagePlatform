@@ -1,4 +1,4 @@
-import { useEffect, useContext, useRef } from "react";
+import {useEffect, useContext, useRef} from "react";
 import { MapContext } from "../../../MapContext";
 
 export const useToolbarActions = () => {
@@ -9,6 +9,8 @@ export const useToolbarActions = () => {
     const handleCurrentLocationRef = useRef(() => {});
     const handleMeasureAltitudeRef = useRef(() => {});
     const handleMeasureRadiusRef = useRef(() => {});
+    const handleMeasureDistanceRef = useRef(() => {});
+    const handleMeasureAreaRef = useRef(() => {});
 
     useEffect(() => {
         if (!strategy) return;
@@ -17,6 +19,8 @@ export const useToolbarActions = () => {
         handleCurrentLocationRef.current = strategy.handleCurrentLocation.bind(strategy);
         handleMeasureAltitudeRef.current = strategy.handleMeasureAltitude.bind(strategy);
         handleMeasureRadiusRef.current = strategy.handleMeasureRadius.bind(strategy);
+        handleMeasureDistanceRef.current = strategy.handleMeasureDistance.bind(strategy);
+        handleMeasureAreaRef.current = strategy.handleMeasureArea.bind(strategy);
     }, [strategy]);
 
     return {
@@ -25,5 +29,7 @@ export const useToolbarActions = () => {
         handleCurrentLocation: () => handleCurrentLocationRef.current(),
         handleMeasureAltitude: () => handleMeasureAltitudeRef.current(),
         handleMeasureRadius: () => handleMeasureRadiusRef.current(),
+        handleMeasureDistance: () => handleMeasureDistanceRef.current(),
+        handleMeasureArea: () => handleMeasureAreaRef.current(),
     };
 };

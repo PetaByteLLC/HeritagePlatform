@@ -20,7 +20,7 @@ function AppContent() {
   return (
     <div className="App">
       <header className="App-header">
-        <h2>Heritage Platform</h2>
+        <h2 className="App-header-title">Heritage Platform</h2>
       </header>
       <SearchField />
       <div className={`map-container-wrap ${mode === '2D' ? 'active' : ''}`}>

@@ -2,10 +2,19 @@
     position: relative;
 }
 
-.search-field-container {
+.menu-container {
     position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     top: 2vh;
     left: 1vw;
+    z-index: 2;
+    gap: 10px;
+}
+
+.search-field-container {
+    width: 100%;
     display: flex;
     align-items: center;
     background-color: #282c34;
@@ -43,10 +52,7 @@
 }
 
 .no-data-container {
-    position: absolute;
-    top: 11vh;
-    left: 1vw;
-    width: 16vw;
+    width: 100%;
     background-color: #282c34;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -62,10 +68,6 @@
 }
 
 .result-list {
-    position: absolute;
-    top: 11vh;
-    left: 1vw;
-    width: 16vw;
     max-height: 80vh;
     overflow-y: auto;
     color: white;
@@ -107,13 +109,9 @@
 }
 
 .icon-buttons {
-    position: absolute;
-    top: calc(6vh - 2px);
-    left: 1vw;
     z-index: 2;
     display: flex;
     justify-content: center;
-    margin-top: 10px;
     gap: 10px;
 }
 
@@ -147,8 +145,8 @@
 
 .poi-details-sidebar {
     position: absolute;
-    top: 11vh;
-    left: calc(17vw + 1vw);
+    top: 94px;
+    left: 238px;
     width: 20vw;
     height: auto;
     max-height: 80vh;

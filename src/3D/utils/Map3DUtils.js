@@ -107,7 +107,7 @@ export const createWmsLayer = (map, wmsLayerJson) => {
     let options = {
 		url: `${GEOSERVER_BASE_URL}/wms?STYLES=${wmsLayerJson.style}&`,
 		layer: `${wmsLayerJson.workspace}:${wmsLayerJson.layerName}`,
-		minimumlevel: wmsLayerJson.min,
+		minimumlevel: wmsLayerJson.min - 3,
 		maximumlevel: wmsLayerJson.max,
 		tilesize: wmsLayerJson.tileSize,
 		crs: DEFAULT_SRS,

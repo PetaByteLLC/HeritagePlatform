@@ -10,7 +10,7 @@ import { faCircle } from "@fortawesome/free-regular-svg-icons";
 
 const Toolbar = () => {
     const { map2DType, setMap2DType } = useContext(MapContext);
-    const { handleZoomIn, handleZoomOut, handleCurrentLocation, handleAltitude } = useToolbarActions();
+    const { handleZoomIn, handleZoomOut, handleCurrentLocation, handleMeasureAltitude, handleMeasureRadius } = useToolbarActions();
 
     return (
         <div className="toolbar">
@@ -31,10 +31,10 @@ const Toolbar = () => {
             <button className="toolbar-button">
                 <FontAwesomeIcon icon={faRulerHorizontal}/>
             </button>
-            <button className="toolbar-button">
+            <button className="toolbar-button" onClick={handleMeasureRadius}>
                 <FontAwesomeIcon icon={faCircle}/>
             </button>
-            <button className="toolbar-button" onClick={handleAltitude}>
+            <button className="toolbar-button" onClick={handleMeasureAltitude}>
                 <FontAwesomeIcon icon={faRulerVertical}/>
             </button>
         </div>

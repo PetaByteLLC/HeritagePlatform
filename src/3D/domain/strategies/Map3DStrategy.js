@@ -116,6 +116,8 @@ export class Map3DStrategy extends MapStrategy {
 		this.clearLayer(layerList, "MEASURE_POI");
 		this.clearLayer(layerList, "MEASURE_WALL");
         this.clearLayer(layerList, "ALTITUDE_MEASURE_POI");
+        this.clearLayer(layerList, "MEASURE_RADIUS_POI");
+        this.clearLayer(layerList, "MEASURE_RADIUS_WALL");
 	}
 
 	clearLayer(layerList, layerName) {
@@ -323,7 +325,9 @@ export class Map3DStrategy extends MapStrategy {
         this.removeRectangleEvent();
         this.removeRadiusEvent();
         this.removeAltitudeEvent();
+        this.removeRadiusMeasureEvent();
         this.clearAltitudeAnalysis();
+        this.clearRadiusAnalysis();
     }
 
 	handleZoomIn() {
@@ -364,7 +368,7 @@ export class Map3DStrategy extends MapStrategy {
 		moveToSingleFeature(this.map3D, feature);
 	}
 
-    handleAltitude() {
+    handleMeasureAltitude() {
         this.clearEvents();
         this.setMouseState('altitude');
         this.altitudeSymbol = this.map3D.getSymbol();
@@ -396,19 +400,11 @@ export class Map3DStrategy extends MapStrategy {
         var imageData = this.drawIcon(drawCanvas, _color, _value, _subValue),
             altIndex = this.altIndex;
 
-        console.log('imageData', imageData);
-        console.log('altIndex', altIndex);
-        console.log('drawCanvas', drawCanvas);
-        console.log('imageData', imageData);
-        console.log('drawCanvas width', drawCanvas.width, 'drawCanvas.height', drawCanvas.height);
         if (this.altitudeSymbol.insertIcon("Icon"+altIndex, imageData, drawCanvas.width, drawCanvas.height)) {
 
             var icon = this.altitudeSymbol.getIcon("Icon"+altIndex);
-            console.log('icon', icon);
 
             var poi = this.map3D.createPoint("POI"+altIndex);
-            console.log('poi', poi);
-
             poi.setPosition(_position);
             poi.setIcon(icon);
 
@@ -424,7 +420,7 @@ export class Map3DStrategy extends MapStrategy {
         ;
         ctx.clearRect(0, 0, width, height);
 
-        if (_subValue == -1) {
+        if (_subValue === -1) {
             this.drawRoundRect(ctx, 50, 20, 100, 20, 5, _color);
 
         } else {
@@ -510,5 +506,129 @@ export class Map3DStrategy extends MapStrategy {
             layer.removeAtKey("POI"+i);
             symbol.deleteIcon(icon.getId());
         }
+    }
+
+    handleMeasureRadius() {
+        this.clearEvents();
+        this.setMouseState('circle');
+        this.radiusSymbol = this.map3D.getSymbol();
+
+        let layerList = new this.map3D.JSLayerList(true);
+        this.radiusLayer = layerList.createLayer("MEASURE_RADIUS_POI", this.map3D.ELT_3DPOINT);
+        this.radiusLayer.setMaxDistance(20000.0);
+        this.radiusLayer.setSelectable(false);
+
+        this.radiusWallLayer = layerList.createLayer("MEASURE_RADIUS_WALL", this.map3D.ELT_POLYHEDRON);
+        this.radiusWallLayer.setMaxDistance(20000.0);
+        this.radiusWallLayer.setSelectable(false);
+        this.radiusWallLayer.setEditable(true);
+
+        this.radiusMeasureListener = function (e) {
+            if (e.dTotalDistance > 0) {
+                this.clearIcon();
+                this.createRadiusPOI(new this.map3D.JSVector3D(e.dMidLon, e.dMidLat, e.dMidAlt), "rgba(255, 204, 198, 0.8)", e.dTotalDistance, true);
+            }
+        }.bind(this);
+
+        this.map3D.canvas.addEventListener("Fire_EventAddRadius", this.radiusMeasureListener);
+    }
+
+    removeRadiusMeasureEvent() {
+        this.map3D.canvas.removeEventListener("Fire_EventAddRadius", this.radiusMeasureListener);
+    }
+
+    createRadiusPOI(_position, _color, _value, _balloonType) {
+
+        var drawCanvas = document.createElement('canvas');
+        drawCanvas.width = 100;
+        drawCanvas.height = 100;
+
+        var imageData = this.drawIconRadius(drawCanvas, _color, _value, _balloonType);
+        if (this.radiusSymbol.insertIcon("Icon", imageData, drawCanvas.width, drawCanvas.height)) {
+            var icon = this.radiusSymbol.getIcon("Icon");
+
+            var poi = this.map3D.createPoint("POI");
+            poi.setPosition(_position);
+            poi.setIcon(icon);
+            this.radiusLayer.addObject(poi, 0);
+        }
+    }
+
+    clearIcon() {
+
+        if (this.radiusLayer == null) return;
+        var icon, poi;
+
+        poi = this.radiusLayer.keyAtObject("POI");
+
+        if (poi == null) return;
+
+        icon = poi.getIcon();
+        this.radiusLayer.removeAtKey("POI");
+
+        this.radiusSymbol.deleteIcon(icon.getId());
+    }
+
+    drawIconRadius(_canvas, _color, _value, _balloonType) {
+
+        var ctx = _canvas.getContext('2d'),
+            width = _canvas.width,
+            height = _canvas.height
+        ;
+        ctx.clearRect(0, 0, width, height);
+
+        if (_balloonType) {
+            this.drawBalloon(ctx, height*0.5, width, height, 5, height*0.25, _color);
+            this.setTextRadius(ctx, width*0.5, height*0.2, _value);
+        } else {
+            this.drawRoundRect(ctx, 0, height*0.3, width, height*0.25, 5, _color);
+            this.setTextRadius(ctx, width*0.5, height*0.5, _value);
+        }
+
+        return ctx.getImageData(0, 0, _canvas.width, _canvas.height).data;
+    }
+
+    drawBalloon(ctx, marginBottom, width, height,
+                         barWidth, barHeight,
+                         color) {
+
+        var wCenter = width * 0.5;
+
+        ctx.beginPath();
+        ctx.moveTo(0, 				 0);
+        ctx.lineTo(0, 				 height-barHeight-marginBottom);
+        ctx.lineTo(wCenter-barWidth, height-barHeight-marginBottom);
+        ctx.lineTo(wCenter, 		 height-marginBottom);
+        ctx.lineTo(wCenter+barWidth, height-barHeight-marginBottom);
+        ctx.lineTo(width,			 height-barHeight-marginBottom);
+        ctx.lineTo(width,			 0);
+        ctx.closePath();
+
+        ctx.fillStyle = color;
+        ctx.fill();
+    }
+
+    setTextRadius(_ctx, _posX, _posY, _value) {
+        var strText = "";
+
+        if (typeof _value == 'number') {
+            strText = this.setKilloUnit(_value, 0.001, 0);
+        } else {
+            strText = _value;
+        }
+
+        _ctx.font = "bold 16px sans-serif";
+        _ctx.textAlign = "center";
+        _ctx.fillStyle = "rgb(0, 0, 0)";
+
+        _ctx.fillText(strText, _posX, _posY);
+    }
+
+    clearRadiusAnalysis() {
+        this.map3D.XDClearCircleMeasurement();
+
+        if (this.radiusWallLayer == null) return;
+        this.clearIcon();
+        this.radiusWallLayer.removeAll();
     }
 }

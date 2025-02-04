@@ -35,7 +35,11 @@ export class MapStrategy {
 		throw new Error('Method not implemented');
 	}
 
-    handleAltitude() {
+    handleMeasureAltitude() {
+        throw new Error('Method not implemented');
+    }
+
+    handleMeasureRadius() {
         throw new Error('Method not implemented');
     }
 }

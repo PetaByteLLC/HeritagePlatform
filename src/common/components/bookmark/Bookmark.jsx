@@ -45,6 +45,10 @@ const Bookmark = () => {
             })
     };
 
+    const showBookmark = (bookmark) => {
+        strategy.showBookmark(bookmark);
+    };
+
     const removeBookmark = (bookmark) => {
         deleteBookmark(bookmark)
             .then(resp => {
@@ -89,7 +93,7 @@ const Bookmark = () => {
                         )
                         : bookmarks.map((bookmark, index) => (
                         <div key={bookmark.id} className="bookmark-item">
-                            <div className="bookmark-item-body" onClick={() => strategy.showBookmark(bookmark)}>
+                            <div className="bookmark-item-body" onClick={() => showBookmark(bookmark)}>
                                 <div className="bookmark-item-icon">
                                     <FontAwesomeIcon icon={faBookmark} />
                                 </div>

@@ -137,8 +137,9 @@ export class Map2DStrategy extends MapStrategy {
 	eventHandler() {
 		let self = this;
 
-		this.map2D.on('click', function (event) {
+		self.map2D.on('click', function (event) {
 			self.coordinate = toLonLat(event.coordinate);
+			console.log(self.coordinate);
 			self._showPoint(self.coordinate, 'red');
 		});
 	}

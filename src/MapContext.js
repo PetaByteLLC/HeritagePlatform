@@ -16,12 +16,24 @@ export const MapProvider = ({ children }) => {
     const [strategy, setStrategy] = useState(null);
     const [selectedPOI, setSelectedPOI] = useState(null);
     const [wmsLayers, setWmsLayers] = useState(WMSLayers);
+    const [init2D, setInit2D] = useState(null);
+    const [init3D, setInit3D] = useState(null);
 
     useEffect(() => {
         if (mode === '2D' && map2D) {
-            setStrategy(new Map2DStrategy(map2D));
+            let temp;
+            if (!init2D)  {
+                temp = new Map2DStrategy(map2D);
+                setInit2D(temp);
+            }
+            setStrategy(init2D || temp);
         } else if (mode === '3D' && map3D) {
-            setStrategy(new Map3DStrategy(map3D));
+            let temp;
+            if (!init3D) {
+                temp = new Map3DStrategy(map3D);
+                setInit3D(temp);
+            }
+            setStrategy(init3D || temp);
         }
     }, [mode, map2D, map3D]);
 

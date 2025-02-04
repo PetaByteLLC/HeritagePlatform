@@ -1,10 +1,12 @@
-import { POI_LAYER_NAME, WFS_VERSION } from "../../common/constants/GeoserverConfig";
+import {POI_LAYER_NAME, WFS_VERSION} from "../../common/constants/GeoserverConfig";
 import GeoJSON from 'ol/format/GeoJSON';
 import { boundingExtent } from 'ol/extent';
 import { DEFAULT_SRS, WMS_VERSION, } from "../../common/constants/GeoserverConfig";
 import { GEOSERVER_BASE_URL } from "../../common/constants/ApiUrl";
 import { PIN_PNG_URL } from "../../common/constants/GeneralConfig";
 import { fetchPOIByLayer } from "../../common/domain/usecases/SearchPOIUseCase";
+import Feature from "ol/Feature";
+import Polygon from "ol/geom/Polygon";
 
 
 export const addGeoJSONToMap = (map, geojson) => {
@@ -218,4 +220,15 @@ const _extendBBox = (bbox, meters) => {
     ];
 
     return extendedBbox;
+}
+
+export const convertToGeoJSON = (coords) => {
+    if (!Array.isArray(coords) || coords.length < 3) return null;
+
+    const closedCoords = [...coords, coords[0]];
+    const transformedCoords = closedCoords.map(coord => [coord.longitude, coord.latitude]);
+
+    return new Feature({
+        geometry: new Polygon([transformedCoords])
+    });
 }

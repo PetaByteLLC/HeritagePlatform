@@ -4,6 +4,7 @@ import { boundingExtent } from 'ol/extent';
 import { DEFAULT_SRS, WMS_VERSION, } from "../../common/constants/GeoserverConfig";
 import { GEOSERVER_BASE_URL } from "../../common/constants/ApiUrl";
 import { PIN_PNG_URL } from "../../common/constants/GeneralConfig";
+import { fetchPOIByLayer } from "../../common/domain/usecases/SearchPOIUseCase";
 import Feature from "ol/Feature";
 import Polygon from "ol/geom/Polygon";
 
@@ -26,7 +27,7 @@ const _createPOIFromGeoJSON = (map, geojson, layer) => {
         img.src = PIN_PNG_URL;
         img.onload = function () {
             var canvas = document.createElement('canvas');
-            var ctx = canvas.getContext('2d');
+            var ctx = canvas.getContext('2d', { willReadFrequently: true });
             canvas.width = img.width;
             canvas.height = img.height;
             ctx.drawImage(img, 0, 0);
@@ -35,7 +36,7 @@ const _createPOIFromGeoJSON = (map, geojson, layer) => {
 
             var poi = map.createPoint(feature.id);
             poi.setPosition(new map.JSVector3D(coords[0], coords[1], map.getMap().getTerrHeight(coords[0], coords[1])));
-            poi.setImage(ctx.getImageData(0, 0, 30, 30).data, 30, 30);
+            poi.setImage(ctx.getImageData(0, 0, img.width, img.height).data, img.width, img.height);
             poi.setText(feature.properties.title);
             poi.setDescription(JSON.stringify(feature.properties));
 
@@ -133,7 +134,8 @@ export const removeWmsLayer = (map, name) => {
 
 export const updateWfsLayers = (map, wfsLayers) => {
     if (!map || typeof map.getTileLayerList !== 'function') return;
-    var layerList = map.getTileLayerList();
+    var layerList = new map.JSLayerList(true);
+
     wfsLayers.forEach((layer) => {
         const wfslayer = layerList.nameAtLayer(layer.layerName);
         if (layer.visible) {
@@ -143,41 +145,21 @@ export const updateWfsLayers = (map, wfsLayers) => {
             if (wfslayer) wfslayer.setVisible(false);
         }
     });
+    
 }
 
-export const createWfsLayer = (map, wfsLayerJson) => {
-    const layer = map.getTileLayerList().createXDServerLayer({
-        url: 'http://0.0.0.0',
-        servername: "",
-        name: wfsLayerJson.layerName,
-        type: 23,
-        minLevel: wfsLayerJson.min,
-        maxLevel: wfsLayerJson.max,
-    });
+export const createWfsLayer = async (map, wfsLayerJson) => {
+    var layerList = new map.JSLayerList(true);
+    var layer = layerList.createLayer(wfsLayerJson.layerName, map.ELT_3DPOINT);
     layer.setVisible(true);
     // TODO add type (PIN or GRID)
-    layer.setUserTileLoadCallback((e) => _poiCallback(map, layer, e, wfsLayerJson, null));
+    var geojson = await fetchPOIByLayer(`${wfsLayerJson.workspace}:${wfsLayerJson.layerName}`);
+    layer.setMinDistance(0);
+    layer.setMaxDistance(50000);
+    _createWfsPOI(map, geojson, layer);
 }
 
-const _poiCallback = (map, layer, event, wfsLayerJson, poiType) => {
-    let minx = parseFloat(event.rect.minx);
-    let miny = parseFloat(event.rect.miny);
-    let maxx = parseFloat(event.rect.maxx);
-    let maxy = parseFloat(event.rect.maxy);
-    let _url = `${GEOSERVER_BASE_URL}/wfs?`;
-    let srs = `&srsName=${DEFAULT_SRS}`;
-    let service_request = `service=WFS&request=GetFeature&typeName=${wfsLayerJson.workspace}:${wfsLayerJson.layerName}`;
-    let version = `&VERSION=${WFS_VERSION}&outputFormat=application/json`;
-    let bbox = '&BBOX=' + minx + ',' + miny + ',' + maxx + ',' + maxy;
-    var url = _url + service_request + srs + version + bbox;
-    fetch(url)
-        .then(res => res.json())
-        .then(res => {
-            _createWfsPOI(map, res, layer, event);
-        });
-}
-
-const _createWfsPOI = (map, geojson, layer, tileInfo) => {
+const _createWfsPOI = (map, geojson, layer) => {
     if (geojson.type === undefined || geojson.type !== "FeatureCollection" || geojson.features === undefined || geojson.features.length < 1) {
         console.log('No Json or No Features');
         return;
@@ -190,7 +172,7 @@ const _createWfsPOI = (map, geojson, layer, tileInfo) => {
     img.layer = layer;
     img.onload = function () {
         var canvas = document.createElement('canvas');
-        var ctx = canvas.getContext('2d');
+        var ctx = canvas.getContext('2d', { willReadFrequently: true });
         canvas.width = img.width;
         canvas.height = img.height;
         ctx.drawImage(img, 0, 0);
@@ -201,15 +183,14 @@ const _createWfsPOI = (map, geojson, layer, tileInfo) => {
             var poi = map.createPoint(point.id);
 
             // TODO get height from server
-            poi.setPosition(new map.JSVector3D(coords[0], coords[1], map.getMap().getTerrHeight(coords[0], coords[1])));
-            poi.setImage(ctx.getImageData(0, 0, 30, 30).data, 30, 30);
+            poi.setPosition(new map.JSVector3D(coords[0], coords[1], map.getMap().getTerrHeightFast(coords[0], coords[1])));
+            poi.setImage(ctx.getImageData(0, 0, img.width, img.height).data, img.width, img.height);
             poi.setText(point.properties.title);
             poi.setDescription(JSON.stringify(point.properties));
-            layer.addTileInObject(tileInfo, poi);
+            poi.setVisibleRange(true, 1, 100000);
             layer.addObject(poi, 0);
         });
     }
-    layer.setTileInObjectEnd(tileInfo);
 }
 
 const _extendBBox = (bbox, meters) => {

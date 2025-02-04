@@ -6,7 +6,8 @@ import {
     fetchAllBookmarks as AllBookmarks,
     addBookmark as AddBookmark,
     editBookmark as EditBookmark,
-    deleteBookmark as DeleteBookmark
+    deleteBookmark as DeleteBookmark,
+    fetchPOIByLayer as POIByLayer
 } from '../sources/GeoserverSource';
 
 
@@ -19,6 +20,8 @@ export const fetchPOIByPolygon = async (keyword, wkt) => await POIByPolygon(keyw
 export const fetchAllPOI = async (keyword) => await AllPOI(keyword);
 
 export const fetchAllBookmarks = async (keyword) => await AllBookmarks(keyword);
+
+export const fetchPOIByLayer = async (name) => await POIByLayer(name);
 
 export const addBookmark = async (keyword) => await AddBookmark(keyword);
 

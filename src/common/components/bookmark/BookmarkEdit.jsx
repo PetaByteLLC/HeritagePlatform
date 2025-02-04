@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
+import ReactDOM from "react-dom";
 
 const BookmarkEdit = ({ onAdd }) => {
     const [name, setName] = useState('');
@@ -18,7 +19,7 @@ const BookmarkEdit = ({ onAdd }) => {
         closeRef.current.click();
     };
 
-    return (
+    return ReactDOM.createPortal(
         <div className="modal fade" id="bookmarkEditModal" tabIndex="-1" aria-labelledby="bookmarkEditModalLabel" aria-hidden="true">
             <div className="modal-dialog">
                 <div className="modal-content">
@@ -77,7 +78,8 @@ const BookmarkEdit = ({ onAdd }) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.getElementById("modal-root")
     );
 };
 

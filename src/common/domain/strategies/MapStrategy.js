@@ -43,6 +43,10 @@ export class MapStrategy {
 		throw new Error('Method not implemented');
 	}
 
+	viewBookmark(feature) {
+		throw new Error('Method not implemented');
+	}
+
 	removeBookmark() {
 		throw new Error('Method not implemented');
 	}

@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faPlus, faMinus, faTimes, faBookmark, faSearch, faAdd, faTrash} from '@fortawesome/free-solid-svg-icons';
+import { faBookmark, faSearch, faAdd, faTrash, faEye, faMousePointer } from '@fortawesome/free-solid-svg-icons';
 import { MapContext } from '../../../MapContext';
 import { fetchAllBookmarks, addBookmark, editBookmark, deleteBookmark } from "../../data/repositories/GeoserverRepository";
 import BookmarkEdit from './BookmarkEdit'
 import './Bookmark.css';
 
 const Bookmark = () => {
-    const { strategy } = useContext(MapContext);
+    const { strategy, mode } = useContext(MapContext);
     const [error, setError] = useState(null);
     const [error2, setError2] = useState(null);
     const [bookmarks, setBookmarks] = useState([]);
@@ -49,6 +49,10 @@ const Bookmark = () => {
         strategy.showBookmark(bookmark);
     };
 
+    const viewBookmark = (bookmark) => {
+        strategy.viewBookmark(bookmark);
+    };
+
     const removeBookmark = (bookmark) => {
         deleteBookmark(bookmark)
             .then(resp => {
@@ -71,7 +75,7 @@ const Bookmark = () => {
                 <div className="offcanvas-body">
                     <div className="bookmark-actions">
                         <div className="hstack gap-3">
-                            <input className="form-control me-auto" type="text"
+                            <input className="form-control me-auto" type="search"
                                    placeholder="Search bookmark..."
                                    aria-label="Search bookmark..."
                                    value={searchQuery}
@@ -93,7 +97,7 @@ const Bookmark = () => {
                         )
                         : bookmarks.map((bookmark, index) => (
                         <div key={bookmark.id} className="bookmark-item">
-                            <div className="bookmark-item-body" onClick={() => showBookmark(bookmark)}>
+                            <div className="bookmark-item-body">
                                 <div className="bookmark-item-icon">
                                     <FontAwesomeIcon icon={faBookmark} />
                                 </div>
@@ -101,8 +105,24 @@ const Bookmark = () => {
                                     {bookmark.properties.name}
                                 </div>
                             </div>
-                            <div className="bookmark-item-action" onClick={() => removeBookmark(bookmark)}>
-                                <FontAwesomeIcon icon={faTrash} />
+                            <div className="bookmark-item-action">
+                                <div className="hstack gap-1">
+                                    <div className="btn-group btn-group-sm" role="group" aria-label="Small button group">
+                                        <button type="button" className="btn btn-outline-success" onClick={() => showBookmark(bookmark)}
+                                                title="Find bookmark">
+                                            <FontAwesomeIcon icon={faMousePointer} />
+                                        </button>
+                                        {mode === '3D' && (<button type="button" className="btn btn-outline-success" onClick={() => viewBookmark(bookmark)}
+                                                title="View bookmark">
+                                            <FontAwesomeIcon icon={faEye} />
+                                        </button>)}
+                                    </div>
+                                    <div className="vr"></div>
+                                    <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => removeBookmark(bookmark)}
+                                            title="Delete bookmark">
+                                        <FontAwesomeIcon icon={faTrash} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         ))}

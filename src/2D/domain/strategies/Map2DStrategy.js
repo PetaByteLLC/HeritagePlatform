@@ -139,7 +139,7 @@ export class Map2DStrategy extends MapStrategy {
 
 		self.map2D.on('click', function (event) {
 			self.coordinate = toLonLat(event.coordinate);
-			console.log(self.coordinate);
+			// console.log(self.coordinate);
 			self._showPoint(self.coordinate, 'red');
 		});
 	}
@@ -157,8 +157,8 @@ export class Map2DStrategy extends MapStrategy {
 			"properties": {
 				"name": name,
 				"level": Math.floor(view.getZoom()),
-				"direction": 90,
-				"tilt": 45,
+				"direction":0,
+				"tilt": 90,
 				"fov_x": 88,
 				"fov_y": 88,
 				"color": color || "#c8ff00",
@@ -176,8 +176,12 @@ export class Map2DStrategy extends MapStrategy {
 		view.animate({
 			center: fromLonLat(feature.geometry.coordinates),
 			zoom: feature.properties.level,
-			duration: 1500,
+			duration: 500,
 		});
+	}
+
+	viewBookmark(feature) {
+		this.showBookmark(feature);
 	}
 
 	removeBookmark() {
@@ -189,7 +193,7 @@ export class Map2DStrategy extends MapStrategy {
 
 	_showPoint(coordinate, color){
 		let self = this;
-		console.log("self", self);
+		// console.log("self", self);
 		if (!!self.vectorLayer) {
 			self.map2D.removeLayer(self.vectorLayer);
 		}

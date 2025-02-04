@@ -42,7 +42,9 @@
 
 .vertical-switch-text {
   position: absolute;
-  width: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
   text-align: center;
   font-size: 10px;
   font-weight: bold;

@@ -13,7 +13,6 @@ export class Map3DStrategy extends MapStrategy {
         this.endDistancePoint = this.endDistancePoint.bind(this);
         this.addAreaPoint = this.addAreaPoint.bind(this);
         this.endAreaPoint = this.endAreaPoint.bind(this);
-        this.activeButton = null;
 	}
 
 	addInteraction(icon, setCurrentSpatial) {
@@ -139,7 +138,7 @@ export class Map3DStrategy extends MapStrategy {
 	}
 
 	removePolygonClickEvent() {
-		document.body.removeEventListener('click', this.handlePolygonClick);
+		this.map3D.canvas.removeEventListener('click', this.handlePolygonClick);
 	}
 
 	endPoint() {
@@ -221,11 +220,11 @@ export class Map3DStrategy extends MapStrategy {
 			}
 		};
 
-		document.body.addEventListener('click', this.handleClickEvent);
+        this.map3D.canvas.addEventListener('click', this.handleClickEvent);
 	}
 
 	removeRectangleEvent() {
-		document.body.removeEventListener('click', this.handleClickEvent);
+        this.map3D.canvas.removeEventListener('click', this.handleClickEvent);
 	}
 
 	getSquareCoordinates() {
@@ -341,6 +340,8 @@ export class Map3DStrategy extends MapStrategy {
         this.clearAltitudeAnalysis();
         this.clearRadiusAnalysis();
         this.clearAreaAnalysis();
+        this.map3D.getOption().callBackAddPoint(null);
+        this.map3D.getOption().callBackCompletePoint(null);
     }
 
 	handleZoomIn() {
@@ -413,11 +414,11 @@ export class Map3DStrategy extends MapStrategy {
         var imageData = this.drawIcon(drawCanvas, _color, _value, _subValue),
             altIndex = this.altIndex;
 
-        if (this.altitudeSymbol.insertIcon("Icon"+altIndex, imageData, drawCanvas.width, drawCanvas.height)) {
+        if (this.altitudeSymbol.insertIcon("AltitudeIcon"+altIndex, imageData, drawCanvas.width, drawCanvas.height)) {
 
-            var icon = this.altitudeSymbol.getIcon("Icon"+altIndex);
+            var icon = this.altitudeSymbol.getIcon("AltitudeIcon"+altIndex);
 
-            var poi = this.map3D.createPoint("POI"+altIndex);
+            var poi = this.map3D.createPoint("ALTITUDE_POI"+altIndex);
             poi.setPosition(_position);
             poi.setIcon(icon);
 
@@ -514,9 +515,9 @@ export class Map3DStrategy extends MapStrategy {
 
         var i, len, icon, poi;
         for (i=0, len=layer.getObjectCount(); i<len; i++) {
-            poi = layer.keyAtObject("POI"+i);
+            poi = layer.keyAtObject("ALTITUDE_POI"+i);
             icon = poi.getIcon();
-            layer.removeAtKey("POI"+i);
+            layer.removeAtKey("ALTITUDE_POI"+i);
             symbol.deleteIcon(icon.getId());
         }
     }
@@ -557,14 +558,17 @@ export class Map3DStrategy extends MapStrategy {
         drawCanvas.height = 100;
 
         var imageData = this.drawIconRadiusArea(drawCanvas, _color, _value, _balloonType);
-        if (this.radiusSymbol.insertIcon("Icon", imageData, drawCanvas.width, drawCanvas.height)) {
-            var icon = this.radiusSymbol.getIcon("Icon");
 
-            var poi = this.map3D.createPoint("POI");
-            poi.setPosition(_position);
-            poi.setIcon(icon);
-            this.radiusLayer.addObject(poi, 0);
+        var oldIcon = this.radiusSymbol.getIcon("RadiusIcon")
+        if (oldIcon) {
+            this.radiusSymbol.deleteIcon(oldIcon.getId());
         }
+        this.radiusSymbol.insertIcon("RadiusIcon", imageData, drawCanvas.width, drawCanvas.height);
+        var icon = this.radiusSymbol.getIcon("RadiusIcon");
+        var poi = this.map3D.createPoint("RADIUS_POI");
+        poi.setPosition(_position);
+        poi.setIcon(icon);
+        this.radiusLayer.addObject(poi, 0);
     }
 
     clearIcon() {
@@ -572,12 +576,12 @@ export class Map3DStrategy extends MapStrategy {
         if (this.radiusLayer == null) return;
         var icon, poi;
 
-        poi = this.radiusLayer.keyAtObject("POI");
+        poi = this.radiusLayer.keyAtObject("RADIUS_POI");
 
         if (poi == null) return;
 
         icon = poi.getIcon();
-        this.radiusLayer.removeAtKey("POI");
+        this.radiusLayer.removeAtKey("RADIUS_POI");
 
         this.radiusSymbol.deleteIcon(icon.getId());
     }

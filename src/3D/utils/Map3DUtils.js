@@ -2,6 +2,8 @@ import { POI_LAYER_NAME } from "../../common/constants/GeoserverConfig";
 import GeoJSON from 'ol/format/GeoJSON';
 import { boundingExtent } from 'ol/extent';
 import { DEFAULT_SRS } from "../../common/constants/GeoserverConfig";
+import Feature from "ol/Feature";
+import Polygon from "ol/geom/Polygon";
 
 
 export const addGeoJSONToMap = (map, geojson) => {
@@ -114,4 +116,15 @@ const _extendBBox = (bbox, meters) => {
     ];
 
     return extendedBbox;
+}
+
+export const convertToGeoJSON = (coords) => {
+    if (!Array.isArray(coords) || coords.length < 3) return null;
+
+    const closedCoords = [...coords, coords[0]];
+    const transformedCoords = closedCoords.map(coord => [coord.longitude, coord.latitude]);
+
+    return new Feature({
+        geometry: new Polygon([transformedCoords])
+    });
 }

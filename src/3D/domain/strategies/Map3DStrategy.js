@@ -1,8 +1,6 @@
 import { MapStrategy } from '../../../common/domain/strategies/MapStrategy';
-import { addGeoJSONToMap, removeLayerFromMap, moveToSingleFeature } from '../../utils/Map3DUtils';
+import {addGeoJSONToMap, removeLayerFromMap, moveToSingleFeature, convertToGeoJSON} from '../../utils/Map3DUtils';
 import { POI_LAYER_NAME } from '../../../common/constants/GeoserverConfig';
-import Feature from "ol/Feature";
-import Polygon from "ol/geom/Polygon";
 
 export class Map3DStrategy extends MapStrategy {
 	constructor(map3D) {
@@ -10,13 +8,11 @@ export class Map3DStrategy extends MapStrategy {
 		this.map3D = map3D;
 		this.m_mercount = 0;
 		this.m_objcount = 0;
+        this.altIndex = 0;
 	}
 
 	addInteraction(icon, setCurrentSpatial) {
-		this.clearMeasurements();
-		this.clearPreviousShapes();
-		this.removeRectangleEvent();
-		this.removeRadiusEvent();
+		this.clearEvents();
 		let coordinate = null;
 		switch (icon) {
 			case 'circle':
@@ -119,6 +115,7 @@ export class Map3DStrategy extends MapStrategy {
 		this.clearLayer(layerList, "POLYGON_LAYER");
 		this.clearLayer(layerList, "MEASURE_POI");
 		this.clearLayer(layerList, "MEASURE_WALL");
+        this.clearLayer(layerList, "ALTITUDE_MEASURE_POI");
 	}
 
 	clearLayer(layerList, layerName) {
@@ -193,7 +190,7 @@ export class Map3DStrategy extends MapStrategy {
 		map.clearInputPoint();
 		this.map3D.XDClearDistanceMeasurement();
 
-		return this.convertToFeature(coordinates);
+		return convertToGeoJSON(coordinates);
 	}
 
 	getPolygonStyle() {
@@ -203,17 +200,6 @@ export class Map3DStrategy extends MapStrategy {
 		polyStyle.setOutLineColor(new this.map3D.JSColor(255, 255, 255, 0));
 
 		return polyStyle;
-	}
-
-	convertToFeature(coords) {
-		if (!Array.isArray(coords) || coords.length < 3) return null;
-
-		const closedCoords = [...coords, coords[0]];
-		const transformedCoords = closedCoords.map(coord => [coord.longitude, coord.latitude]);
-
-		return new Feature({
-			geometry: new Polygon([transformedCoords])
-		});
 	}
 
 	initRectangleEvent(setCurrentSpatial) {
@@ -249,7 +235,7 @@ export class Map3DStrategy extends MapStrategy {
 			longitude: point.Longitude,
 			latitude: point.Latitude
 		}));
-		return this.convertToFeature(coordinates);
+		return convertToGeoJSON(coordinates);
 	}
 
 	setMouseState(state) {
@@ -258,6 +244,7 @@ export class Map3DStrategy extends MapStrategy {
 			polygon: this.map3D.MML_ANALYS_DISTANCE,
             circle: this.map3D.MML_ANALYS_AREA_CIRCLE,
 			default: this.map3D.MML_MOVE_GRAB,
+            altitude: this.map3D.MML_ANALYS_ALTITUDE,
         };
 
         const mouseState = mouseStates[state];
@@ -330,6 +317,15 @@ export class Map3DStrategy extends MapStrategy {
 		this.map3D.XDClearCircleMeasurement();
     }
 
+    clearEvents() {
+        this.clearMeasurements();
+        this.clearPreviousShapes();
+        this.removeRectangleEvent();
+        this.removeRadiusEvent();
+        this.removeAltitudeEvent();
+        this.clearAltitudeAnalysis();
+    }
+
 	handleZoomIn() {
 		this.zoom(4);
 	}
@@ -367,4 +363,152 @@ export class Map3DStrategy extends MapStrategy {
 	moveToSingleFeature(feature) {
 		moveToSingleFeature(this.map3D, feature);
 	}
+
+    handleAltitude() {
+        this.clearEvents();
+        this.setMouseState('altitude');
+        this.altitudeSymbol = this.map3D.getSymbol();
+
+        var layerList = new this.map3D.JSLayerList(true);
+        this.altitudeLayer = layerList.createLayer("ALTITUDE_MEASURE_POI", this.map3D.ELT_3DPOINT);
+        this.altitudeLayer.setMaxDistance(20000.0);
+        this.altitudeLayer.setSelectable(false);
+
+        this.altitudeListener = (e) => {
+            this.createAltitudePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt),
+                "rgba(10, 10, 0, 0.5)",
+                e.dGroundAltitude, e.dObjectAltitude);
+        };
+
+        this.map3D.canvas.addEventListener("Fire_EventAddAltitudePoint", this.altitudeListener);
+    }
+
+    removeAltitudeEvent() {
+        this.map3D.canvas.removeEventListener("Fire_EventAddAltitudePoint", this.altitudeListener);
+    }
+
+    createAltitudePOI(_position, _color, _value, _subValue) {
+
+        var drawCanvas = document.createElement('canvas');
+        drawCanvas.width = 200;
+        drawCanvas.height = 100;
+
+        var imageData = this.drawIcon(drawCanvas, _color, _value, _subValue),
+            altIndex = this.altIndex;
+
+        console.log('imageData', imageData);
+        console.log('altIndex', altIndex);
+        console.log('drawCanvas', drawCanvas);
+        console.log('imageData', imageData);
+        console.log('drawCanvas width', drawCanvas.width, 'drawCanvas.height', drawCanvas.height);
+        if (this.altitudeSymbol.insertIcon("Icon"+altIndex, imageData, drawCanvas.width, drawCanvas.height)) {
+
+            var icon = this.altitudeSymbol.getIcon("Icon"+altIndex);
+            console.log('icon', icon);
+
+            var poi = this.map3D.createPoint("POI"+altIndex);
+            console.log('poi', poi);
+
+            poi.setPosition(_position);
+            poi.setIcon(icon);
+
+            this.altitudeLayer.addObject(poi, 0);
+            this.altIndex++;
+        }
+    }
+
+    drawIcon(_canvas, _color, _value, _subValue) {
+        var ctx = _canvas.getContext('2d'),
+            width = _canvas.width,
+            height = _canvas.height
+        ;
+        ctx.clearRect(0, 0, width, height);
+
+        if (_subValue == -1) {
+            this.drawRoundRect(ctx, 50, 20, 100, 20, 5, _color);
+
+        } else {
+            this.drawRoundRect(ctx, 50, 5, 100, 35, 5, _color);
+            this.setText(ctx, width*0.5, height*0.2, 'Ground Altitude : ' + this.setKilloUnit(_subValue, 0.001, 0));
+        }
+        this.setText(ctx, width*0.5, height*0.2+15, 'Elevation : '+ this.setKilloUnit(_value, 0.001, 0));
+
+        this.drawDot(ctx, width, height);
+        return ctx.getImageData(0, 0, _canvas.width, _canvas.height).data;
+    }
+
+    drawDot(ctx, width, height) {
+
+        ctx.beginPath();
+        ctx.lineWidth = 6;
+        ctx.arc(width*0.5, height*0.5, 2, 0, 2*Math.PI, false);
+        ctx.closePath();
+
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
+        ctx.fill();
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = "rgba(255, 255, 0, 0.8)";
+        ctx.stroke();
+    }
+
+    drawRoundRect(ctx,
+                           x, y,
+                           width, height, radius,
+                           color) {
+
+        if (width < 2 * radius) 	radius = width * 0.5;
+        if (height < 2 * radius) 	radius = height * 0.5;
+
+        ctx.beginPath();
+        ctx.moveTo(x+radius, y);
+        ctx.arcTo(x+width, 	y, 	 		x+width, 	y+height, 	radius);
+        ctx.arcTo(x+width, 	y+height, 	x,		 	y+height, 	radius);
+        ctx.arcTo(x, 	 	y+height, 	x,   		y,   		radius);
+        ctx.arcTo(x,	   	y,   	 	x+width, 	y,   		radius);
+        ctx.closePath();
+
+        ctx.fillStyle = color;
+        ctx.fill();
+
+        return ctx;
+    }
+
+    setText(_ctx, _posX, _posY, _strText) {
+
+        _ctx.font = "bold 12px sans-serif";
+        _ctx.textAlign = "center";
+
+        _ctx.fillStyle = "rgb(255, 255, 255)";
+        _ctx.fillText(_strText, _posX, _posY);
+    }
+
+    setKilloUnit(_text, _meterToKilloRate, _decimalSize){
+
+        if (_decimalSize < 0){
+            _decimalSize = 0;
+        }
+        if (typeof _text == "number") {
+            if (_text < 1.0/(_meterToKilloRate*Math.pow(10,_decimalSize))) {
+                _text = _text.toFixed(1).toString()+'m';
+            } else {
+                _text = (_text*_meterToKilloRate).toFixed(2).toString()+'㎞';
+            }
+        }
+        return _text;
+    }
+
+    clearAltitudeAnalysis() {
+
+        var layer = this.altitudeLayer,
+            symbol = this.altitudeSymbol;
+        if (layer == null) return;
+
+        var i, len, icon, poi;
+        for (i=0, len=layer.getObjectCount(); i<len; i++) {
+            poi = layer.keyAtObject("POI"+i);
+            icon = poi.getIcon();
+            layer.removeAtKey("POI"+i);
+            symbol.deleteIcon(icon.getId());
+        }
+    }
 }

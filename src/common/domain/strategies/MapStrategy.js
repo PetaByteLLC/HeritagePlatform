@@ -34,4 +34,8 @@ export class MapStrategy {
 	moveToSingleFeature(feature) {
 		throw new Error('Method not implemented');
 	}
+
+    handleAltitude() {
+        throw new Error('Method not implemented');
+    }
 }

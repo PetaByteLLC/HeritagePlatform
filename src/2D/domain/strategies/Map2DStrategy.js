@@ -129,4 +129,8 @@ export class Map2DStrategy extends MapStrategy {
 			return toLonLat(coordinates);
 		}
 	}
+
+    handleAltitude() {
+        console.log('Method not implemented');
+    }
 }

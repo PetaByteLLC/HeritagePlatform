@@ -7,7 +7,7 @@
     gap: 10px;
     z-index: 100;
   }
-  
+
   .toolbar-button {
     background-color: #282c34;
     border: none;
@@ -20,7 +20,12 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   .toolbar-button:hover {
     background-color: #3c3f41;
+  }
+
+  .toolbar-button.active {
+    background-color: white;
+    color: #282c34;
   }

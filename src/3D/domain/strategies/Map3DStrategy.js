@@ -381,14 +381,7 @@ export class Map3DStrategy extends MapStrategy {
 		moveToSingleFeature(this.map3D, feature);
 	}
 
-    handleMeasureAltitude(selectedIcon) {
-        if (selectedIcon !== 'measureAltitude') {
-            this.clearEvents();
-            this.clearPreviousShapes();
-            this.removeAltitudeEvent();
-            this.setMouseState('default');
-            return;
-        }
+    handleMeasureAltitude() {
         this.clearEvents();
         this.setMouseState('altitude');
         this.altitudeSymbol = this.map3D.getSymbol();
@@ -528,14 +521,7 @@ export class Map3DStrategy extends MapStrategy {
         }
     }
 
-    handleMeasureRadius(selectedIcon) {
-        if (selectedIcon !== 'measureRadius') {
-            this.clearEvents();
-            this.clearPreviousShapes();
-            this.removeRadiusMeasureEvent();
-            this.setMouseState('default');
-            return;
-        }
+    handleMeasureRadius() {
         this.clearEvents();
         this.setMouseState('circle');
         this.radiusSymbol = this.map3D.getSymbol();
@@ -658,14 +644,7 @@ export class Map3DStrategy extends MapStrategy {
         this.radiusWallLayer.removeAll();
     }
 
-    handleMeasureArea(selectedIcon) {
-        if (selectedIcon !== 'measureArea') {
-            this.clearEvents();
-            this.clearPreviousShapes();
-            this.removeAreaMeasureEvent();
-            this.setMouseState('default');
-            return;
-        }
+    handleMeasureArea() {
         this.clearEvents();
         this.setMouseState('area');
         this.createAreaMeasureLayer();
@@ -796,14 +775,7 @@ export class Map3DStrategy extends MapStrategy {
         this.m_mercount = 0;
     }
 
-    handleMeasureDistance(selectedIcon) {
-        if (selectedIcon !== 'measureDistance') {
-            this.clearEvents();
-            this.clearPreviousShapes();
-            this.removeDistanceMeasureEvent();
-            this.setMouseState('default');
-            return;
-        }
+    handleMeasureDistance() {
         this.clearEvents();
         this.setMouseState('distance');
 
@@ -858,14 +830,27 @@ export class Map3DStrategy extends MapStrategy {
         // document.body.removeEventListener('click', this.distanceMeasureListener);
     }
 
-    setActiveButton(buttonName) {
-        this.activeButton = buttonName;
-        if (!buttonName) {
-            this.setMouseState('default');
+    handleToolIconClick(icon, selectedIcon, setSelectedIcon) {
+        this.clearPreviousShapes();
+        this.clearEvents();
+        if (selectedIcon === icon) {
+            setSelectedIcon(null);
+            this.clearMeasurements();
+            return;
         }
+        setSelectedIcon(icon);
+        this.handleToolAction(icon);
     }
 
-    getActiveButton() {
-        return this.activeButton;
+    handleToolAction(icon) {
+        if (icon === 'area') {
+            this.handleMeasureArea(icon);
+        } else if (icon === 'distance') {
+            this.handleMeasureDistance(icon);
+        } else if (icon === 'radius') {
+            this.handleMeasureRadius(icon);
+        } else if (icon === 'altitude') {
+            this.handleMeasureAltitude(icon);
+        }
     }
 }

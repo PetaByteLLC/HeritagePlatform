@@ -7,31 +7,20 @@ export const useToolbarActions = () => {
     const handleZoomInRef = useRef(() => {});
     const handleZoomOutRef = useRef(() => {});
     const handleCurrentLocationRef = useRef(() => {});
-    const handleMeasureAltitudeRef = useRef(() => {});
-    const handleMeasureRadiusRef = useRef(() => {});
-    const handleMeasureDistanceRef = useRef(() => {});
-    const handleMeasureAreaRef = useRef(() => {});
+    const handleToolIconClickRef = useRef(() => {});
 
     useEffect(() => {
         if (!strategy) return;
         handleZoomInRef.current = strategy.handleZoomIn.bind(strategy);
         handleZoomOutRef.current = strategy.handleZoomOut.bind(strategy);
         handleCurrentLocationRef.current = strategy.handleCurrentLocation.bind(strategy);
-        handleMeasureAltitudeRef.current = strategy.handleMeasureAltitude.bind(strategy);
-        handleMeasureRadiusRef.current = strategy.handleMeasureRadius.bind(strategy);
-        handleMeasureDistanceRef.current = strategy.handleMeasureDistance.bind(strategy);
-        handleMeasureAreaRef.current = strategy.handleMeasureArea.bind(strategy);
+        handleToolIconClickRef.current = strategy.handleToolIconClick.bind(strategy);
     }, [strategy]);
 
     return {
         handleZoomIn: () => handleZoomInRef.current(),
         handleZoomOut: () => handleZoomOutRef.current(),
         handleCurrentLocation: () => handleCurrentLocationRef.current(),
-        handleMeasureAltitude: (selectedIcon) => handleMeasureAltitudeRef.current(selectedIcon),
-        handleMeasureRadius: (selectedIcon) => handleMeasureRadiusRef.current(selectedIcon),
-        handleMeasureDistance: (selectedIcon) => handleMeasureDistanceRef.current(selectedIcon),
-        handleMeasureArea: (selectedIcon) => handleMeasureAreaRef.current(selectedIcon),
-        getActiveButton: () => strategy.getActiveButton(),
-        setActiveButton: (buttonName) => strategy.setActiveButton(buttonName),
+        handleToolIconClick: (icon, selectedIcon, setSelectedIcon) => handleToolIconClickRef.current(icon, selectedIcon, setSelectedIcon)
     };
 };

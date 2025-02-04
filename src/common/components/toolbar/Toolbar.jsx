@@ -10,20 +10,11 @@ import { faCircle } from "@fortawesome/free-regular-svg-icons";
 
 const Toolbar = () => {
     const { map2DType, setMap2DType } = useContext(MapContext);
-    const { handleZoomIn, handleZoomOut, handleCurrentLocation, handleMeasureArea,
-        handleMeasureDistance, handleMeasureAltitude, handleMeasureRadius, setActiveButton } = useToolbarActions();
-    const [activeButton, setActiveButtonState] = useState(null);
+    const { handleZoomIn, handleZoomOut, handleCurrentLocation, handleToolIconClick} = useToolbarActions();
+    const [ selectedIcon, setSelectedIcon ] = useState(null);
 
-    const handleButtonClick = (buttonName, action) => {
-        if (activeButton === buttonName) {
-            setActiveButtonState(null);
-            setActiveButton(null);
-            action(null);
-        } else {
-            setActiveButtonState(buttonName);
-            setActiveButton(buttonName);
-            action(buttonName);
-        }
+    const handleToolClick = (icon) => {
+        handleToolIconClick(icon, selectedIcon, setSelectedIcon);
     };
 
     return (
@@ -39,16 +30,16 @@ const Toolbar = () => {
             </button>
             <TileSwitcher map2DType={map2DType} setMap2DType={setMap2DType}/>
             <VerticalSwitch/>
-            <button className={`toolbar-button ${activeButton === 'measureArea' ? 'active' : ''}`} onClick={() => handleButtonClick('measureArea', handleMeasureArea)}>
+            <button className={`toolbar-button ${selectedIcon === 'area' ? 'active' : ''}`} onClick={() => handleToolClick('area')}>
                 <FontAwesomeIcon icon={faRoute}/>
             </button>
-            <button className={`toolbar-button ${activeButton === 'measureDistance' ? 'active' : ''}`} onClick={() => handleButtonClick('measureDistance', handleMeasureDistance)}>
+            <button className={`toolbar-button ${selectedIcon === 'distance' ? 'active' : ''}`} onClick={() => handleToolClick('distance')}>
                 <FontAwesomeIcon icon={faRulerHorizontal}/>
             </button>
-            <button className={`toolbar-button ${activeButton === 'measureRadius' ? 'active' : ''}`} onClick={() => handleButtonClick('measureRadius', handleMeasureRadius)}>
+            <button className={`toolbar-button ${selectedIcon === 'radius' ? 'active' : ''}`} onClick={() => handleToolClick('radius')}>
                 <FontAwesomeIcon icon={faCircle}/>
             </button>
-            <button className={`toolbar-button ${activeButton === 'measureAltitude' ? 'active' : ''}`} onClick={() => handleButtonClick('measureAltitude', handleMeasureAltitude)}>
+            <button className={`toolbar-button ${selectedIcon === 'altitude' ? 'active' : ''}`} onClick={() => handleToolClick('altitude')}>
                 <FontAwesomeIcon icon={faRulerVertical}/>
             </button>
         </div>

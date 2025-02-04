@@ -7,6 +7,14 @@ export class MapStrategy {
 		throw new Error('Method not implemented');
 	}
 
+    handleToolIconClick(icon, selectedIcon, setSelectedIcon) {
+        throw new Error('Method not implemented');
+    }
+
+    handleToolAction(icon) {
+        throw new Error('Method not implemented');
+    }
+
 	handleZoomIn() {
 		throw new Error('Method not implemented');
 	}

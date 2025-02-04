@@ -31,5 +31,7 @@ export const useToolbarActions = () => {
         handleMeasureRadius: (selectedIcon) => handleMeasureRadiusRef.current(selectedIcon),
         handleMeasureDistance: (selectedIcon) => handleMeasureDistanceRef.current(selectedIcon),
         handleMeasureArea: (selectedIcon) => handleMeasureAreaRef.current(selectedIcon),
+        getActiveButton: () => strategy.getActiveButton(),
+        setActiveButton: (buttonName) => strategy.setActiveButton(buttonName),
     };
 };

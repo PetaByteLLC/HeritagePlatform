@@ -188,7 +188,7 @@ export class Map2DStrategy extends MapStrategy {
 
 	_showPoint(coordinate, color){
 		let self = this;
-
+		console.log("self", self);
 		if (!!self.vectorLayer) {
 			self.map2D.removeLayer(self.vectorLayer);
 		}
@@ -198,12 +198,13 @@ export class Map2DStrategy extends MapStrategy {
 			source: vectorSource,
 			style: new Style({
 				image: new Circle({
-					radius: 6,
+					radius: 10,
 					fill: new Fill({ color: color }),
 					stroke: new Stroke({ color: 'white', width: 2 })
 				})
 			})
 		});
+		self.vectorLayer.setZIndex(100);
 
 		self.map2D.addLayer(self.vectorLayer);
 

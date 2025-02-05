@@ -86,14 +86,16 @@ const Bookmark = ({ bookmarkActive, setBookmarkActive }) => {
     };
 
     const removeBookmark = (bookmark) => {
-        deleteBookmark(bookmark)
-            .then(resp => {
-                setBookmarks(bookmarks.filter((bm, i) => bm.id !== bookmark.id));
-                strategy.removeBookmark();
-            })
-            .catch(err => {
-                setError2(err);
-            })
+        if (window.confirm("Are you sure you want to delete the bookmark?")) {
+            deleteBookmark(bookmark)
+                .then(resp => {
+                    setBookmarks(bookmarks.filter((bm, i) => bm.id !== bookmark.id));
+                    strategy.removeBookmark();
+                })
+                .catch(err => {
+                    setError2(err);
+                });
+        }
     };
 
     return (

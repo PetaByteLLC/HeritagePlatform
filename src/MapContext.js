@@ -3,8 +3,7 @@ import { Map2DStrategy } from './2D/domain/strategies/Map2DStrategy';
 import { Map3DStrategy } from './3D/domain/strategies/Map3DStrategy';
 import { Effect2DStrategy } from './2D/domain/strategies/Effect2DStrategy';
 import { Effect3DStrategy } from './3D/domain/strategies/Effect3DStrategy';
-import { WMSLayers } from './common/constants/WMSLayers';
-import { WFSLayers } from './common/constants/WFSLayers';
+import { WFSLayers, WFSPointType } from './common/constants/WFSLayers';
 
 export const MapContext = createContext();
 
@@ -22,6 +21,7 @@ export const MapProvider = ({ children }) => {
     const [wmsLayers, setWmsLayers] = useState(WMSLayers);
     const [wfsLayers, setWfsLayers] = useState(WFSLayers);
     const [hoveredPOI, setHoveredPOI] = useState(null);
+    const [wfsPOIType, setWfsPOIType] = useState(WFSPointType.LINE)
     const [init2D, setInit2D] = useState(null);
     const [init3D, setInit3D] = useState(null);
     const [effects, setEffects] = useState(null);
@@ -59,6 +59,7 @@ export const MapProvider = ({ children }) => {
             wmsLayers, setWmsLayers,
             hoveredPOI, setHoveredPOI,
             wfsLayers, setWfsLayers,
+            wfsPOIType, setWfsPOIType,
             strategy,
             effectStrategy,
             effects, setEffects

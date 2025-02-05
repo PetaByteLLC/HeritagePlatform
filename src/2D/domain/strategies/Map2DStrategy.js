@@ -267,7 +267,7 @@ export class Map2DStrategy extends MapStrategy {
 		});
 	}
 
-	createBookmark(name, distance, color) : object {
+	createBookmark(name, distance, color) {
 		let view = this.map2D.getView();
 		return {
 			"type": "Feature",

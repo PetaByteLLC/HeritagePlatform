@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faBookmark, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
-import Bookmark from './../bookmark'
+import { faTimes, faBookmark, faLayerGroup, faMagic } from '@fortawesome/free-solid-svg-icons';
+import Bookmark from './../bookmark';
 import LayerList from '../layer-list/LayerList';
+import Effect from "../effect";
 import './Menu.css';
 
 const Menu = ({ isOpen, onClose }) => {
@@ -28,10 +29,17 @@ const Menu = ({ isOpen, onClose }) => {
                         Bookmarks
                     </p>
                 </li>
+                <li data-bs-toggle="offcanvas" data-bs-target="#effectsMenu" aria-controls="effectsMenu" role="button">
+                    <p className='d-flex align-items-center gap-2 p-0 m-0'>
+                        <FontAwesomeIcon icon={faMagic} className="icon" fixedWidth/>
+                        Effects
+                    </p>
+                </li>
             </ul>
         </div>
         <LayerList />
         <Bookmark />
+        <Effect />
     </>
     );
 };

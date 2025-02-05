@@ -61,7 +61,6 @@ h2.bookmark-title {
     color: #fff;
     border: 1px solid gray;
     margin-bottom: 5px;
-    cursor: pointer;
     position: relative;
 }
 
@@ -75,18 +74,30 @@ h2.bookmark-title {
     height: 35px;
     text-align: center;
     line-height: 35px;
+    vertical-align:top;
 }
 
 .bookmark-item-name {
     display: inline-block;
-    width: calc(100% - 55px);
+    width: calc(100% - 110px);
     padding: 5px;
+    word-break: break-word;
 }
 
 .bookmark-item-action {
     display: inline-block;
     position: absolute;
     right: 5px;
-    top: 7px;
+    top: 12px;
     text-align: center;
+}
+
+.btn-square-sm {
+    width: 21px !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    height: 21px !important;
+    text-align: center;
+    padding: 0;
+    font-size:12px;
 }

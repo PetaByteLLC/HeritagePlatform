@@ -138,9 +138,10 @@ export class Map2DStrategy extends MapStrategy {
 		let self = this;
 
 		self.map2D.on('click', function (event) {
-			self.coordinate = toLonLat(event.coordinate);
+			var coordinate = toLonLat(event.coordinate);
 			// console.log(self.coordinate);
-			self._showPoint(self.coordinate, 'red');
+			self._showPoint(coordinate, 'red');
+			self.coordinate = coordinate;
 		});
 	}
 
@@ -193,6 +194,7 @@ export class Map2DStrategy extends MapStrategy {
 
 	_showPoint(coordinate, color){
 		let self = this;
+		this.coordinate = null;
 		// console.log("self", self);
 		if (!!self.vectorLayer) {
 			self.map2D.removeLayer(self.vectorLayer);

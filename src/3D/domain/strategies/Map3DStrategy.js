@@ -90,9 +90,8 @@ export class Map3DStrategy extends MapStrategy {
 			let layerList = new this.map3D.JSLayerList(true);
 			this.layer = layerList.createLayer("CCTV", this.map3D.ELT_POLYHEDRON);
 		}
-
-		if (!!this.frustum && this.layer.indexAtObject(this.frustum) > -1) {
-			this.layer.removeAtObject(this.frustum);
+		else if (!!this.frustum) {
+			this.layer.removeAll();
 		}
 
 		this.map3D.getViewCamera().setLocation(new this.map3D.JSVector3D(feature.geometry.coordinates[0], feature.geometry.coordinates[1], feature.properties.altitude + 700.0));
@@ -130,11 +129,11 @@ export class Map3DStrategy extends MapStrategy {
 	}
 
 	removeBookmark() {
-		if (!!this.layer && !!this.frustum && this.layer.indexAtObject(this.frustum) > -1) {
-			this.layer.removeAtObject(this.frustum);
+		if (!!this.layer && !!this.frustum) {
+			this.layer.removeAll();
 		}
-		if (!!this.lineLayer && !!this.line && this.lineLayer.indexAtObject(this.line) > -1) {
-			this.lineLayer.removeAtObject(this.line);
+		if (!!this.lineLayer && !!this.line) {
+			this.lineLayer.removeAll();
 		}
 	}
 
@@ -159,9 +158,8 @@ export class Map3DStrategy extends MapStrategy {
 			let layerList = new this.map3D.JSLayerList(true);
 			this.lineLayer = layerList.createLayer("FRUSTUM_LINE_LAYER", this.map3D.ELT_3DLINE);
 		}
-
-		if (!!this.line && this.lineLayer.indexAtObject(this.line) > -1) {
-			this.lineLayer.removeAtObject(this.line);
+		else if (!!this.line) {
+			this.lineLayer.removeAll();
 		}
 
 		this.line = this.map3D.createLineString("FRUSTUM_LINE");

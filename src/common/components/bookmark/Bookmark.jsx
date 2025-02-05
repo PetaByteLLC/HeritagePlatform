@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookmark, faSearch, faAdd, faTrash, faEye, faMousePointer } from '@fortawesome/free-solid-svg-icons';
 import { MapContext } from '../../../MapContext';
@@ -10,12 +10,20 @@ const Bookmark = () => {
     const { strategy, mode } = useContext(MapContext);
     const [error, setError] = useState(null);
     const [error2, setError2] = useState(null);
+    const [errorAdd, setErrorAdd] = useState(null);
     const [bookmarks, setBookmarks] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const modalBtnRef = useRef();
 
     useEffect(() => {
         loadBookmarks(null);
     }, []);
+
+    useEffect(() => {
+        if (strategy) {
+            strategy.removeBookmark();
+        }
+    }, [strategy, mode]);
 
     const loadBookmarks = async (keyword) => {
         try {
@@ -26,6 +34,15 @@ const Bookmark = () => {
             setError('Failed to load bookmarks');
             console.error(error);
         }
+    };
+
+    const showAddBookmark = () => {
+        if (mode === '2D' && !strategy.coordinate) {
+            setErrorAdd('Please select a point on map.');
+            return;
+        }
+        setErrorAdd('');
+        modalBtnRef.current.click();
     };
 
     const addNewBookmark = (name, distance, color) => {
@@ -53,6 +70,10 @@ const Bookmark = () => {
         strategy.viewBookmark(bookmark);
     };
 
+    const clearBookmark = () => {
+        strategy.removeBookmark();
+    };
+
     const removeBookmark = (bookmark) => {
         deleteBookmark(bookmark)
             .then(resp => {
@@ -70,7 +91,7 @@ const Bookmark = () => {
                  id="bookmarkMenu" aria-labelledby="bookmarkMenuLabel">
                 <div className="offcanvas-header">
                     <h5 className="offcanvas-title" id="bookmarkMenuLabel">Bookmarks</h5>
-                    <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" onClick={() => clearBookmark()}></button>
                 </div>
                 <div className="offcanvas-body">
                     <div className="bookmark-actions">
@@ -85,10 +106,16 @@ const Bookmark = () => {
                                 <FontAwesomeIcon icon={faSearch} />
                             </button>
                             <div className="vr"></div>
-                            <button type="button" className="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#bookmarkEditModal">
+                            <button type="button" ref={modalBtnRef} className="hidden" data-bs-toggle="modal" data-bs-target="#bookmarkEditModal">
+                            </button>
+                            <button type="button" className="btn btn-outline-success" onClick={() => showAddBookmark()}>
                                 <FontAwesomeIcon icon={faAdd} />
                             </button>
                         </div>
+                        {errorAdd && (<div className="alert alert-danger alert-dismissible mt-3 mb-0" role="alert">
+                            <div>{errorAdd}</div>
+                            <button type="button" className="btn-sm btn-close" onClick={()=>setErrorAdd('')}></button>
+                        </div>)}
                     </div>
                     <div className="bookmark-items">
                         {error2 ? (<p style={{ color: 'red' }}>{error2}</p>) : ''}
@@ -107,18 +134,15 @@ const Bookmark = () => {
                             </div>
                             <div className="bookmark-item-action">
                                 <div className="hstack gap-1">
-                                    <div className="btn-group btn-group-sm" role="group" aria-label="Small button group">
-                                        <button type="button" className="btn btn-outline-success" onClick={() => showBookmark(bookmark)}
-                                                title="Find bookmark">
-                                            <FontAwesomeIcon icon={faMousePointer} />
-                                        </button>
-                                        {mode === '3D' && (<button type="button" className="btn btn-outline-success" onClick={() => viewBookmark(bookmark)}
-                                                title="View bookmark">
-                                            <FontAwesomeIcon icon={faEye} />
-                                        </button>)}
-                                    </div>
-                                    <div className="vr"></div>
-                                    <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => removeBookmark(bookmark)}
+                                    <button type="button" className="btn btn-sm btn-outline-success btn-square-sm" onClick={() => showBookmark(bookmark)}
+                                            title="Find bookmark">
+                                        <FontAwesomeIcon icon={faMousePointer} />
+                                    </button>
+                                    {mode === '3D' && (<button type="button" className="btn btn-sm btn-outline-success btn-square-sm" onClick={() => viewBookmark(bookmark)}
+                                                               title="View bookmark">
+                                        <FontAwesomeIcon icon={faEye} />
+                                    </button>)}
+                                    <button type="button" className="btn btn-sm btn-outline-danger btn-square-sm" onClick={() => removeBookmark(bookmark)}
                                             title="Delete bookmark">
                                         <FontAwesomeIcon icon={faTrash} />
                                     </button>

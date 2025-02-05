@@ -43,7 +43,7 @@ const BookmarkEdit = ({ onAdd }) => {
                                 )}
                             </div>
                             <div className="mb-3">
-                                <label htmlFor="bookmark-distance" className="col-form-label">Distance: {distance} meter</label>
+                                <label htmlFor="bookmark-distance" className="col-form-label">View distance: {distance} meter</label>
                                 <input type="range" className="form-range" id="bookmark-distance"  min="50" max="1000" step="50"
                                        value={distance}
                                        onChange={(e) => setDistance(e.target.value)}/>
@@ -74,7 +74,7 @@ const BookmarkEdit = ({ onAdd }) => {
                     </div>
                     <div className="modal-footer">
                         <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" className="btn btn-primary" onClick={() => addNewBookmark()}>Craete mookmark</button>
+                        <button type="button" className="btn btn-primary" onClick={() => addNewBookmark()}>Create bookmark</button>
                     </div>
                 </div>
             </div>

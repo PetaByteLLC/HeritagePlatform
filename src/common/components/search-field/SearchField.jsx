@@ -7,6 +7,7 @@ import { MapContext } from '../../../MapContext';
 import { Map2DStrategy } from '../../../2D/domain/strategies/Map2DStrategy';
 import Menu from '../menu/Menu';
 import { searchPOIBySpatial } from '../../domain/usecases/SearchPOIUseCase';
+import { MEASURE_LAYER } from "../../constants/GeoserverConfig";
 
 
 const SearchField = () => {
@@ -23,7 +24,7 @@ const SearchField = () => {
 
     useEffect(() => {
         if (strategy instanceof Map2DStrategy) {
-            const { vectorSource } = strategy.createVectorLayer();
+            const { vectorSource } = strategy.createVectorLayer(MEASURE_LAYER);
             setVectorSource(vectorSource);
         }
     }, [strategy]);

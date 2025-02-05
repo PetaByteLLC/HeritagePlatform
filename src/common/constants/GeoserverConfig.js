@@ -7,3 +7,4 @@ export const DEFAULT_SRS = process.env.REACT_APP_DEFAULT_SRS;
 export const POI_LAYER_NAME = process.env.REACT_APP_POI_LAYER_NAME;
 export const TILE_LAYER_NAME = process.env.REACT_APP_TILE_LAYER_NAME;
 export const WMS_VERSION = process.env.REACT_APP_WMS_VERSION;
+export const MEASURE_LAYER = process.env.REACT_APP_MEASURE_LAYER;

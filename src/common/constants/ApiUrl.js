@@ -5,3 +5,4 @@ export const API = {
 }
 
 export const GEOSERVER_BASE_URL = process.env.REACT_APP_GEOSERVER_URL;
+export const GEOSERVER_BASE_TOKEN = process.env.REACT_APP_GEOSERVER_TOKEN;

@@ -1,4 +1,4 @@
-import { API, GEOSERVER_BASE_URL } from '../../constants/ApiUrl';
+import { API, GEOSERVER_BASE_URL, GEOSERVER_BASE_TOKEN } from '../../constants/ApiUrl';
 import { WFS_VERSION, WFS_WORKSPACE, WFS_LAYER, WFS_CITY_LAYER, WFS_DEFAULT_NAME_FIELD } from '../../constants/GeoserverConfig';
 import { format } from '../../domain/utils/StringFormat';
 
@@ -93,7 +93,7 @@ export const fetchAllBookmarks = async (keyword) => {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Basic ' + btoa('admin:geoserver')
+                'Authorization': 'Basic ' + GEOSERVER_BASE_TOKEN
             }
         });
 
@@ -178,7 +178,7 @@ const executeWFSTransaction = async (xmlPayload) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/xml',
-                'Authorization': 'Basic ' + btoa('admin:geoserver')
+                'Authorization': 'Basic ' + GEOSERVER_BASE_TOKEN
             },
             body: xmlPayload
         });

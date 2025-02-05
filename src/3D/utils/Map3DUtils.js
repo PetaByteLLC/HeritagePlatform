@@ -155,21 +155,18 @@ export const updateWfsPOILayerType = (map, wfsLayers, type) => {
 
     wfsLayers.forEach((layer) => {
         const wfslayer = layerList.nameAtLayer(layer.layerName);
+        if (wfslayer) layerList.delLayerAtName(layer.layerName);
+
         if (layer.visible) {
-            if (wfslayer) wfslayer.setVisible(true);
-            else createWfsLayer(map, layer, type);
-        } else {
-            if (wfslayer) layerList.delLayerAtName(layer.layerName);
+            createWfsLayer(map, layer, type);
         }
     });
 }
 
 export const createWfsLayer = async (map, wfsLayerJson, type) => {
-    console.log(type);
     var layerList = new map.JSLayerList(true);
     var layer = layerList.createLayer(wfsLayerJson.layerName, map.ELT_3DPOINT);
     layer.setVisible(true);
-    // TODO add type (PIN or GRID)
     var geojson = await fetchPOIByLayer(`${wfsLayerJson.workspace}:${wfsLayerJson.layerName}`);
     layer.setMinDistance(0);
     layer.setMaxDistance(50000);

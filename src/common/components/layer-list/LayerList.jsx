@@ -2,9 +2,10 @@ import React, { useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { MapContext } from '../../../MapContext';
 import './LayerList.css';
+import { WFSPointType } from '../../constants/WFSLayers';
 
 const LayerList = () => {
-    const { wmsLayers, setWmsLayers, wfsLayers, setWfsLayers } = useContext(MapContext);
+    const { wmsLayers, setWmsLayers, wfsLayers, setWfsLayers, wfsPOIType, setWfsPOIType, mode } = useContext(MapContext);
 
     const toggleWmsVisibility = (name) => {
         var newLayers = wmsLayers.map(layer =>
@@ -28,7 +29,7 @@ const LayerList = () => {
                 <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div className="offcanvas-body p-3">
-                <p className='ps-1 mb-2'>WMS layers</p>
+                <p className='ps-1 mb-2 fw-bold'>WMS layers</p>
                 <ul className="list-group mb-4">
                     {wmsLayers.map((layer) => (
                         <li key={layer.layerName} className="list-group-item d-flex justify-content-between align-items-center">
@@ -46,8 +47,8 @@ const LayerList = () => {
                         </li>
                     ))}
                 </ul>
-                <p className='ps-1 mb-2'>WFS layers</p>
-                <ul className="list-group">
+                <p className='ps-1 mb-2 fw-bold'>WFS layers</p>
+                <ul className="list-group mb-4">
                     {wfsLayers.map((layer) => (
                         <li key={layer.layerName} className="list-group-item d-flex justify-content-between align-items-center">
                             <span className="fw-medium">{layer.title}</span>
@@ -64,6 +65,18 @@ const LayerList = () => {
                         </li>
                     ))}
                 </ul>
+                {mode === '3D' && (<>
+                    <p className='ps-1 mb-3 fw-bold'>POI Type</p>
+                    <div className="form-check form-check-inline ms-1">
+                        <input className="form-check-input" type="radio" name="inlineRadioOptions" id="POIAsPIN" checked={wfsPOIType === WFSPointType.PIN} onChange={() => setWfsPOIType(WFSPointType.PIN)} />
+                        <label className="form-check-label" htmlFor="POIAsPIN">PIN</label>
+                    </div>
+                    <div className="form-check form-check-inline ms-1">
+                        <input className="form-check-input" type="radio" name="inlineRadioOptions" id="POIAsLINE" checked={wfsPOIType === WFSPointType.LINE} onChange={() => setWfsPOIType(WFSPointType.LINE)} />
+                        <label className="form-check-label" htmlFor="POIAsLINE">LINE</label>
+                    </div>
+                </>)
+                }
             </div>
         </div>
     );

@@ -34,7 +34,7 @@ export const MapProvider = ({ children }) => {
                 setInit2D(temp);
             }
             setStrategy(init2D || temp);
-            setEffectStrategy(new Effect2DStrategy(init2D || temp));
+            setEffectStrategy(new Effect2DStrategy(map2D));
         } else if (mode === '3D' && map3D) {
             let temp;
             if (!init3D) {
@@ -42,7 +42,7 @@ export const MapProvider = ({ children }) => {
                 setInit3D(temp);
             }
             setStrategy(init3D || temp);
-            setEffectStrategy(new Effect3DStrategy(init3D || temp));
+            setEffectStrategy(new Effect3DStrategy(map3D));
         }
     }, [mode, map2D, map3D]);
 

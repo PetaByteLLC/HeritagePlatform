@@ -10,7 +10,7 @@ function getHeightFromZoom(zoomLevel) {
 }
 
 const Map3D = () => {
-	const { is3DMapInitialized, setIs3DMapInitialized, currentLocation, setCurrentLocation, mode, map3DType, setMap3D, setSelectedPOI, wmsLayers, wfsLayers } = useContext(MapContext);
+	const { is3DMapInitialized, setIs3DMapInitialized, currentLocation, setCurrentLocation, mode, map3DType, setMap3D, setSelectedPOI, wmsLayers, wfsLayers, setHoveredPOI } = useContext(MapContext);
 	const mapContainerRef = useRef(null);
 
 	useEffect(() => {
@@ -86,6 +86,29 @@ const Map3D = () => {
 			const id = pick.objectKey;
 			moveToSingleFeature(window.Module, { geometry: { coordinates: [pick.position.longitude, pick.position.latitude] } });
 			setSelectedPOIOnMap(window.Module, id, setSelectedPOI);
+		}
+
+		document.getElementById("map").onmousemove = function (event) {
+			for (const e of wfsLayers) {
+				let layerList = new window.Module.JSLayerList(true);
+				const poiLayer = layerList.nameAtLayer(e.layerName);
+				if (!poiLayer) continue;
+
+				const cameraLevel = window.Module.getViewCamera().getMapZoomLevel();
+				if (cameraLevel < e.min) {
+					setHoveredPOI(null);
+					continue;
+				}
+			
+				const pick = poiLayer.pick(event.offsetX, event.offsetY);
+				if (pick) {
+					const props = JSON.parse(poiLayer.keyAtObject(pick.objectKey).getDescription());
+					setHoveredPOI({ properties: props, position: event });
+					break;
+				} else {
+					setHoveredPOI(null);
+				}
+			}
 		}
 
 		loadScript(scriptSrc)

@@ -119,11 +119,11 @@ export class Map3DStrategy extends MapStrategy {
 		this.clearLayer(layerList, "POLYGON_LAYER");
 		this.clearLayer(layerList, "MEASURE_POI");
 		this.clearLayer(layerList, "MEASURE_WALL");
-        this.clearLayer(layerList, "ALTITUDE_MEASURE_POI");
-        this.clearLayer(layerList, "MEASURE_RADIUS_POI");
-        this.clearLayer(layerList, "MEASURE_RADIUS_WALL");
-        this.clearLayer(layerList, "MEASURE_AREA_POI");
-        this.clearLayer(layerList, "MEASURE_DISTANCE_POI");
+		this.clearLayer(layerList, "ALTITUDE_MEASURE_POI");
+		this.clearLayer(layerList, "MEASURE_RADIUS_POI");
+		this.clearLayer(layerList, "MEASURE_RADIUS_WALL");
+		this.clearLayer(layerList, "MEASURE_AREA_POI");
+		this.clearLayer(layerList, "MEASURE_DISTANCE_POI");
 	}
 
 	clearLayer(layerList, layerName) {
@@ -250,16 +250,16 @@ export class Map3DStrategy extends MapStrategy {
 		const mouseStates = {
 			square: this.map3D.MML_INPUT_RECT,
 			polygon: this.map3D.MML_ANALYS_DISTANCE,
-            circle: this.map3D.MML_ANALYS_AREA_CIRCLE,
+			circle: this.map3D.MML_ANALYS_AREA_CIRCLE,
 			default: this.map3D.MML_MOVE_GRAB,
-            altitude: this.map3D.MML_ANALYS_ALTITUDE,
-            distance: this.map3D.MML_ANALYS_DISTANCE_STRAIGHT,
-            area: this.map3D.MML_ANALYS_AREA_PLANE,
-        };
+			altitude: this.map3D.MML_ANALYS_ALTITUDE,
+			distance: this.map3D.MML_ANALYS_DISTANCE_STRAIGHT,
+			area: this.map3D.MML_ANALYS_AREA_PLANE,
+		};
 
-        const mouseState = mouseStates[state];
-        if (mouseState) {
-            this.map3D.XDSetMouseState(mouseState);
+		const mouseState = mouseStates[state];
+		if (mouseState) {
+			this.map3D.XDSetMouseState(mouseState);
 			console.log(`Mouse state set to: ${state}`);
 		} else {
 			console.warn(`Unknown mouse state: ${state}`);
@@ -320,12 +320,12 @@ export class Map3DStrategy extends MapStrategy {
 		};
 	}
 
-    clearMeasurements() {
-        this.map3D.XDSetMouseState(this.map3D.MML_MOVE_GRAB);
+	clearMeasurements() {
+		this.map3D.XDSetMouseState(this.map3D.MML_MOVE_GRAB);
 		this.map3D.XDClearDistanceMeasurement();
 		this.map3D.XDClearAreaMeasurement();
 		this.map3D.XDClearCircleMeasurement();
-    }
+	}
 
     clearEvents() {
         this.clearMeasurements();
@@ -382,37 +382,37 @@ export class Map3DStrategy extends MapStrategy {
 		moveToSingleFeature(this.map3D, feature);
 	}
 
-    handleMeasureAltitude() {
-        this.clearEvents();
-        this.setMouseState('altitude');
-        this.altitudeSymbol = this.map3D.getSymbol();
+	handleMeasureAltitude() {
+		this.clearEvents();
+		this.setMouseState('altitude');
+		this.altitudeSymbol = this.map3D.getSymbol();
 
-        var layerList = new this.map3D.JSLayerList(true);
-        this.altitudeLayer = layerList.createLayer("ALTITUDE_MEASURE_POI", this.map3D.ELT_3DPOINT);
-        this.altitudeLayer.setMaxDistance(20000.0);
-        this.altitudeLayer.setSelectable(false);
+		var layerList = new this.map3D.JSLayerList(true);
+		this.altitudeLayer = layerList.createLayer("ALTITUDE_MEASURE_POI", this.map3D.ELT_3DPOINT);
+		this.altitudeLayer.setMaxDistance(20000.0);
+		this.altitudeLayer.setSelectable(false);
 
-        this.altitudeListener = (e) => {
-            this.createAltitudePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt),
-                "rgba(10, 10, 0, 0.5)",
-                e.dGroundAltitude, e.dObjectAltitude);
-        };
+		this.altitudeListener = (e) => {
+			this.createAltitudePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt),
+				"rgba(10, 10, 0, 0.5)",
+				e.dGroundAltitude, e.dObjectAltitude);
+		};
 
-        this.map3D.canvas.addEventListener("Fire_EventAddAltitudePoint", this.altitudeListener);
-    }
+		this.map3D.canvas.addEventListener("Fire_EventAddAltitudePoint", this.altitudeListener);
+	}
 
-    removeAltitudeEvent() {
-        this.map3D.canvas.removeEventListener("Fire_EventAddAltitudePoint", this.altitudeListener);
-    }
+	removeAltitudeEvent() {
+		this.map3D.canvas.removeEventListener("Fire_EventAddAltitudePoint", this.altitudeListener);
+	}
 
-    createAltitudePOI(_position, _color, _value, _subValue) {
+	createAltitudePOI(_position, _color, _value, _subValue) {
 
-        var drawCanvas = document.createElement('canvas');
-        drawCanvas.width = 200;
-        drawCanvas.height = 100;
+		var drawCanvas = document.createElement('canvas');
+		drawCanvas.width = 200;
+		drawCanvas.height = 100;
 
-        var imageData = this.drawIcon(drawCanvas, _color, _value, _subValue),
-            altIndex = this.altIndex;
+		var imageData = this.drawIcon(drawCanvas, _color, _value, _subValue),
+			altIndex = this.altIndex;
 
         if (this.altitudeSymbol.insertIcon("AltitudeIcon"+altIndex, imageData, drawCanvas.width, drawCanvas.height)) {
 
@@ -422,96 +422,96 @@ export class Map3DStrategy extends MapStrategy {
             poi.setPosition(_position);
             poi.setIcon(icon);
 
-            this.altitudeLayer.addObject(poi, 0);
-            this.altIndex++;
-        }
-    }
+			this.altitudeLayer.addObject(poi, 0);
+			this.altIndex++;
+		}
+	}
 
-    drawIcon(_canvas, _color, _value, _subValue) {
-        var ctx = _canvas.getContext('2d'),
-            width = _canvas.width,
-            height = _canvas.height
-        ;
-        ctx.clearRect(0, 0, width, height);
+	drawIcon(_canvas, _color, _value, _subValue) {
+		var ctx = _canvas.getContext('2d'),
+			width = _canvas.width,
+			height = _canvas.height
+		;
+		ctx.clearRect(0, 0, width, height);
 
-        if (_subValue === -1) {
-            this.drawRoundRect(ctx, 50, 20, 100, 20, 5, _color);
+		if (_subValue === -1) {
+			this.drawRoundRect(ctx, 50, 20, 100, 20, 5, _color);
 
-        } else {
-            this.drawRoundRect(ctx, 50, 5, 100, 35, 5, _color);
-            this.setText(ctx, width*0.5, height*0.2, 'Ground Altitude : ' + this.setKilloUnit(_subValue, 0.001, 0));
-        }
-        this.setText(ctx, width*0.5, height*0.2+15, 'Elevation : '+ this.setKilloUnit(_value, 0.001, 0));
+		} else {
+			this.drawRoundRect(ctx, 50, 5, 100, 35, 5, _color);
+			this.setText(ctx, width*0.5, height*0.2, 'Ground Altitude : ' + this.setKilloUnit(_subValue, 0.001, 0));
+		}
+		this.setText(ctx, width*0.5, height*0.2+15, 'Elevation : '+ this.setKilloUnit(_value, 0.001, 0));
 
-        this.drawDot(ctx, width, height);
-        return ctx.getImageData(0, 0, _canvas.width, _canvas.height).data;
-    }
+		this.drawDot(ctx, width, height);
+		return ctx.getImageData(0, 0, _canvas.width, _canvas.height).data;
+	}
 
-    drawDot(ctx, width, height) {
+	drawDot(ctx, width, height) {
 
-        ctx.beginPath();
-        ctx.lineWidth = 6;
-        ctx.arc(width*0.5, height*0.5, 2, 0, 2*Math.PI, false);
-        ctx.closePath();
+		ctx.beginPath();
+		ctx.lineWidth = 6;
+		ctx.arc(width*0.5, height*0.5, 2, 0, 2*Math.PI, false);
+		ctx.closePath();
 
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
-        ctx.fill();
-        ctx.lineWidth = 8;
-        ctx.strokeStyle = "rgba(255, 255, 0, 0.8)";
-        ctx.stroke();
-    }
+		ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
+		ctx.fill();
+		ctx.lineWidth = 8;
+		ctx.strokeStyle = "rgba(255, 255, 0, 0.8)";
+		ctx.stroke();
+	}
 
-    drawRoundRect(ctx,
-                           x, y,
-                           width, height, radius,
-                           color) {
+	drawRoundRect(ctx,
+				  x, y,
+				  width, height, radius,
+				  color) {
 
-        if (width < 2 * radius) 	radius = width * 0.5;
-        if (height < 2 * radius) 	radius = height * 0.5;
+		if (width < 2 * radius) 	radius = width * 0.5;
+		if (height < 2 * radius) 	radius = height * 0.5;
 
-        ctx.beginPath();
-        ctx.moveTo(x+radius, y);
-        ctx.arcTo(x+width, 	y, 	 		x+width, 	y+height, 	radius);
-        ctx.arcTo(x+width, 	y+height, 	x,		 	y+height, 	radius);
-        ctx.arcTo(x, 	 	y+height, 	x,   		y,   		radius);
-        ctx.arcTo(x,	   	y,   	 	x+width, 	y,   		radius);
-        ctx.closePath();
+		ctx.beginPath();
+		ctx.moveTo(x+radius, y);
+		ctx.arcTo(x+width, 	y, 	 		x+width, 	y+height, 	radius);
+		ctx.arcTo(x+width, 	y+height, 	x,		 	y+height, 	radius);
+		ctx.arcTo(x, 	 	y+height, 	x,   		y,   		radius);
+		ctx.arcTo(x,	   	y,   	 	x+width, 	y,   		radius);
+		ctx.closePath();
 
-        ctx.fillStyle = color;
-        ctx.fill();
+		ctx.fillStyle = color;
+		ctx.fill();
 
-        return ctx;
-    }
+		return ctx;
+	}
 
-    setText(_ctx, _posX, _posY, _strText) {
+	setText(_ctx, _posX, _posY, _strText) {
 
-        _ctx.font = "bold 12px sans-serif";
-        _ctx.textAlign = "center";
+		_ctx.font = "bold 12px sans-serif";
+		_ctx.textAlign = "center";
 
-        _ctx.fillStyle = "rgb(255, 255, 255)";
-        _ctx.fillText(_strText, _posX, _posY);
-    }
+		_ctx.fillStyle = "rgb(255, 255, 255)";
+		_ctx.fillText(_strText, _posX, _posY);
+	}
 
-    setKilloUnit(_text, _meterToKilloRate, _decimalSize){
+	setKilloUnit(_text, _meterToKilloRate, _decimalSize){
 
-        if (_decimalSize < 0){
-            _decimalSize = 0;
-        }
-        if (typeof _text == "number") {
-            if (_text < 1.0/(_meterToKilloRate*Math.pow(10,_decimalSize))) {
-                _text = _text.toFixed(1).toString()+'m';
-            } else {
-                _text = (_text*_meterToKilloRate).toFixed(2).toString()+'㎞';
-            }
-        }
-        return _text;
-    }
+		if (_decimalSize < 0){
+			_decimalSize = 0;
+		}
+		if (typeof _text == "number") {
+			if (_text < 1.0/(_meterToKilloRate*Math.pow(10,_decimalSize))) {
+				_text = _text.toFixed(1).toString()+'m';
+			} else {
+				_text = (_text*_meterToKilloRate).toFixed(2).toString()+'㎞';
+			}
+		}
+		return _text;
+	}
 
-    clearAltitudeAnalysis() {
+	clearAltitudeAnalysis() {
 
-        var layer = this.altitudeLayer,
-            symbol = this.altitudeSymbol;
-        if (layer == null) return;
+		var layer = this.altitudeLayer,
+			symbol = this.altitudeSymbol;
+		if (layer == null) return;
 
         var i, len, icon, poi;
         for (i=0, len=layer.getObjectCount(); i<len; i++) {
@@ -522,40 +522,40 @@ export class Map3DStrategy extends MapStrategy {
         }
     }
 
-    handleMeasureRadius() {
-        this.clearEvents();
-        this.setMouseState('circle');
-        this.radiusSymbol = this.map3D.getSymbol();
+	handleMeasureRadius() {
+		this.clearEvents();
+		this.setMouseState('circle');
+		this.radiusSymbol = this.map3D.getSymbol();
 
-        let layerList = new this.map3D.JSLayerList(true);
-        this.radiusLayer = layerList.createLayer("MEASURE_RADIUS_POI", this.map3D.ELT_3DPOINT);
-        this.radiusLayer.setMaxDistance(20000.0);
-        this.radiusLayer.setSelectable(false);
+		let layerList = new this.map3D.JSLayerList(true);
+		this.radiusLayer = layerList.createLayer("MEASURE_RADIUS_POI", this.map3D.ELT_3DPOINT);
+		this.radiusLayer.setMaxDistance(20000.0);
+		this.radiusLayer.setSelectable(false);
 
-        this.radiusWallLayer = layerList.createLayer("MEASURE_RADIUS_WALL", this.map3D.ELT_POLYHEDRON);
-        this.radiusWallLayer.setMaxDistance(20000.0);
-        this.radiusWallLayer.setSelectable(false);
-        this.radiusWallLayer.setEditable(true);
+		this.radiusWallLayer = layerList.createLayer("MEASURE_RADIUS_WALL", this.map3D.ELT_POLYHEDRON);
+		this.radiusWallLayer.setMaxDistance(20000.0);
+		this.radiusWallLayer.setSelectable(false);
+		this.radiusWallLayer.setEditable(true);
 
-        this.radiusMeasureListener = function (e) {
-            if (e.dTotalDistance > 0) {
-                this.clearIcon();
-                this.createRadiusPOI(new this.map3D.JSVector3D(e.dMidLon, e.dMidLat, e.dMidAlt), "rgba(255, 204, 198, 0.8)", e.dTotalDistance, true);
-            }
-        }.bind(this);
+		this.radiusMeasureListener = function (e) {
+			if (e.dTotalDistance > 0) {
+				this.clearIcon();
+				this.createRadiusPOI(new this.map3D.JSVector3D(e.dMidLon, e.dMidLat, e.dMidAlt), "rgba(255, 204, 198, 0.8)", e.dTotalDistance, true);
+			}
+		}.bind(this);
 
-        this.map3D.canvas.addEventListener("Fire_EventAddRadius", this.radiusMeasureListener);
-    }
+		this.map3D.canvas.addEventListener("Fire_EventAddRadius", this.radiusMeasureListener);
+	}
 
-    removeRadiusMeasureEvent() {
-        this.map3D.canvas.removeEventListener("Fire_EventAddRadius", this.radiusMeasureListener);
-    }
+	removeRadiusMeasureEvent() {
+		this.map3D.canvas.removeEventListener("Fire_EventAddRadius", this.radiusMeasureListener);
+	}
 
-    createRadiusPOI(_position, _color, _value, _balloonType) {
+	createRadiusPOI(_position, _color, _value, _balloonType) {
 
-        var drawCanvas = document.createElement('canvas');
-        drawCanvas.width = 100;
-        drawCanvas.height = 100;
+		var drawCanvas = document.createElement('canvas');
+		drawCanvas.width = 100;
+		drawCanvas.height = 100;
 
         var imageData = this.drawIconRadiusArea(drawCanvas, _color, _value, _balloonType);
 
@@ -571,10 +571,10 @@ export class Map3DStrategy extends MapStrategy {
         this.radiusLayer.addObject(poi, 0);
     }
 
-    clearIcon() {
+	clearIcon() {
 
-        if (this.radiusLayer == null) return;
-        var icon, poi;
+		if (this.radiusLayer == null) return;
+		var icon, poi;
 
         poi = this.radiusLayer.keyAtObject("RADIUS_POI");
 
@@ -583,268 +583,268 @@ export class Map3DStrategy extends MapStrategy {
         icon = poi.getIcon();
         this.radiusLayer.removeAtKey("RADIUS_POI");
 
-        this.radiusSymbol.deleteIcon(icon.getId());
-    }
+		this.radiusSymbol.deleteIcon(icon.getId());
+	}
 
-    drawIconRadiusArea(_canvas, _color, _value, _balloonType) {
+	drawIconRadiusArea(_canvas, _color, _value, _balloonType) {
 
-        var ctx = _canvas.getContext('2d'),
-            width = _canvas.width,
-            height = _canvas.height;
-        ctx.clearRect(0, 0, width, height);
+		var ctx = _canvas.getContext('2d'),
+			width = _canvas.width,
+			height = _canvas.height;
+		ctx.clearRect(0, 0, width, height);
 
-        if (_balloonType) {
-            this.drawBalloon(ctx, height*0.5, width, height, 5, height*0.25, _color);
-            this.setTextRadius(ctx, width*0.5, height*0.2, _value);
-        } else {
-            this.drawRoundRect(ctx, 0, height*0.3, width, height*0.25, 5, _color);
-            this.setTextRadius(ctx, width*0.5, height*0.5, _value);
-        }
+		if (_balloonType) {
+			this.drawBalloon(ctx, height*0.5, width, height, 5, height*0.25, _color);
+			this.setTextRadius(ctx, width*0.5, height*0.2, _value);
+		} else {
+			this.drawRoundRect(ctx, 0, height*0.3, width, height*0.25, 5, _color);
+			this.setTextRadius(ctx, width*0.5, height*0.5, _value);
+		}
 
-        return ctx.getImageData(0, 0, _canvas.width, _canvas.height).data;
-    }
+		return ctx.getImageData(0, 0, _canvas.width, _canvas.height).data;
+	}
 
-    drawBalloon(ctx, marginBottom, width, height,
-                         barWidth, barHeight,
-                         color) {
+	drawBalloon(ctx, marginBottom, width, height,
+				barWidth, barHeight,
+				color) {
 
-        var wCenter = width * 0.5;
+		var wCenter = width * 0.5;
 
-        ctx.beginPath();
-        ctx.moveTo(0, 				 0);
-        ctx.lineTo(0, 				 height-barHeight-marginBottom);
-        ctx.lineTo(wCenter-barWidth, height-barHeight-marginBottom);
-        ctx.lineTo(wCenter, 		 height-marginBottom);
-        ctx.lineTo(wCenter+barWidth, height-barHeight-marginBottom);
-        ctx.lineTo(width,			 height-barHeight-marginBottom);
-        ctx.lineTo(width,			 0);
-        ctx.closePath();
+		ctx.beginPath();
+		ctx.moveTo(0, 				 0);
+		ctx.lineTo(0, 				 height-barHeight-marginBottom);
+		ctx.lineTo(wCenter-barWidth, height-barHeight-marginBottom);
+		ctx.lineTo(wCenter, 		 height-marginBottom);
+		ctx.lineTo(wCenter+barWidth, height-barHeight-marginBottom);
+		ctx.lineTo(width,			 height-barHeight-marginBottom);
+		ctx.lineTo(width,			 0);
+		ctx.closePath();
 
-        ctx.fillStyle = color;
-        ctx.fill();
-    }
+		ctx.fillStyle = color;
+		ctx.fill();
+	}
 
-    setTextRadius(_ctx, _posX, _posY, _value) {
-        var strText;
+	setTextRadius(_ctx, _posX, _posY, _value) {
+		var strText;
 
-        if (typeof _value == 'number') {
-            strText = this.setKilloUnit(_value, 0.001, 0);
-        } else {
-            strText = _value;
-        }
+		if (typeof _value == 'number') {
+			strText = this.setKilloUnit(_value, 0.001, 0);
+		} else {
+			strText = _value;
+		}
 
-        _ctx.font = "bold 16px sans-serif";
-        _ctx.textAlign = "center";
-        _ctx.fillStyle = "rgb(0, 0, 0)";
+		_ctx.font = "bold 16px sans-serif";
+		_ctx.textAlign = "center";
+		_ctx.fillStyle = "rgb(0, 0, 0)";
 
-        _ctx.fillText(strText, _posX, _posY);
-    }
+		_ctx.fillText(strText, _posX, _posY);
+	}
 
-    clearRadiusAnalysis() {
-        this.map3D.XDClearCircleMeasurement();
+	clearRadiusAnalysis() {
+		this.map3D.XDClearCircleMeasurement();
 
-        if (this.radiusWallLayer == null) return;
-        this.clearIcon();
-        this.radiusWallLayer.removeAll();
-    }
+		if (this.radiusWallLayer == null) return;
+		this.clearIcon();
+		this.radiusWallLayer.removeAll();
+	}
 
-    handleMeasureArea() {
-        this.clearEvents();
-        this.setMouseState('area');
-        this.createAreaMeasureLayer();
+	handleMeasureArea() {
+		this.clearEvents();
+		this.setMouseState('area');
+		this.createAreaMeasureLayer();
 
-        this.map3D.getOption().SetAreaMeasurePolygonDepthBuffer(false);
+		this.map3D.getOption().SetAreaMeasurePolygonDepthBuffer(false);
 
-        this.map3D.getOption().callBackAddPoint(this.addAreaPoint);
-        this.map3D.getOption().callBackCompletePoint(this.endAreaPoint);
-    }
+		this.map3D.getOption().callBackAddPoint(this.addAreaPoint);
+		this.map3D.getOption().callBackCompletePoint(this.endAreaPoint);
+	}
 
-    addAreaPoint(e) {
-        this.clearPreviousShapes();
-        this.createAreaPOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt), "rgba(255, 204, 198, 0.8)", e.dArea, true, this.m_mercount);
-    }
+	addAreaPoint(e) {
+		this.clearPreviousShapes();
+		this.createAreaPOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt), "rgba(255, 204, 198, 0.8)", e.dArea, true, this.m_mercount);
+	}
 
-    endAreaPoint(e) {
-        this.m_mercount++;
-    }
+	endAreaPoint(e) {
+		this.m_mercount++;
+	}
 
-    createAreaPOI(_position, _color, _value, _balloonType) {
-        var drawCanvas = document.createElement('canvas');
-        drawCanvas.width = 100;
-        drawCanvas.height = 100;
+	createAreaPOI(_position, _color, _value, _balloonType) {
+		var drawCanvas = document.createElement('canvas');
+		drawCanvas.width = 100;
+		drawCanvas.height = 100;
 
-        let imageData = this.drawAreaIcon(drawCanvas, _color, _value, _balloonType);
+		let imageData = this.drawAreaIcon(drawCanvas, _color, _value, _balloonType);
 
-        let layerList = new this.map3D.JSLayerList(true);
-        let areaLayer = layerList.nameAtLayer("MEASURE_POI");
-        if (!areaLayer) {
-            areaLayer = layerList.createLayer("MEASURE_POI", this.map3D.ELT_3DPOINT);
-            areaLayer.setMaxDistance(20000.0);
-            areaLayer.setSelectable(false);
-        }
+		let layerList = new this.map3D.JSLayerList(true);
+		let areaLayer = layerList.nameAtLayer("MEASURE_POI");
+		if (!areaLayer) {
+			areaLayer = layerList.createLayer("MEASURE_POI", this.map3D.ELT_3DPOINT);
+			areaLayer.setMaxDistance(20000.0);
+			areaLayer.setSelectable(false);
+		}
 
-        let areaPOI = this.map3D.createPoint(this.m_mercount + "_POI");
-        areaPOI.setPosition(_position);
-        areaPOI.setImage(imageData, drawCanvas.width, drawCanvas.height);
-        areaLayer.addObject(areaPOI, 0);
-    }
+		let areaPOI = this.map3D.createPoint(this.m_mercount + "_POI");
+		areaPOI.setPosition(_position);
+		areaPOI.setImage(imageData, drawCanvas.width, drawCanvas.height);
+		areaLayer.addObject(areaPOI, 0);
+	}
 
-    drawAreaIcon(_canvas, _color, _value, _balloonType) {
-        var ctx = _canvas.getContext('2d'),
-            width = _canvas.width,
-            height = _canvas.height
-        ;
-        ctx.clearRect(0, 0, width, height);
-        if (_balloonType) {
-            this.drawAreaBalloon(ctx, height * 0.5, width, height, 5, height * 0.25, _color);
-            this.setAreaText(ctx, width * 0.5, height * 0.2, _value);
-        } else {
-            this.drawAreaRoundRect(ctx, 0, height * 0.3, width, height * 0.25, 5, _color);
-            this.setAreaText(ctx, width * 0.5, height * 0.5, _value);
-        }
+	drawAreaIcon(_canvas, _color, _value, _balloonType) {
+		var ctx = _canvas.getContext('2d'),
+			width = _canvas.width,
+			height = _canvas.height
+		;
+		ctx.clearRect(0, 0, width, height);
+		if (_balloonType) {
+			this.drawAreaBalloon(ctx, height * 0.5, width, height, 5, height * 0.25, _color);
+			this.setAreaText(ctx, width * 0.5, height * 0.2, _value);
+		} else {
+			this.drawAreaRoundRect(ctx, 0, height * 0.3, width, height * 0.25, 5, _color);
+			this.setAreaText(ctx, width * 0.5, height * 0.5, _value);
+		}
 
-        return ctx.getImageData(0, 0, _canvas.width, _canvas.height).data;
-    }
+		return ctx.getImageData(0, 0, _canvas.width, _canvas.height).data;
+	}
 
-    drawAreaBalloon(ctx,
-                    marginBottom, width, height,
-                    barWidth, barHeight,
-                    color) {
+	drawAreaBalloon(ctx,
+					marginBottom, width, height,
+					barWidth, barHeight,
+					color) {
 
-        var wCenter = width * 0.5;
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(0, height - barHeight - marginBottom);
-        ctx.lineTo(wCenter - barWidth, height - barHeight - marginBottom);
-        ctx.lineTo(wCenter, height - marginBottom);
-        ctx.lineTo(wCenter + barWidth, height - barHeight - marginBottom);
-        ctx.lineTo(width, height - barHeight - marginBottom);
-        ctx.lineTo(width, 0);
-        ctx.closePath();
+		var wCenter = width * 0.5;
+		ctx.beginPath();
+		ctx.moveTo(0, 0);
+		ctx.lineTo(0, height - barHeight - marginBottom);
+		ctx.lineTo(wCenter - barWidth, height - barHeight - marginBottom);
+		ctx.lineTo(wCenter, height - marginBottom);
+		ctx.lineTo(wCenter + barWidth, height - barHeight - marginBottom);
+		ctx.lineTo(width, height - barHeight - marginBottom);
+		ctx.lineTo(width, 0);
+		ctx.closePath();
 
-        ctx.fillStyle = color;
-        ctx.fill();
-    }
+		ctx.fillStyle = color;
+		ctx.fill();
+	}
 
-    drawAreaRoundRect(ctx,
-                      x, y,
-                      width, height, radius,
-                      color) {
+	drawAreaRoundRect(ctx,
+					  x, y,
+					  width, height, radius,
+					  color) {
 
-        if (width < 2 * radius) radius = width * 0.5;
-        if (height < 2 * radius) radius = height * 0.5;
+		if (width < 2 * radius) radius = width * 0.5;
+		if (height < 2 * radius) radius = height * 0.5;
 
-        ctx.beginPath();
-        ctx.moveTo(x + radius, y);
-        ctx.arcTo(x + width, y, x + width, y + height, radius);
-        ctx.arcTo(x + width, y + height, x, y + height, radius);
-        ctx.arcTo(x, y + height, x, y, radius);
-        ctx.arcTo(x, y, x + width, y, radius);
-        ctx.closePath();
+		ctx.beginPath();
+		ctx.moveTo(x + radius, y);
+		ctx.arcTo(x + width, y, x + width, y + height, radius);
+		ctx.arcTo(x + width, y + height, x, y + height, radius);
+		ctx.arcTo(x, y + height, x, y, radius);
+		ctx.arcTo(x, y, x + width, y, radius);
+		ctx.closePath();
 
-        ctx.fillStyle = color;
-        ctx.fill();
+		ctx.fillStyle = color;
+		ctx.fill();
 
-        return ctx;
-    }
+		return ctx;
+	}
 
-    setAreaText(_ctx, _posX, _posY, _value) {
-        let strText;
-        if (_value === undefined) {
-            strText = '';
-        } else {
-            strText = (Math.round(_value * 10) / 10) + '㎡';
-        }
+	setAreaText(_ctx, _posX, _posY, _value) {
+		let strText;
+		if (_value === undefined) {
+			strText = '';
+		} else {
+			strText = (Math.round(_value * 10) / 10) + '㎡';
+		}
 
-        _ctx.font = "bold 16px sans-serif";
-        _ctx.textAlign = "center";
-        _ctx.fillStyle = "rgb(0, 0, 0)";
+		_ctx.font = "bold 16px sans-serif";
+		_ctx.textAlign = "center";
+		_ctx.fillStyle = "rgb(0, 0, 0)";
 
-        _ctx.fillText(strText, _posX, _posY);
-    }
+		_ctx.fillText(strText, _posX, _posY);
+	}
 
-    removeAreaMeasureEvent() {
-        // document.body.removeEventListener('click', this.areaMeasureListener);
-    }
+	removeAreaMeasureEvent() {
+		// document.body.removeEventListener('click', this.areaMeasureListener);
+	}
 
-    createAreaMeasureLayer() {
-        let layerList = new this.map3D.JSLayerList(true);
-        let layer = layerList.createLayer("MEASURE_AREA_POI", this.map3D.ELT_3DPOINT);
-        layer.setMaxDistance(20000.0);
-        layer.setSelectable(false);
-    }
+	createAreaMeasureLayer() {
+		let layerList = new this.map3D.JSLayerList(true);
+		let layer = layerList.createLayer("MEASURE_AREA_POI", this.map3D.ELT_3DPOINT);
+		layer.setMaxDistance(20000.0);
+		layer.setSelectable(false);
+	}
 
-    clearAreaAnalysis() {
-        this.map3D.XDClearAreaMeasurement();
-        this.m_mercount = 0;
-    }
+	clearAreaAnalysis() {
+		this.map3D.XDClearAreaMeasurement();
+		this.m_mercount = 0;
+	}
 
-    handleMeasureDistance() {
-        this.clearEvents();
-        this.setMouseState('distance');
+	handleMeasureDistance() {
+		this.clearEvents();
+		this.setMouseState('distance');
 
-        let layerList = new this.map3D.JSLayerList(true);
-        this.distanceLayer = layerList.createLayer("MEASURE_DISTANCE_POI", this.map3D.ELT_3DPOINT);
-        this.distanceLayer.setMaxDistance(20000.0);
-        this.distanceLayer.setSelectable(false);
+		let layerList = new this.map3D.JSLayerList(true);
+		this.distanceLayer = layerList.createLayer("MEASURE_DISTANCE_POI", this.map3D.ELT_3DPOINT);
+		this.distanceLayer.setMaxDistance(20000.0);
+		this.distanceLayer.setSelectable(false);
 
-        this.map3D.getOption().SetDistanceMeasureLineDepthBuffer(false);
-        this.map3D.getOption().callBackAddPoint(this.addDistancePoint);
-        this.map3D.getOption().callBackCompletePoint(this.endDistancePoint);
-        this.removeDistanceMeasureEvent();
-    }
+		this.map3D.getOption().SetDistanceMeasureLineDepthBuffer(false);
+		this.map3D.getOption().callBackAddPoint(this.addDistancePoint);
+		this.map3D.getOption().callBackCompletePoint(this.endDistancePoint);
+		this.removeDistanceMeasureEvent();
+	}
 
-    addDistancePoint(e) {
-        let partDistance = e.dDistance,
-            totalDistance = e.dTotalDistance;
+	addDistancePoint(e) {
+		let partDistance = e.dDistance,
+			totalDistance = e.dTotalDistance;
 
-        if (partDistance === 0 && totalDistance === 0) {
-            this.m_objcount = 0;
-            this.createDistancePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt), "rgba(255, 204, 198, 0.8)", "Start", true);
-        } else {
-            if (e.dDistance > 0.01) {
-                this.createDistancePOI(new this.map3D.JSVector3D(e.dMidLon, e.dMidLat, e.dMidAlt), "rgba(255, 255, 0, 0.8)", e.dDistance, false);
-            }
-            this.createDistancePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt), "rgba(255, 204, 198, 0.8)", e.dTotalDistance, true);
-        }
-    }
+		if (partDistance === 0 && totalDistance === 0) {
+			this.m_objcount = 0;
+			this.createDistancePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt), "rgba(255, 204, 198, 0.8)", "Start", true);
+		} else {
+			if (e.dDistance > 0.01) {
+				this.createDistancePOI(new this.map3D.JSVector3D(e.dMidLon, e.dMidLat, e.dMidAlt), "rgba(255, 255, 0, 0.8)", e.dDistance, false);
+			}
+			this.createDistancePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt), "rgba(255, 204, 198, 0.8)", e.dTotalDistance, true);
+		}
+	}
 
-    endDistancePoint(e) {
-        this.m_mercount++;
-    }
+	endDistancePoint(e) {
+		this.m_mercount++;
+	}
 
-    createDistancePOI(_position, _color, _value, _balloonType) {
-        var drawCanvas = document.createElement('canvas');
-        drawCanvas.width = 100;
-        drawCanvas.height = 100;
+	createDistancePOI(_position, _color, _value, _balloonType) {
+		var drawCanvas = document.createElement('canvas');
+		drawCanvas.width = 100;
+		drawCanvas.height = 100;
 
-        let imageData = this.drawIconRadiusArea(drawCanvas, _color, _value, _balloonType);
+		let imageData = this.drawIconRadiusArea(drawCanvas, _color, _value, _balloonType);
 
-        let layerList = new this.map3D.JSLayerList(true);
-        this.distanceLayer = layerList.nameAtLayer("MEASURE_DISTANCE_POI");
+		let layerList = new this.map3D.JSLayerList(true);
+		this.distanceLayer = layerList.nameAtLayer("MEASURE_DISTANCE_POI");
 
-        let poi = this.map3D.createPoint(this.m_mercount + "_POI_" + this.m_objcount);
-        poi.setPosition(_position);
-        poi.setImage(imageData, drawCanvas.width, drawCanvas.height);
-        this.distanceLayer.addObject(poi, 0);
-        this.m_objcount++;
-    }
+		let poi = this.map3D.createPoint(this.m_mercount + "_POI_" + this.m_objcount);
+		poi.setPosition(_position);
+		poi.setImage(imageData, drawCanvas.width, drawCanvas.height);
+		this.distanceLayer.addObject(poi, 0);
+		this.m_objcount++;
+	}
 
-    removeDistanceMeasureEvent() {
-        // document.body.removeEventListener('click', this.distanceMeasureListener);
-    }
+	removeDistanceMeasureEvent() {
+		// document.body.removeEventListener('click', this.distanceMeasureListener);
+	}
 
-    handleToolIconClick(icon, selectedIcon, setSelectedIcon) {
-        this.clearPreviousShapes();
-        this.clearEvents();
-        if (selectedIcon === icon) {
-            setSelectedIcon(null);
-            this.clearMeasurements();
-            return;
-        }
-        setSelectedIcon(icon);
-        this.handleToolAction(icon);
-    }
+	handleToolIconClick(icon, selectedIcon, setSelectedIcon) {
+		this.clearPreviousShapes();
+		this.clearEvents();
+		if (selectedIcon === icon) {
+			setSelectedIcon(null);
+			this.clearMeasurements();
+			return;
+		}
+		setSelectedIcon(icon);
+		this.handleToolAction(icon);
+	}
 
     handleToolAction(icon) {
         if (icon === 'area') {

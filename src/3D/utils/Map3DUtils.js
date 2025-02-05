@@ -3,7 +3,7 @@ import GeoJSON from 'ol/format/GeoJSON';
 import { boundingExtent } from 'ol/extent';
 import { DEFAULT_SRS, WMS_VERSION, } from "../../common/constants/GeoserverConfig";
 import { GEOSERVER_BASE_URL } from "../../common/constants/ApiUrl";
-import { PIN_PNG_URL } from "../../common/constants/GeneralConfig";
+import { PIN_PNG_URL, SEC_PIN_PNG_URL } from "../../common/constants/GeneralConfig";
 import { fetchPOIByLayer } from "../../common/domain/usecases/SearchPOIUseCase";
 import Feature from "ol/Feature";
 import Polygon from "ol/geom/Polygon";
@@ -168,7 +168,7 @@ const _createWfsPOI = (map, geojson, layer) => {
     let features = geojson.features;
 
     var img = new Image();
-    img.src = PIN_PNG_URL;
+    img.src = SEC_PIN_PNG_URL;
     img.layer = layer;
     img.onload = function () {
         var canvas = document.createElement('canvas');

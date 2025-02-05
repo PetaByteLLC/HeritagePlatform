@@ -23,8 +23,9 @@ export const fetchAllBookmarks = async (keyword) => await AllBookmarks(keyword);
 
 export const fetchPOIByLayer = async (name) => await POIByLayer(name);
 
-export const addBookmark = async (keyword) => await AddBookmark(keyword);
+export const addBookmark = async (feature) => await AddBookmark(feature);
 
-export const editBookmark = async (keyword) => await EditBookmark(keyword);
 
-export const deleteBookmark = async (keyword) => await DeleteBookmark(keyword);
+export const editBookmark = async (feature) => await EditBookmark(feature);
+
+export const deleteBookmark = async (feature) => await DeleteBookmark(feature);

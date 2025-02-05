@@ -3,19 +3,21 @@ import { Draw } from 'ol/interaction';
 import { createBox } from 'ol/interaction/Draw';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
+import { Style, Circle, Fill, Stroke } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
 import { toLonLat } from 'ol/proj';
 import { get2DBbox } from '../../../common/domain/utils/2DBbox';
 import { DEFAULT_SRS, POI_LAYER_NAME } from '../../../common/constants/GeoserverConfig';
 import { addGeoJSONToMap, removeLayerFromMap, moveToSingleFeature } from '../../utils/Map2DUtils';
 import Overlay from 'ol/Overlay';
-import Feature from "ol/Feature";
+import { Feature } from 'ol';
 import { LineString, Point } from "ol/geom";
 
 export class Map2DStrategy extends MapStrategy {
 	constructor(map2D) {
 		super();
 		this.map2D = map2D;
+		this.eventHandler();
 	}
 
 	createVectorLayer() {
@@ -253,4 +255,99 @@ export class Map2DStrategy extends MapStrategy {
         alert('Height measurement is not possible on a 2D map. Use a 3D map or external height services.');
         console.log('Measuring height on a 2D map is not possible.');
     }
+
+	eventHandler() {
+		let self = this;
+
+		self.map2D.on('click', function (event) {
+			var coordinate = toLonLat(event.coordinate);
+			// console.log(self.coordinate);
+			self._showPoint(coordinate, 'red');
+			self.coordinate = coordinate;
+		});
+	}
+
+	createBookmark(name, distance, color) : object {
+		let view = this.map2D.getView();
+		return {
+			"type": "Feature",
+			"id": null,
+			"geometry": {
+				"type": "Point",
+				"coordinates": this.coordinate
+			},
+			"geometry_name": "geom",
+			"properties": {
+				"name": name,
+				"level": Math.floor(view.getZoom()),
+				"direction":0,
+				"tilt": 90,
+				"fov_x": 88,
+				"fov_y": 88,
+				"color": color || "#c8ff00",
+				"altitude": this._getZoomHeightMeters(),
+				"distance": distance,
+				"date":  Math.floor(new Date().getTime() / 1000)
+			}
+		};
+	}
+
+	showBookmark(feature) {
+		this._showPoint(feature.geometry.coordinates, feature.properties.color);
+
+		const view = this.map2D.getView();
+		view.animate({
+			center: fromLonLat(feature.geometry.coordinates),
+			zoom: feature.properties.level,
+			duration: 500,
+		});
+	}
+
+	viewBookmark(feature) {
+		this.showBookmark(feature);
+	}
+
+	removeBookmark() {
+		let self = this;
+		if (!!self.vectorLayer) {
+			self.map2D.removeLayer(self.vectorLayer);
+		}
+	}
+
+	_showPoint(coordinate, color){
+		let self = this;
+		this.coordinate = null;
+		// console.log("self", self);
+		if (!!self.vectorLayer) {
+			self.map2D.removeLayer(self.vectorLayer);
+		}
+
+		const vectorSource = new VectorSource();
+		self.vectorLayer = new VectorLayer({
+			source: vectorSource,
+			style: new Style({
+				image: new Circle({
+					radius: 10,
+					fill: new Fill({ color: color }),
+					stroke: new Stroke({ color: 'white', width: 2 })
+				})
+			})
+		});
+		self.vectorLayer.setZIndex(100);
+
+		self.map2D.addLayer(self.vectorLayer);
+
+		let pointFeature = new Feature({
+			geometry: new Point(fromLonLat(coordinate))
+		});
+
+		vectorSource.addFeature(pointFeature);
+	}
+
+	_getZoomHeightMeters() {
+		const view = this.map2D.getView();
+		const resolution = view.getResolution();
+		const heightPixels = this.map2D.getSize()[1]; // Количество пикселей по высоте
+		return resolution * heightPixels;
+	}
 }

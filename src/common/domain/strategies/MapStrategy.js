@@ -58,4 +58,20 @@ export class MapStrategy {
     handleMeasureRadius(activeButton, setActiveButton) {
         throw new Error('Method not implemented');
     }
+
+	createBookmark(name, distance, color): object {
+		throw new Error('Method not implemented');
+	}
+
+	showBookmark(feature) {
+		throw new Error('Method not implemented');
+	}
+
+	viewBookmark(feature) {
+		throw new Error('Method not implemented');
+	}
+
+	removeBookmark() {
+		throw new Error('Method not implemented');
+	}
 }

@@ -8,7 +8,7 @@ const Effect = () => {
     const [effects, setLocalEffects] = useState({
         rain: { enabled: false, speed: 5, intensity: 5, image: '/rain1.png' },
         snow: { enabled: false, speed: 5, intensity: 5, image: '/snow1.png' },
-        fog: { enabled: false, startDistance: 10, gradientDistance: 2000, density: 0.5 },
+        fog: { enabled: false, startDistance: 10, gradientDistance: 2000, density: 0.5, type: 'Fog' },
     });
 
     const handleEffectAction = useCallback((newEffects => {
@@ -135,6 +135,15 @@ const Effect = () => {
                                                 value={effects[effect].density}
                                                 onChange={(e) => handleSettingChange(effect, 'density', e.target.value)}
                                             />
+                                            <label className="form-label">Type</label>
+                                            <select
+                                                className="form-select"
+                                                value={effects[effect].type}
+                                                onChange={(e) => handleSettingChange(effect, 'type', e.target.value)}
+                                            >
+                                                <option value="Fog">Fog</option>
+                                                <option value="Smog">Smog</option>
+                                            </select>
                                         </>
                                     )}
                                 </div>
@@ -148,7 +157,3 @@ const Effect = () => {
 };
 
 export default Effect;
-
-export class
-
-export class

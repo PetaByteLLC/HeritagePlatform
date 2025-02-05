@@ -1,12 +1,12 @@
 export const EffectTypes = {
     rain: [
-        { '1': '/rain1.png' },
-        { '2': '/rain2.png' },
-        { '3': '/rain3.png' }
+        { 'Heavy Rain': '/rain1.png' },
+        { 'Light Rain': '/rain2.png' },
+        { 'Moderate Rain': '/rain3.png' }
     ],
     snow: [
-        { '1': '/snow1.png' },
-        { '2': '/snow2.png' },
-        { '3': '/snow3.png' }
+        { 'Blizzard': '/snow1.png' },
+        { 'Flurries': '/snow2.png' },
+        { 'Snow Showers': '/snow3.png' }
     ]
 };

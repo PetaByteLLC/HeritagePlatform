@@ -6,10 +6,10 @@ export class Effect3DStrategy extends EffectStrategy {
         this.map3D = map3D;
         this.map = this.map3D.getMap();
         this.fogColor = new this.map3D.JSColor(255, 255, 255, 255);
+        this.smogColor = new this.map3D.JSColor(255, 255, 255, 100);
     }
 
     handleEffectAction(effects) {
-        console.log(effects);
         this.stopWeather();
 
         Object.keys(effects).forEach(effect => {
@@ -19,14 +19,13 @@ export class Effect3DStrategy extends EffectStrategy {
                 } else if (effect === 'snow') {
                     this.setUseSnowEffect(effects[effect].image, effects[effect].speed, effects[effect].intensity);
                 } else if (effect === 'fog') {
-                    this.setUseFogEffect(effects[effect].startDistance, effects[effect].gradientDistance, effects[effect].density);
+                    this.setUseFogEffect(effects[effect].startDistance, effects[effect].gradientDistance, effects[effect].density, effects[effect].type);
                 }
             }
         });
     }
 
     setUseRainEffect(image, speed, intensity) {
-        console.log("Rain effect started");
         if (image) {
             this.map.setRainImageURL(image);
             this.map.startWeather(1, speed, intensity);
@@ -34,7 +33,6 @@ export class Effect3DStrategy extends EffectStrategy {
     }
 
     setUseSnowEffect(image, speed, intensity) {
-        console.log("Snow effect started");
         if (image) {
             this.map.setSnowImageURL(image);
             this.map.startWeather(0, speed, intensity);
@@ -43,11 +41,13 @@ export class Effect3DStrategy extends EffectStrategy {
         }
     }
 
-    setUseFogEffect(startDist, gradDist, fogDensity) {
-        console.log("Fog effect started");
-        this.map.setFogLimitAltitude(6000000.0);
-        this.map.setFog(this.fogColor, startDist, startDist + gradDist, fogDensity);
-        this.map.setFogEnable(true);
+    setUseFogEffect(startDist, gradDist, fogDensity, type) {
+        if (type) {
+            const fogColor = type === "Fog" ? this.fogColor : this.smogColor;
+            this.map.setFogLimitAltitude(6000000.0);
+            this.map.setFog(fogColor, startDist, startDist + gradDist, fogDensity);
+            this.map.setFogEnable(true);
+        }
     }
 
     stopWeather() {

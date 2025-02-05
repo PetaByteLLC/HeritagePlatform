@@ -9,10 +9,6 @@ export class Map3DStrategy extends MapStrategy {
 		this.m_mercount = 0;
 		this.m_objcount = 0;
         this.altIndex = 0;
-        this.addDistancePoint = this.addDistancePoint.bind(this);
-        this.endDistancePoint = this.endDistancePoint.bind(this);
-        this.addAreaPoint = this.addAreaPoint.bind(this);
-        this.endAreaPoint = this.endAreaPoint.bind(this);
 	}
 
 	addInteraction(icon, setCurrentSpatial) {
@@ -340,8 +336,6 @@ export class Map3DStrategy extends MapStrategy {
         this.clearAltitudeAnalysis();
         this.clearRadiusAnalysis();
         this.clearAreaAnalysis();
-        this.map3D.getOption().callBackAddPoint(null);
-        this.map3D.getOption().callBackCompletePoint(null);
     }
 
 	handleZoomIn() {
@@ -653,19 +647,13 @@ export class Map3DStrategy extends MapStrategy {
 		this.setMouseState('area');
 		this.createAreaMeasureLayer();
 
-		this.map3D.getOption().SetAreaMeasurePolygonDepthBuffer(false);
+        this.areaMeasureListener = function (e) {
+            this.clearPreviousShapes();
+            this.createAreaPOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt + 50), "rgba(255, 204, 198, 0.8)", e.dArea, true, this.m_mercount);
+            this.m_mercount++;
+        }.bind(this);
 
-		this.map3D.getOption().callBackAddPoint(this.addAreaPoint);
-		this.map3D.getOption().callBackCompletePoint(this.endAreaPoint);
-	}
-
-	addAreaPoint(e) {
-		this.clearPreviousShapes();
-		this.createAreaPOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt), "rgba(255, 204, 198, 0.8)", e.dArea, true, this.m_mercount);
-	}
-
-	endAreaPoint(e) {
-		this.m_mercount++;
+        this.map3D.canvas.addEventListener("Fire_EventAddAreaPoint", this.areaMeasureListener);
 	}
 
 	createAreaPOI(_position, _color, _value, _balloonType) {
@@ -764,7 +752,7 @@ export class Map3DStrategy extends MapStrategy {
 	}
 
 	removeAreaMeasureEvent() {
-		// document.body.removeEventListener('click', this.areaMeasureListener);
+        this.map3D.canvas.removeEventListener('Fire_EventAddAreaPoint', this.areaMeasureListener);
 	}
 
 	createAreaMeasureLayer() {
@@ -788,29 +776,23 @@ export class Map3DStrategy extends MapStrategy {
 		this.distanceLayer.setMaxDistance(20000.0);
 		this.distanceLayer.setSelectable(false);
 
-		this.map3D.getOption().SetDistanceMeasureLineDepthBuffer(false);
-		this.map3D.getOption().callBackAddPoint(this.addDistancePoint);
-		this.map3D.getOption().callBackCompletePoint(this.endDistancePoint);
-		this.removeDistanceMeasureEvent();
-	}
+        this.distanceMeasureListener = function (e) {
+            let partDistance = e.dDistance,
+                totalDistance = e.dTotalDistance;
 
-	addDistancePoint(e) {
-		let partDistance = e.dDistance,
-			totalDistance = e.dTotalDistance;
+            if (partDistance === 0 && totalDistance === 0) {
+                this.m_objcount = 0;
+                this.createDistancePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt + 50), "rgba(255, 204, 198, 0.8)", "Start", true);
+            } else {
+                if (e.dDistance > 0.01) {
+                    this.createDistancePOI(new this.map3D.JSVector3D(e.dMidLon, e.dMidLat, e.dMidAlt + 50), "rgba(255, 255, 0, 0.8)", e.dDistance, false);
+                }
+                this.createDistancePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt + 50), "rgba(255, 204, 198, 0.8)", e.dTotalDistance, true);
+            }
+            this.m_mercount++;
+        }.bind(this);
 
-		if (partDistance === 0 && totalDistance === 0) {
-			this.m_objcount = 0;
-			this.createDistancePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt), "rgba(255, 204, 198, 0.8)", "Start", true);
-		} else {
-			if (e.dDistance > 0.01) {
-				this.createDistancePOI(new this.map3D.JSVector3D(e.dMidLon, e.dMidLat, e.dMidAlt), "rgba(255, 255, 0, 0.8)", e.dDistance, false);
-			}
-			this.createDistancePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt), "rgba(255, 204, 198, 0.8)", e.dTotalDistance, true);
-		}
-	}
-
-	endDistancePoint(e) {
-		this.m_mercount++;
+        this.map3D.canvas.addEventListener("Fire_EventAddDistancePoint", this.distanceMeasureListener);
 	}
 
 	createDistancePOI(_position, _color, _value, _balloonType) {
@@ -831,7 +813,7 @@ export class Map3DStrategy extends MapStrategy {
 	}
 
 	removeDistanceMeasureEvent() {
-		// document.body.removeEventListener('click', this.distanceMeasureListener);
+        this.map3D.canvas.removeEventListener('Fire_EventAddDistancePoint', this.distanceMeasureListener);
 	}
 
 	handleToolIconClick(icon, selectedIcon, setSelectedIcon) {

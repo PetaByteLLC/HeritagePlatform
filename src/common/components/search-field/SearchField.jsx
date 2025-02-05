@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faSearch, faLocationArrow, faDrawPolygon, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faSearch, faLocationArrow, faDrawPolygon, faInfoCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faCircle, faSquare } from '@fortawesome/free-regular-svg-icons';
 import './SearchField.css';
 import { MapContext } from '../../../MapContext';
@@ -47,6 +47,13 @@ const SearchField = () => {
         setIsMenuOpen(false);
     };
 
+    const handleCleanClick = () => {
+        strategy.removePOILayer();
+        setSelectedPOI(null);
+        setResult(null);
+        setValue('');
+    }
+
     const handleSearchClick = async () => {
         strategy.removePOILayer();
         setSelectedPOI(null);
@@ -75,7 +82,7 @@ const SearchField = () => {
         e.stopPropagation();
         setSelectedPOI(feature.properties);
     };
-    
+
     const handleLocationClick = (e, feature) => {
         e.stopPropagation();
         strategy.moveToSingleFeature(feature);
@@ -100,7 +107,12 @@ const SearchField = () => {
                         onFocus={handleFocus}
                         onBlur={handleBlur}
                     />
-                    <FontAwesomeIcon icon={faSearch} className="icon-right" onClick={handleSearchClick}/>
+                    <FontAwesomeIcon
+                        icon={faTimes}
+                        className="icon-clear"
+                        onClick={handleCleanClick}
+                    />
+                    <FontAwesomeIcon icon={faSearch} className="icon-right" onClick={handleSearchClick} />
                 </div>
 
                 <div className="icon-buttons">
@@ -183,7 +195,7 @@ const SearchField = () => {
                     </div>
                 )}
 
-                <Menu isOpen={isMenuOpen} onClose={handleCloseMenu}/>
+                <Menu isOpen={isMenuOpen} onClose={handleCloseMenu} />
             </div>
         </div>
     );

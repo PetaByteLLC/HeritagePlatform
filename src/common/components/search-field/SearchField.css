@@ -78,6 +78,7 @@
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 2;
+    box-sizing: border-box;
 }
 
 .result-item {
@@ -87,6 +88,7 @@
     padding: 10px;
     border-bottom: 1px solid #ccc;
     cursor: pointer;
+    box-sizing: border-box;
 }
 
 .result-item-text h3 {
@@ -104,6 +106,7 @@
 
 .result-item:last-child {
     border-bottom: none;
+    padding-bottom: 11px;
 }
 
 .result-item:hover {

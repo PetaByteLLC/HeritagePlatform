@@ -8,12 +8,11 @@ export class Map3DStrategy extends MapStrategy {
 		this.map3D = map3D;
 		this.m_mercount = 0;
 		this.m_objcount = 0;
-		this.altIndex = 0;
-		this.addDistancePoint = this.addDistancePoint.bind(this);
-		this.endDistancePoint = this.endDistancePoint.bind(this);
-		this.addAreaPoint = this.addAreaPoint.bind(this);
-		this.endAreaPoint = this.endAreaPoint.bind(this);
-		this.activeButton = null;
+        this.altIndex = 0;
+        this.addDistancePoint = this.addDistancePoint.bind(this);
+        this.endDistancePoint = this.endDistancePoint.bind(this);
+        this.addAreaPoint = this.addAreaPoint.bind(this);
+        this.endAreaPoint = this.endAreaPoint.bind(this);
 	}
 
 	addInteraction(icon, setCurrentSpatial) {
@@ -139,7 +138,7 @@ export class Map3DStrategy extends MapStrategy {
 	}
 
 	removePolygonClickEvent() {
-		document.body.removeEventListener('click', this.handlePolygonClick);
+		this.map3D.canvas.removeEventListener('click', this.handlePolygonClick);
 	}
 
 	endPoint() {
@@ -221,11 +220,11 @@ export class Map3DStrategy extends MapStrategy {
 			}
 		};
 
-		document.body.addEventListener('click', this.handleClickEvent);
+        this.map3D.canvas.addEventListener('click', this.handleClickEvent);
 	}
 
 	removeRectangleEvent() {
-		document.body.removeEventListener('click', this.handleClickEvent);
+        this.map3D.canvas.removeEventListener('click', this.handleClickEvent);
 	}
 
 	getSquareCoordinates() {
@@ -328,20 +327,22 @@ export class Map3DStrategy extends MapStrategy {
 		this.map3D.XDClearCircleMeasurement();
 	}
 
-	clearEvents() {
-		this.clearMeasurements();
-		this.clearPreviousShapes();
-		this.removeRectangleEvent();
-		this.removePolygonClickEvent();
-		this.removeRadiusEvent();
-		this.removeAltitudeEvent();
-		this.removeRadiusMeasureEvent();
-		this.removeAreaMeasureEvent();
-		this.removeDistanceMeasureEvent();
-		this.clearAltitudeAnalysis();
-		this.clearRadiusAnalysis();
-		this.clearAreaAnalysis();
-	}
+    clearEvents() {
+        this.clearMeasurements();
+        this.clearPreviousShapes();
+        this.removeRectangleEvent();
+        this.removePolygonClickEvent();
+        this.removeRadiusEvent();
+        this.removeAltitudeEvent();
+        this.removeRadiusMeasureEvent();
+        this.removeAreaMeasureEvent();
+        this.removeDistanceMeasureEvent();
+        this.clearAltitudeAnalysis();
+        this.clearRadiusAnalysis();
+        this.clearAreaAnalysis();
+        this.map3D.getOption().callBackAddPoint(null);
+        this.map3D.getOption().callBackCompletePoint(null);
+    }
 
 	handleZoomIn() {
 		this.zoom(4);
@@ -413,13 +414,13 @@ export class Map3DStrategy extends MapStrategy {
 		var imageData = this.drawIcon(drawCanvas, _color, _value, _subValue),
 			altIndex = this.altIndex;
 
-		if (this.altitudeSymbol.insertIcon("Icon"+altIndex, imageData, drawCanvas.width, drawCanvas.height)) {
+        if (this.altitudeSymbol.insertIcon("AltitudeIcon"+altIndex, imageData, drawCanvas.width, drawCanvas.height)) {
 
-			var icon = this.altitudeSymbol.getIcon("Icon"+altIndex);
+            var icon = this.altitudeSymbol.getIcon("AltitudeIcon"+altIndex);
 
-			var poi = this.map3D.createPoint("POI"+altIndex);
-			poi.setPosition(_position);
-			poi.setIcon(icon);
+            var poi = this.map3D.createPoint("ALTITUDE_POI"+altIndex);
+            poi.setPosition(_position);
+            poi.setIcon(icon);
 
 			this.altitudeLayer.addObject(poi, 0);
 			this.altIndex++;
@@ -512,14 +513,14 @@ export class Map3DStrategy extends MapStrategy {
 			symbol = this.altitudeSymbol;
 		if (layer == null) return;
 
-		var i, len, icon, poi;
-		for (i=0, len=layer.getObjectCount(); i<len; i++) {
-			poi = layer.keyAtObject("POI"+i);
-			icon = poi.getIcon();
-			layer.removeAtKey("POI"+i);
-			symbol.deleteIcon(icon.getId());
-		}
-	}
+        var i, len, icon, poi;
+        for (i=0, len=layer.getObjectCount(); i<len; i++) {
+            poi = layer.keyAtObject("ALTITUDE_POI"+i);
+            icon = poi.getIcon();
+            layer.removeAtKey("ALTITUDE_POI"+i);
+            symbol.deleteIcon(icon.getId());
+        }
+    }
 
 	handleMeasureRadius() {
 		this.clearEvents();
@@ -556,28 +557,31 @@ export class Map3DStrategy extends MapStrategy {
 		drawCanvas.width = 100;
 		drawCanvas.height = 100;
 
-		var imageData = this.drawIconRadiusArea(drawCanvas, _color, _value, _balloonType);
-		if (this.radiusSymbol.insertIcon("Icon", imageData, drawCanvas.width, drawCanvas.height)) {
-			var icon = this.radiusSymbol.getIcon("Icon");
+        var imageData = this.drawIconRadiusArea(drawCanvas, _color, _value, _balloonType);
 
-			var poi = this.map3D.createPoint("POI");
-			poi.setPosition(_position);
-			poi.setIcon(icon);
-			this.radiusLayer.addObject(poi, 0);
-		}
-	}
+        var oldIcon = this.radiusSymbol.getIcon("RadiusIcon")
+        if (oldIcon) {
+            this.radiusSymbol.deleteIcon(oldIcon.getId());
+        }
+        this.radiusSymbol.insertIcon("RadiusIcon", imageData, drawCanvas.width, drawCanvas.height);
+        var icon = this.radiusSymbol.getIcon("RadiusIcon");
+        var poi = this.map3D.createPoint("RADIUS_POI");
+        poi.setPosition(_position);
+        poi.setIcon(icon);
+        this.radiusLayer.addObject(poi, 0);
+    }
 
 	clearIcon() {
 
 		if (this.radiusLayer == null) return;
 		var icon, poi;
 
-		poi = this.radiusLayer.keyAtObject("POI");
+        poi = this.radiusLayer.keyAtObject("RADIUS_POI");
 
-		if (poi == null) return;
+        if (poi == null) return;
 
-		icon = poi.getIcon();
-		this.radiusLayer.removeAtKey("POI");
+        icon = poi.getIcon();
+        this.radiusLayer.removeAtKey("RADIUS_POI");
 
 		this.radiusSymbol.deleteIcon(icon.getId());
 	}

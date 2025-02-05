@@ -92,7 +92,7 @@ const Map3D = () => {
 			for (const e of wfsLayers) {
 				let layerList = new window.Module.JSLayerList(true);
 				const poiLayer = layerList.nameAtLayer(e.layerName);
-				if (!poiLayer) continue;
+				if (!poiLayer || !poiLayer.getVisible()) continue;
 
 				const cameraLevel = window.Module.getViewCamera().getMapZoomLevel();
 				if (cameraLevel < e.min) {

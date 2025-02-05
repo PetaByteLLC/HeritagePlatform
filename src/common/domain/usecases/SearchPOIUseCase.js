@@ -2,7 +2,7 @@ import { fetchPOIByBbox, fetchPOIByRadius, fetchPOIByPolygon, fetchAllPOI, fetch
 import WKT from 'ol/format/WKT';
 
 export const searchPOIBySpatial = async (keyword, spatialType, spatial) => {
-    if (keyword === null || keyword === undefined || keyword.trim().length === 0) return;
+    if ((keyword === null || keyword === undefined || keyword.trim().length === 0) && !spatial) return;
     if (spatial === null || spatial === undefined) {
         return await fetchAllPOI(keyword);
     }

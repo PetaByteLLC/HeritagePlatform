@@ -846,15 +846,151 @@ export class Map3DStrategy extends MapStrategy {
 		this.handleToolAction(icon);
 	}
 
-    handleToolAction(icon) {
-        if (icon === 'area') {
-            this.handleMeasureArea(icon);
-        } else if (icon === 'distance') {
-            this.handleMeasureDistance(icon);
-        } else if (icon === 'radius') {
-            this.handleMeasureRadius(icon);
-        } else if (icon === 'altitude') {
-            this.handleMeasureAltitude(icon);
-        }
-    }
+	handleToolAction(icon) {
+		if (icon === 'area') {
+			this.handleMeasureArea(icon);
+		} else if (icon === 'distance') {
+			this.handleMeasureDistance(icon);
+		} else if (icon === 'radius') {
+			this.handleMeasureRadius(icon);
+		} else if (icon === 'altitude') {
+			this.handleMeasureAltitude(icon);
+		}
+	}
+
+	handleSelectPointEvent() {
+	}
+
+	unHandleSelectPointEvent() {
+	}
+
+	createBookmark(name, distance, color): object {
+		let camera = this.map3D.getViewCamera();
+		let cameraLocation = camera.getLocation();
+
+		return {
+			"type": "Feature",
+			"id": null,
+			"geometry": {
+				"type": "Point",
+				"coordinates": [
+					cameraLocation.longitude,
+					cameraLocation.latitude
+				]
+			},
+			"geometry_name": "geom",
+			"properties": {
+				"name": name,
+				"level": camera.getMapZoomLevel(),
+				"direction": camera.getDirect(),
+				"tilt": camera.getTilt(),
+				"fov_x": camera.videoFovX,
+				"fov_y": camera.videoFovY,
+				"color": color || "#c8ff00",
+				"altitude": camera.getAltitude(),
+				"distance": distance,
+				"date":  Math.floor(new Date().getTime() / 1000)
+			}
+		};
+	}
+
+	showBookmark(feature) {
+		if (!this.layer) {
+			let layerList = new this.map3D.JSLayerList(true);
+			this.layer = layerList.createLayer("CCTV", this.map3D.ELT_POLYHEDRON);
+		}
+		else if (!!this.frustum) {
+			this.layer.removeAll();
+		}
+
+		this.map3D.getViewCamera().setLocation(new this.map3D.JSVector3D(feature.geometry.coordinates[0], feature.geometry.coordinates[1], feature.properties.altitude + 1000));
+		this.map3D.getViewCamera().setTilt(85);
+		this.map3D.getViewCamera().setDirect(feature.properties.direction);
+
+		let color = new this.map3D.JSColor();
+		color.setHexCode(feature.properties.color.replace('#', '#CC'));
+
+		let lineColor = new this.map3D.JSColor();
+		lineColor.setHexCode(feature.properties.color);
+
+		this.frustum = this._createViewFrustum({
+			position: new this.map3D.JSVector3D(feature.geometry.coordinates[0], feature.geometry.coordinates[1], feature.properties.altitude),
+			pan: feature.properties.direction,
+			tilt: feature.properties.tilt,
+			fov_x: feature.properties.fov_x,
+			fov_y: feature.properties.fov_y,
+			distance: feature.properties.distance,
+			color: color
+		});
+
+		// Create a line object perpendicular to the ground from the frustum starting position
+		this._createVerticalLine(this.frustum.getEyepos(), lineColor);
+
+		this.layer.addObject(this.frustum, 0);
+
+		this.map3D.XDRenderData();
+	}
+
+	viewBookmark(feature) {
+		this.removeBookmark();
+		this.map3D.getViewCamera().setLocation(new this.map3D.JSVector3D(feature.geometry.coordinates[0], feature.geometry.coordinates[1], feature.properties.altitude));
+		this.map3D.getViewCamera().setTilt(feature.properties.tilt);
+		this.map3D.getViewCamera().setDirect(feature.properties.direction);
+	}
+
+	removeBookmark() {
+		if (!!this.layer && !!this.frustum) {
+			this.layer.removeAll();
+		}
+		if (!!this.lineLayer && !!this.line) {
+			this.lineLayer.removeAll();
+		}
+	}
+
+	_createViewFrustum(_options) {
+
+		let frustum = this.map3D.createViewFrustum("FRUSTUM");
+		frustum.createViewFrustum(
+			_options.position,
+			_options.pan, _options.tilt,
+			_options.fov_x, _options.fov_y,
+			_options.distance
+		);
+		frustum.setColor(_options.color);
+
+		return frustum;
+	}
+
+	_createVerticalLine(_position, color) {
+
+		if (!this.lineLayer) {
+			// Create line layer
+			let layerList = new this.map3D.JSLayerList(true);
+			this.lineLayer = layerList.createLayer("FRUSTUM_LINE_LAYER", this.map3D.ELT_3DLINE);
+		}
+		else if (!!this.line) {
+			this.lineLayer.removeAll();
+		}
+
+		this.line = this.map3D.createLineString("FRUSTUM_LINE");
+
+		let vertices = new this.map3D.JSVec3Array();
+		vertices.push(_position);
+		_position.Altitude = 0.0;
+		vertices.push(_position);
+
+		let part = new this.map3D.Collection();
+		part.add(2);
+
+		this.line.setPartCoordinates(vertices, part);
+		this.line.setUnionMode(false);
+
+		// Set line color
+		let lineStyle = new this.map3D.JSPolyLineStyle();
+		lineStyle.setColor(color);
+		lineStyle.setWidth(2.0);
+		this.line.setStyle(lineStyle);
+
+		this.lineLayer.addObject(this.line, 0);
+	}
 }

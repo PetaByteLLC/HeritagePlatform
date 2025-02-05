@@ -1,4 +1,4 @@
-import {POI_LAYER_NAME, WFS_VERSION} from "../../common/constants/GeoserverConfig";
+import { POI_LAYER_NAME, WFS_VERSION } from "../../common/constants/GeoserverConfig";
 import GeoJSON from 'ol/format/GeoJSON';
 import { boundingExtent } from 'ol/extent';
 import { DEFAULT_SRS, WMS_VERSION, } from "../../common/constants/GeoserverConfig";
@@ -7,6 +7,7 @@ import { PIN_PNG_URL, SEC_PIN_PNG_URL } from "../../common/constants/GeneralConf
 import { fetchPOIByLayer } from "../../common/domain/usecases/SearchPOIUseCase";
 import Feature from "ol/Feature";
 import Polygon from "ol/geom/Polygon";
+import { WFSPointType } from "../../common/constants/WFSLayers";
 
 
 export const addGeoJSONToMap = (map, geojson) => {
@@ -132,23 +133,39 @@ export const removeWmsLayer = (map, name) => {
     layerList.delLayerAtName(name)
 }
 
-export const updateWfsLayers = (map, wfsLayers) => {
-    if (!map || typeof map.getTileLayerList !== 'function') return;
+export const updateWfsLayers = (map, wfsLayers, type) => {
+    if (!map || typeof map.JSLayerList !== 'function') return;
     var layerList = new map.JSLayerList(true);
 
     wfsLayers.forEach((layer) => {
         const wfslayer = layerList.nameAtLayer(layer.layerName);
         if (layer.visible) {
             if (wfslayer) wfslayer.setVisible(true);
-            else createWfsLayer(map, layer);
+            else createWfsLayer(map, layer, type);
         } else {
             if (wfslayer) wfslayer.setVisible(false);
         }
     });
-    
+
 }
 
-export const createWfsLayer = async (map, wfsLayerJson) => {
+export const updateWfsPOILayerType = (map, wfsLayers, type) => {
+    if (!map || typeof map.JSLayerList !== 'function') return;
+    var layerList = new map.JSLayerList(true);
+
+    wfsLayers.forEach((layer) => {
+        const wfslayer = layerList.nameAtLayer(layer.layerName);
+        if (layer.visible) {
+            if (wfslayer) wfslayer.setVisible(true);
+            else createWfsLayer(map, layer, type);
+        } else {
+            if (wfslayer) layerList.delLayerAtName(layer.layerName);
+        }
+    });
+}
+
+export const createWfsLayer = async (map, wfsLayerJson, type) => {
+    console.log(type);
     var layerList = new map.JSLayerList(true);
     var layer = layerList.createLayer(wfsLayerJson.layerName, map.ELT_3DPOINT);
     layer.setVisible(true);
@@ -156,10 +173,10 @@ export const createWfsLayer = async (map, wfsLayerJson) => {
     var geojson = await fetchPOIByLayer(`${wfsLayerJson.workspace}:${wfsLayerJson.layerName}`);
     layer.setMinDistance(0);
     layer.setMaxDistance(50000);
-    _createWfsPOI(map, geojson, layer);
+    _createWfsPOI(map, geojson, layer, type);
 }
 
-const _createWfsPOI = (map, geojson, layer) => {
+const _createWfsPOI = (map, geojson, layer, type) => {
     if (geojson.type === undefined || geojson.type !== "FeatureCollection" || geojson.features === undefined || geojson.features.length < 1) {
         console.log('No Json or No Features');
         return;
@@ -167,15 +184,47 @@ const _createWfsPOI = (map, geojson, layer) => {
 
     let features = geojson.features;
 
-    var img = new Image();
-    img.src = SEC_PIN_PNG_URL;
-    img.layer = layer;
-    img.onload = function () {
-        var canvas = document.createElement('canvas');
-        var ctx = canvas.getContext('2d', { willReadFrequently: true });
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
+
+    if (type === WFSPointType.PIN) {
+        var img = new Image();
+        img.src = SEC_PIN_PNG_URL;
+        img.layer = layer;
+        img.onload = function () {
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d', { willReadFrequently: true });
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+            features.forEach((point) => {
+                var coords = point.geometry.coordinates;
+
+                var poi = map.createPoint(point.id);
+
+                // TODO get height from server
+                poi.setPosition(new map.JSVector3D(coords[0], coords[1], map.getMap().getTerrHeightFast(coords[0], coords[1])));
+                poi.setImage(ctx.getImageData(0, 0, img.width, img.height).data, img.width, img.height);
+                poi.setText(point.properties.title);
+                poi.setDescription(JSON.stringify(point.properties));
+                poi.setVisibleRange(true, 1, 100000);
+                layer.addObject(poi, 0);
+            });
+        }
+    } else if (type === WFSPointType.LINE) {
+
+        var imageCanvas = document.createElement('canvas');
+        imageCanvas.width = 15;
+        imageCanvas.height = 15;
+
+        var ctx = imageCanvas.getContext('2d', { willReadFrequently: true });
+        ctx.beginPath();
+        ctx.lineWidth = 1;
+        ctx.arc(imageCanvas.width * 0.5, imageCanvas.height * 0.5, imageCanvas.width / 2 - ctx.lineWidth, 0, 2 * Math.PI, false);
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
+        ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+        ctx.stroke();
 
         features.forEach((point) => {
             var coords = point.geometry.coordinates;
@@ -184,12 +233,13 @@ const _createWfsPOI = (map, geojson, layer) => {
 
             // TODO get height from server
             poi.setPosition(new map.JSVector3D(coords[0], coords[1], map.getMap().getTerrHeightFast(coords[0], coords[1])));
-            poi.setImage(ctx.getImageData(0, 0, img.width, img.height).data, img.width, img.height);
+            poi.setImage(ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height).data, imageCanvas.width, imageCanvas.height);
             poi.setText(point.properties.title);
             poi.setDescription(JSON.stringify(point.properties));
             poi.setVisibleRange(true, 1, 100000);
+            poi.setPositionLine(3000.0, map.COLOR_WHITE);
             layer.addObject(poi, 0);
-        });
+        })
     }
 }
 

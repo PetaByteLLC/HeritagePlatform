@@ -18,6 +18,7 @@ export const MapProvider = ({ children }) => {
     const [selectedPOI, setSelectedPOI] = useState(null);
     const [wmsLayers, setWmsLayers] = useState(WMSLayers);
     const [wfsLayers, setWfsLayers] = useState(WFSLayers);
+    const [hoveredPOI, setHoveredPOI] = useState(null);
 
     useEffect(() => {
         if (mode === '2D' && map2D) {
@@ -39,6 +40,7 @@ export const MapProvider = ({ children }) => {
                 map3D, setMap3D,
                 selectedPOI, setSelectedPOI,
                 wmsLayers, setWmsLayers,
+                hoveredPOI, setHoveredPOI,
                 wfsLayers, setWfsLayers,
                 strategy
             }}>

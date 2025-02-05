@@ -5,6 +5,7 @@ import { MapProvider, MapContext } from './MapContext';
 import { useContext } from 'react';
 import Toolbar from './common/components/toolbar/Toolbar';
 import SearchField from './common/components/search-field/SearchField';
+import { HoverPOIDetails } from './common/components/hover-poi/HoverPOIDetails';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function AppContent() {
         <ThreeDMap />
       </div>
       <Toolbar />
+      <HoverPOIDetails/>
     </div>
   );
 }

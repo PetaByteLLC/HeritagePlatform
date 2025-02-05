@@ -4,6 +4,7 @@ import { Map3DStrategy } from './3D/domain/strategies/Map3DStrategy';
 import { Effect2DStrategy } from './2D/domain/strategies/Effect2DStrategy';
 import { Effect3DStrategy } from './3D/domain/strategies/Effect3DStrategy';
 import { WFSLayers, WFSPointType } from './common/constants/WFSLayers';
+import { WMSLayers } from "./common/constants/WMSLayers";
 
 export const MapContext = createContext();
 

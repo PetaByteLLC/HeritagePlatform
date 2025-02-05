@@ -4,11 +4,12 @@ import VectorLayer from 'ol/layer/Vector';
 import Cluster from 'ol/source/Cluster';
 import { getCenter, extend, createEmpty } from 'ol/extent';
 import { Style, Icon, Circle as CircleStyle, Text, Fill, Stroke } from 'ol/style';
-import { DEFAULT_SRS, POI_LAYER_NAME, TILE_LAYER_NAME } from '../../common/constants/GeoserverConfig';
+import { DEFAULT_SRS, POI_LAYER_NAME, TILE_LAYER_NAME, WFS_VERSION } from '../../common/constants/GeoserverConfig';
 import { GEOSERVER_BASE_URL } from '../../common/constants/ApiUrl';
-import { fromLonLat } from 'ol/proj';
+import { fromLonLat, transformExtent } from 'ol/proj';
 import TileLayer from 'ol/layer/Tile';
 import { TileWMS } from 'ol/source';
+import { bbox as bboxStrategy } from 'ol/loadingstrategy';
 
 export const addGeoJSONToMap = (map, geojson) => {
 
@@ -154,4 +155,48 @@ export const createWmsLayer = (map, wmsLayerJson) => {
     });
     layer.set('name', wmsLayerJson.layerName);
     map.addLayer(layer);
+}
+
+export const updateWfsLayers = (map, wfsLayers) => {
+    wfsLayers.forEach((wfsLayer) => {
+        var current = map.getLayers().getArray().find(layer => layer.get('name') === wfsLayer.layerName);
+        if (wfsLayer.visible) {
+            if (current) current.setVisible(true);
+            else createWfsLayer(map, wfsLayer);
+        } else {
+            if (current) current.setVisible(false);
+        }
+    });
+}
+
+export const createWfsLayer = (map, wfsLayerJson) => {
+    const vectorSource = new VectorSource({
+        format: new GeoJSON({
+            dataProjection: 'EPSG:4326',
+            featureProjection: 'EPSG:3857'
+        }),
+        url: (extent) => {
+            const transformedExtent = transformExtent(extent, map.getView().getProjection().getCode(), DEFAULT_SRS);
+            return `${GEOSERVER_BASE_URL}/wfs?service=WFS&version=${WFS_VERSION}&request=GetFeature&typeName=${wfsLayerJson.workspace}:${wfsLayerJson.layerName}&outputFormat=application/json&srsname=${DEFAULT_SRS}&bbox=${transformedExtent.join(',')},${DEFAULT_SRS}`;
+        },
+        strategy: bboxStrategy,
+    });
+
+    const wfsLayer = new VectorLayer({
+        source: vectorSource,
+        zIndex: wfsLayerJson.zIndex,
+        visible: true,
+        style: new Style({
+            image: new CircleStyle({
+                radius: 6,
+                fill: new Fill({ color: 'blue' }),
+                stroke: new Stroke({ color: 'white', width: 2 }),
+            }),
+        }),
+        minZoom: wfsLayerJson.min + 3,
+        maxZoom: wfsLayerJson.max + 3,
+    });
+
+    wfsLayer.set('name', wfsLayerJson.layerName);
+    map.addLayer(wfsLayer);
 }

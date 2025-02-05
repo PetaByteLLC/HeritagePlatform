@@ -6,10 +6,10 @@ import { MapContext } from '../../../MapContext';
 import { transform } from 'ol/proj';
 import layers2D from '../../../common/constants/Tiles2D';
 import { POI_LAYER_NAME, TILE_LAYER_NAME } from '../../../common/constants/GeoserverConfig';
-import { moveToFeature, setSelectedPOIOnMap, removeLayerFromMap, updateWmsLayers } from '../../utils/Map2DUtils';
+import { moveToFeature, setSelectedPOIOnMap, removeLayerFromMap, updateWmsLayers, updateWfsLayers } from '../../utils/Map2DUtils';
 
 const Map2D = () => {
-	const { currentLocation, setCurrentLocation, mode, map2DType, setMap2D, setSelectedPOI, wmsLayers } = useContext(MapContext);
+	const { currentLocation, setCurrentLocation, mode, map2DType, setMap2D, setSelectedPOI, wmsLayers, wfsLayers, setHoveredPOI } = useContext(MapContext);
 	const mapRef = useRef();
 	const mapInstance = useRef();
 	const isMapInitialized = useRef(false);
@@ -53,12 +53,24 @@ const Map2D = () => {
 		});
 
 		mapInstance.current.on("pointermove", function (evt) {
+			setHoveredPOI(null);
 			var hit = this.forEachFeatureAtPixel(evt.pixel, (feature, layer) => true); 
 			if (hit) {
 				this.getTargetElement().style.cursor = 'pointer';
-				return;
+			} else {
+				this.getTargetElement().style.cursor = '';
 			}
-			this.getTargetElement().style.cursor = '';
+			mapInstance.current.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
+				if (!layer || !feature) return;
+				for (const e of wfsLayers) {
+					if (layer.get('name') !== e.layerName) continue;
+
+					var properties = feature.getProperties();
+					delete properties.geometry;
+					setHoveredPOI({ properties: properties, position: evt.originalEvent });
+					return;
+				}
+			});
 		});
 
 		window.mapInstance = mapInstance.current;
@@ -97,6 +109,10 @@ const Map2D = () => {
 	useEffect(() => {
 		updateWmsLayers(mapInstance.current, wmsLayers);
 	}, [wmsLayers])
+
+	useEffect(() => {
+		updateWfsLayers(mapInstance.current, wfsLayers);
+	}, [wfsLayers]);
 
 	return (
 		<div className="map-container">

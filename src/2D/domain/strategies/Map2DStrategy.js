@@ -3,14 +3,15 @@ import { Draw } from 'ol/interaction';
 import { createBox } from 'ol/interaction/Draw';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
-import { Feature } from 'ol';
-import { Point } from 'ol/geom';
 import { Style, Circle, Fill, Stroke } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
 import { toLonLat } from 'ol/proj';
 import { get2DBbox } from '../../../common/domain/utils/2DBbox';
 import { DEFAULT_SRS, POI_LAYER_NAME } from '../../../common/constants/GeoserverConfig';
 import { addGeoJSONToMap, removeLayerFromMap, moveToSingleFeature } from '../../utils/Map2DUtils';
+import Overlay from 'ol/Overlay';
+import { Feature } from 'ol';
+import { LineString, Point } from "ol/geom";
 
 export class Map2DStrategy extends MapStrategy {
 	constructor(map2D) {
@@ -30,6 +31,8 @@ export class Map2DStrategy extends MapStrategy {
 	}
 
 	addInteraction(type, vectorSource, setDraw, setCurrentSpatial) {
+		this.clearPreviousMeasurements();
+		this.removeExistingDrawInteractions();
 		let geometryFunction;
 
 		if (type === 'Box') {
@@ -68,6 +71,8 @@ export class Map2DStrategy extends MapStrategy {
 	}
 
 	handleIconClick(icon, type, selectedIcon, setSelectedIcon, draw, setDraw, vectorSource, setCurrentSpatial) {
+		this.clearPreviousMeasurements();
+		this.removeExistingDrawInteractions();
 		setCurrentSpatial(null);
 		vectorSource.clear();
 		if (draw) {
@@ -133,6 +138,123 @@ export class Map2DStrategy extends MapStrategy {
 			return toLonLat(coordinates);
 		}
 	}
+
+    handleToolIconClick(icon, selectedIcon, setSelectedIcon) {
+        this.removeExistingDrawInteractions();
+        if (selectedIcon === icon) {
+            setSelectedIcon(null);
+            this.clearPreviousMeasurements();
+            this.map2D.getTargetElement().style.cursor = 'default';
+            return;
+        }
+        setSelectedIcon(icon);
+        this.handleToolAction(icon);
+    }
+
+    handleToolAction(icon) {
+        if (icon === 'area') {
+            this.handleMeasureArea();
+        } else if (icon === 'distance') {
+            this.handleMeasureDistance();
+        } else if (icon === 'radius') {
+            this.handleMeasureRadius();
+        } else if (icon === 'altitude') {
+            this.handleMeasureAltitude();
+        }
+    }
+
+    clearPreviousMeasurements() {
+        this.map2D.getLayers().forEach(layer => {
+            if (layer instanceof VectorLayer) layer.getSource().clear();
+        });
+        this.map2D.getOverlays().clear();
+        document.querySelectorAll('.measurement-popup').forEach(popup => popup.remove());
+    }
+
+    removeExistingDrawInteractions() {
+        this.map2D.getInteractions().forEach(interaction => {
+            if (interaction instanceof Draw) this.map2D.removeInteraction(interaction);
+        });
+    }
+
+    displayMeasurement(coordinates, value, unit) {
+        const popup = document.createElement('div');
+        popup.className = 'measurement-popup';
+        popup.style.color = 'red';
+        popup.innerHTML = `<strong>${value.toFixed(2)} ${unit}</strong>`;
+        document.body.appendChild(popup);
+
+        const overlay = new Overlay({ position: coordinates, element: popup, offset: [0, -15], positioning: 'center-center' });
+        this.map2D.addOverlay(overlay);
+    }
+
+    handleMeasureDistance() {
+        this.clearPreviousMeasurements();
+        this.removeExistingDrawInteractions();
+        const { vectorSource } = this.createVectorLayer();
+
+        const draw = new Draw({ source: vectorSource, type: 'LineString' });
+        draw.on('drawstart', () => {
+            vectorSource.clear();
+            this.map2D.getOverlays().clear();
+        });
+        draw.on('drawend', (event) => {
+            const length = event.feature.getGeometry().getLength();
+            this.displayMeasurement(event.feature.getGeometry().getLastCoordinate(), length, 'm');
+        });
+
+        this.map2D.addInteraction(draw);
+    }
+
+    handleMeasureArea() {
+        this.clearPreviousMeasurements();
+        this.removeExistingDrawInteractions();
+        const { vectorSource } = this.createVectorLayer();
+
+        const draw = new Draw({ source: vectorSource, type: 'Polygon' });
+        draw.on('drawstart', () => {
+            vectorSource.clear();
+            this.map2D.getOverlays().clear();
+        });
+        draw.on('drawend', (event) => {
+            const area = event.feature.getGeometry().getArea();
+            this.displayMeasurement(event.feature.getGeometry().getInteriorPoint().getCoordinates(), area, 'm²');
+        });
+
+        this.map2D.addInteraction(draw);
+    }
+
+    handleMeasureRadius() {
+        this.clearPreviousMeasurements();
+        this.removeExistingDrawInteractions();
+        const { vectorSource } = this.createVectorLayer();
+
+        const draw = new Draw({ source: vectorSource, type: 'Circle' });
+        draw.on('drawstart', () => {
+            vectorSource.clear();
+            this.map2D.getOverlays().clear();
+        });
+        draw.on('drawend', (event) => {
+            const feature = event.feature;
+            const geometry = feature.getGeometry();
+            const radius = geometry.getRadius();
+            const center = geometry.getCenter();
+            const radiusLine = new Feature(new LineString([center, [center[0] + radius, center[1]]]));
+            vectorSource.addFeature(radiusLine);
+            const centerPoint = new Feature(new Point(center));
+            vectorSource.addFeature(centerPoint);
+            const midPoint = [(center[0] + (center[0] + radius)) / 2, center[1]];
+            this.displayMeasurement(midPoint, radius, 'm');
+        });
+
+        this.map2D.addInteraction(draw);
+    }
+
+    handleMeasureAltitude() {
+        this.clearPreviousMeasurements();
+        alert('Height measurement is not possible on a 2D map. Use a 3D map or external height services.');
+        console.log('Measuring height on a 2D map is not possible.');
+    }
 
 	eventHandler() {
 		let self = this;

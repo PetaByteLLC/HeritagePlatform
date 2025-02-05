@@ -7,6 +7,14 @@ export class MapStrategy {
 		throw new Error('Method not implemented');
 	}
 
+    handleToolIconClick(icon, selectedIcon, setSelectedIcon) {
+        throw new Error('Method not implemented');
+    }
+
+    handleToolAction(icon) {
+        throw new Error('Method not implemented');
+    }
+
 	handleZoomIn() {
 		throw new Error('Method not implemented');
 	}
@@ -34,6 +42,22 @@ export class MapStrategy {
 	moveToSingleFeature(feature) {
 		throw new Error('Method not implemented');
 	}
+
+    handleMeasureArea(activeButton, setActiveButton) {
+        throw new Error('Method not implemented');
+    }
+
+    handleMeasureDistance(activeButton, setActiveButton) {
+        throw new Error('Method not implemented');
+    }
+
+    handleMeasureAltitude(activeButton, setActiveButton) {
+        throw new Error('Method not implemented');
+    }
+
+    handleMeasureRadius(activeButton, setActiveButton) {
+        throw new Error('Method not implemented');
+    }
 
 	createBookmark(name, distance, color): object {
 		throw new Error('Method not implemented');

@@ -66,6 +66,20 @@ export const fetchAllPOI = async (keyword) => {
     }
 }
 
+export const fetchPOIByLayer = async (name) => {
+    try {
+        const response = await fetch(`${GEOSERVER_BASE_URL}/wfs?outputFormat=application/json&service=WFS&version=${WFS_VERSION}&request=GetFeature&typename=${name}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Failed to fetch map data: ', error);
+        throw error;
+    }
+}
+
 export const fetchAllBookmarks = async (keyword) => {
     const workspace = 'Heritage';
     const layer = 'heritage_bookmark_layer';

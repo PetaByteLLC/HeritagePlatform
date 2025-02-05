@@ -1,4 +1,4 @@
-import { fetchPOIByBbox, fetchPOIByRadius, fetchPOIByPolygon, fetchAllPOI } from "../../data/repositories/GeoserverRepository";
+import { fetchPOIByBbox, fetchPOIByRadius, fetchPOIByPolygon, fetchAllPOI, fetchPOIByLayer as POIByLayer} from "../../data/repositories/GeoserverRepository";
 import WKT from 'ol/format/WKT';
 
 export const searchPOIBySpatial = async (keyword, spatialType, spatial) => {
@@ -20,3 +20,8 @@ export const searchPOIBySpatial = async (keyword, spatialType, spatial) => {
         return await fetchPOIByRadius(keyword, spatial.center[0], spatial.center[1], spatial.radius);
     }
 };
+
+export const fetchPOIByLayer = async (name) => {
+    if (!name) return {};
+    return await POIByLayer(name);
+}

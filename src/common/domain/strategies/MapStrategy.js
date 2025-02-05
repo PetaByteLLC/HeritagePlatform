@@ -67,7 +67,7 @@ export class MapStrategy {
 		throw new Error('Method not implemented');
 	}
 
-	createBookmark(name, distance, color): object {
+	createBookmark(name, distance, color) {
 		throw new Error('Method not implemented');
 	}
 

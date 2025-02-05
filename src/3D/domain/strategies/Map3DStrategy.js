@@ -846,7 +846,7 @@ export class Map3DStrategy extends MapStrategy {
 	unHandleSelectPointEvent() {
 	}
 
-	createBookmark(name, distance, color): object {
+	createBookmark(name, distance, color) {
 		let camera = this.map3D.getViewCamera();
 		let cameraLocation = camera.getLocation();
 

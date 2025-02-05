@@ -6,7 +6,7 @@ import LayerList from '../layer-list/LayerList';
 import './Menu.css';
 
 const Menu = ({ isOpen, onClose }) => {
-
+    const [bookmarkActive, setBookmarkActive] = useState(false);
     return (<>
         <div className={`menu ${isOpen ? 'open' : ''}`}>
             <div className="menu-header">
@@ -22,7 +22,7 @@ const Menu = ({ isOpen, onClose }) => {
                         Layers
                     </p>
                 </li>
-                <li data-bs-toggle="offcanvas" data-bs-target="#bookmarkMenu" aria-controls="bookmarkMenu" role="button">
+                <li data-bs-toggle="offcanvas" data-bs-target="#bookmarkMenu" aria-controls="bookmarkMenu" role="button" onClick={() => setBookmarkActive(true)}>
                     <p className='d-flex align-items-center gap-2 p-0 m-0'>
                         <FontAwesomeIcon icon={faBookmark} className="icon" fixedWidth/>
                         Bookmarks
@@ -31,7 +31,7 @@ const Menu = ({ isOpen, onClose }) => {
             </ul>
         </div>
         <LayerList />
-        <Bookmark />
+        <Bookmark bookmarkActive={bookmarkActive} setBookmarkActive={setBookmarkActive} />
     </>
     );
 };

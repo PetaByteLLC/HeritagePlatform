@@ -6,7 +6,7 @@ import { fetchAllBookmarks, addBookmark, editBookmark, deleteBookmark } from "..
 import BookmarkEdit from './BookmarkEdit'
 import './Bookmark.css';
 
-const Bookmark = () => {
+const Bookmark = ({ bookmarkActive, setBookmarkActive }) => {
     const { strategy, mode } = useContext(MapContext);
     const [error, setError] = useState(null);
     const [error2, setError2] = useState(null);
@@ -24,6 +24,16 @@ const Bookmark = () => {
             strategy.removeBookmark();
         }
     }, [strategy, mode]);
+
+    useEffect(() => {
+        if (strategy) {
+            if (bookmarkActive) {
+                strategy.handleSelectPointEvent();
+            } else {
+                strategy.unHandleSelectPointEvent();
+            }
+        }
+    }, [bookmarkActive]);
 
     const loadBookmarks = async (keyword) => {
         try {
@@ -72,6 +82,7 @@ const Bookmark = () => {
 
     const clearBookmark = () => {
         strategy.removeBookmark();
+        setBookmarkActive(false);
     };
 
     const removeBookmark = (bookmark) => {

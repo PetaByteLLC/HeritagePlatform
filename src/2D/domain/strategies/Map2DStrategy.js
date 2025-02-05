@@ -17,7 +17,6 @@ export class Map2DStrategy extends MapStrategy {
 	constructor(map2D) {
 		super();
 		this.map2D = map2D;
-		this.eventHandler();
 	}
 
 	createVectorLayer() {
@@ -256,15 +255,23 @@ export class Map2DStrategy extends MapStrategy {
         console.log('Measuring height on a 2D map is not possible.');
     }
 
-	eventHandler() {
-		let self = this;
+	handleSelectPointEvent() {
+		this.unHandleSelectPointEvent();
+		this.map2D._self = this;
+		this.map2D.on('click', this._handleMouseClickEvent);
+	}
 
-		self.map2D.on('click', function (event) {
-			var coordinate = toLonLat(event.coordinate);
-			// console.log(self.coordinate);
-			self._showPoint(coordinate, 'red');
-			self.coordinate = coordinate;
-		});
+	unHandleSelectPointEvent() {
+		delete this.map2D._self;
+		this.map2D.un('click', this._handleMouseClickEvent);
+	}
+
+	_handleMouseClickEvent(event) {
+		let self = this._self;
+		let coordinate = toLonLat(event.coordinate);
+		// console.log(self.coordinate);
+		self._showPoint(coordinate, 'red');
+		self.coordinate = coordinate;
 	}
 
 	createBookmark(name, distance, color) : object {
@@ -309,6 +316,7 @@ export class Map2DStrategy extends MapStrategy {
 
 	removeBookmark() {
 		let self = this;
+		self.coordinate = null;
 		if (!!self.vectorLayer) {
 			self.map2D.removeLayer(self.vectorLayer);
 		}

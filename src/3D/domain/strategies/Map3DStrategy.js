@@ -854,6 +854,12 @@ export class Map3DStrategy extends MapStrategy {
 		}
 	}
 
+	handleSelectPointEvent() {
+	}
+
+	unHandleSelectPointEvent() {
+	}
+
 	createBookmark(name, distance, color): object {
 		let camera = this.map3D.getViewCamera();
 		let cameraLocation = camera.getLocation();
@@ -895,6 +901,7 @@ export class Map3DStrategy extends MapStrategy {
 
 		this.map3D.getViewCamera().setLocation(new this.map3D.JSVector3D(feature.geometry.coordinates[0], feature.geometry.coordinates[1], feature.properties.altitude + 1000));
 		this.map3D.getViewCamera().setTilt(85);
+		this.map3D.getViewCamera().setDirect(feature.properties.direction);
 
 		let color = new this.map3D.JSColor();
 		color.setHexCode(feature.properties.color.replace('#', '#CC'));

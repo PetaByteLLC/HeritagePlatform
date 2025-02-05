@@ -646,10 +646,11 @@ export class Map3DStrategy extends MapStrategy {
 		this.clearEvents();
 		this.setMouseState('area');
 		this.createAreaMeasureLayer();
+		this.map3D.getOption().SetAreaMeasurePolygonDepthBuffer(false);
 
         this.areaMeasureListener = function (e) {
             this.clearPreviousShapes();
-            this.createAreaPOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt + 50), "rgba(255, 204, 198, 0.8)", e.dArea, true, this.m_mercount);
+            this.createAreaPOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt), "rgba(255, 204, 198, 0.8)", e.dArea, true, this.m_mercount);
             this.m_mercount++;
         }.bind(this);
 
@@ -775,6 +776,7 @@ export class Map3DStrategy extends MapStrategy {
 		this.distanceLayer = layerList.createLayer("MEASURE_DISTANCE_POI", this.map3D.ELT_3DPOINT);
 		this.distanceLayer.setMaxDistance(20000.0);
 		this.distanceLayer.setSelectable(false);
+		this.map3D.getOption().SetDistanceMeasureLineDepthBuffer(false);
 
         this.distanceMeasureListener = function (e) {
             let partDistance = e.dDistance,
@@ -782,12 +784,12 @@ export class Map3DStrategy extends MapStrategy {
 
             if (partDistance === 0 && totalDistance === 0) {
                 this.m_objcount = 0;
-                this.createDistancePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt + 50), "rgba(255, 204, 198, 0.8)", "Start", true);
+                this.createDistancePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt), "rgba(255, 204, 198, 0.8)", "Start", true);
             } else {
                 if (e.dDistance > 0.01) {
-                    this.createDistancePOI(new this.map3D.JSVector3D(e.dMidLon, e.dMidLat, e.dMidAlt + 50), "rgba(255, 255, 0, 0.8)", e.dDistance, false);
+                    this.createDistancePOI(new this.map3D.JSVector3D(e.dMidLon, e.dMidLat, e.dMidAlt), "rgba(255, 255, 0, 0.8)", e.dDistance, false);
                 }
-                this.createDistancePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt + 50), "rgba(255, 204, 198, 0.8)", e.dTotalDistance, true);
+                this.createDistancePOI(new this.map3D.JSVector3D(e.dLon, e.dLat, e.dAlt), "rgba(255, 204, 198, 0.8)", e.dTotalDistance, true);
             }
             this.m_mercount++;
         }.bind(this);

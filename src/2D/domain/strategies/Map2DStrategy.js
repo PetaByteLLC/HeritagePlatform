@@ -7,7 +7,7 @@ import { Style, Circle, Fill, Stroke } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
 import { toLonLat } from 'ol/proj';
 import { get2DBbox } from '../../../common/domain/utils/2DBbox';
-import { DEFAULT_SRS, POI_LAYER_NAME } from '../../../common/constants/GeoserverConfig';
+import { DEFAULT_SRS, POI_LAYER_NAME, MEASURE_LAYER } from '../../../common/constants/GeoserverConfig';
 import { addGeoJSONToMap, removeLayerFromMap, moveToSingleFeature } from '../../utils/Map2DUtils';
 import Overlay from 'ol/Overlay';
 import { Feature } from 'ol';
@@ -19,12 +19,13 @@ export class Map2DStrategy extends MapStrategy {
 		this.map2D = map2D;
 	}
 
-	createVectorLayer() {
+	createVectorLayer(name) {
 		const vectorSource = new VectorSource();
 		const vectorLayer = new VectorLayer({
 			source: vectorSource,
 			zIndex: 100,
 		});
+		vectorLayer.set('name', name);
 		this.map2D.addLayer(vectorLayer);
 		return { vectorSource, vectorLayer };
 	}
@@ -163,9 +164,11 @@ export class Map2DStrategy extends MapStrategy {
     }
 
     clearPreviousMeasurements() {
-        this.map2D.getLayers().forEach(layer => {
-            if (layer instanceof VectorLayer) layer.getSource().clear();
-        });
+		this.map2D.getLayers().getArray().find(layer => {
+			if (layer.get('name') === MEASURE_LAYER) {
+				layer.getSource().clear();
+			}
+		});
         this.map2D.getOverlays().clear();
         document.querySelectorAll('.measurement-popup').forEach(popup => popup.remove());
     }
@@ -190,7 +193,7 @@ export class Map2DStrategy extends MapStrategy {
     handleMeasureDistance() {
         this.clearPreviousMeasurements();
         this.removeExistingDrawInteractions();
-        const { vectorSource } = this.createVectorLayer();
+        const { vectorSource } = this.createVectorLayer(MEASURE_LAYER);
 
         const draw = new Draw({ source: vectorSource, type: 'LineString' });
         draw.on('drawstart', () => {
@@ -208,7 +211,7 @@ export class Map2DStrategy extends MapStrategy {
     handleMeasureArea() {
         this.clearPreviousMeasurements();
         this.removeExistingDrawInteractions();
-        const { vectorSource } = this.createVectorLayer();
+        const { vectorSource } = this.createVectorLayer(MEASURE_LAYER);
 
         const draw = new Draw({ source: vectorSource, type: 'Polygon' });
         draw.on('drawstart', () => {
@@ -226,7 +229,7 @@ export class Map2DStrategy extends MapStrategy {
     handleMeasureRadius() {
         this.clearPreviousMeasurements();
         this.removeExistingDrawInteractions();
-        const { vectorSource } = this.createVectorLayer();
+        const { vectorSource } = this.createVectorLayer(MEASURE_LAYER);
 
         const draw = new Draw({ source: vectorSource, type: 'Circle' });
         draw.on('drawstart', () => {

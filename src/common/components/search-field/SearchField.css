@@ -236,3 +236,14 @@
 .result-item-icon:hover {
     color: #c7c7c7;
 }
+
+.icon-clear {
+    padding: 8px;
+    color: white;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.icon-clear:hover {
+    color: #ccc;
+}

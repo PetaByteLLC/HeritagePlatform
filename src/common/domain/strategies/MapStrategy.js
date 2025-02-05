@@ -59,6 +59,14 @@ export class MapStrategy {
         throw new Error('Method not implemented');
     }
 
+	handleSelectPointEvent() {
+		throw new Error('Method not implemented');
+	}
+
+	unHandleSelectPointEvent() {
+		throw new Error('Method not implemented');
+	}
+
 	createBookmark(name, distance, color): object {
 		throw new Error('Method not implemented');
 	}

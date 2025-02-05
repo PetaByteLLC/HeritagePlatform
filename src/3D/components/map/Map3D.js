@@ -14,7 +14,7 @@ const Map3D = () => {
 	const mapContainerRef = useRef(null);
 
 	useEffect(() => {
-		const scriptSrc = 'https://cdn.xdworld.kr/latest/XDWorldEM.js';
+		const scriptSrc = './xd/engine/XDWorldEM.js';
 
 		const loadScript = (src) => {
 			return new Promise((resolve, reject) => {
@@ -33,7 +33,7 @@ const Map3D = () => {
 
 		window.Module = {
 			locateFile: function (s) {
-				return 'https://cdn.xdworld.kr/latest/' + s;
+				return './xd/engine/' + s;
 			},
 			postRun: () => {
 				const Module = window.Module;
@@ -51,6 +51,11 @@ const Map3D = () => {
 							name: 'tile',
 							servername: 'XDServer3d',
 						},
+					},
+					worker : {
+						use : true,
+						path : "./xd/worker/XDWorldWorker.js",
+						count : 5
 					},
 					defaultKey: 'DFG~EpIREQDmdJe1E9QpdBca#FBSDJFmdzHoe(fB4!e1E(JS1I==',
 				});

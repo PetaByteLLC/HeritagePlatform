@@ -125,7 +125,7 @@ const Bookmark = () => {
                         : bookmarks.map((bookmark, index) => (
                         <div key={bookmark.id} className="bookmark-item">
                             <div className="bookmark-item-body">
-                                <div className="bookmark-item-icon">
+                                <div className="bookmark-item-icon" style={{color: bookmark.properties.color}}>
                                     <FontAwesomeIcon icon={faBookmark} />
                                 </div>
                                 <div className="bookmark-item-name">

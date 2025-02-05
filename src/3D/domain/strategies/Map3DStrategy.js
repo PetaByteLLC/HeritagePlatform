@@ -893,7 +893,7 @@ export class Map3DStrategy extends MapStrategy {
 			this.layer.removeAll();
 		}
 
-		this.map3D.getViewCamera().setLocation(new this.map3D.JSVector3D(feature.geometry.coordinates[0], feature.geometry.coordinates[1], feature.properties.altitude + 700.0));
+		this.map3D.getViewCamera().setLocation(new this.map3D.JSVector3D(feature.geometry.coordinates[0], feature.geometry.coordinates[1], feature.properties.altitude + 1000));
 		this.map3D.getViewCamera().setTilt(85);
 
 		let color = new this.map3D.JSColor();

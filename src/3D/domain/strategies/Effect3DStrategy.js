@@ -17,7 +17,7 @@ export class Effect3DStrategy extends EffectStrategy {
                 if (effect === 'rain') {
                     this.setUseRainEffect(effects[effect].image, effects[effect].speed, effects[effect].intensity);
                 } else if (effect === 'snow') {
-                    this.setUseSnowEffect(effects[effect].image, effects[effect].speed, effects[effect].intensity);
+                    this.setUseSnowEffect(effects[effect].image, effects[effect].speed, effects[effect].intensity, effects[effect].snowCover);
                 } else if (effect === 'fog') {
                     this.setUseFogEffect(effects[effect].startDistance, effects[effect].gradientDistance, effects[effect].density, effects[effect].type);
                 }
@@ -32,12 +32,14 @@ export class Effect3DStrategy extends EffectStrategy {
         }
     }
 
-    setUseSnowEffect(image, speed, intensity) {
+    setUseSnowEffect(image, speed, intensity, snowCover) {
         if (image) {
             this.map.setSnowImageURL(image);
             this.map.startWeather(0, speed, intensity);
-            this.map.setSnowfall(1);
-            this.map.setSnowfallLevel(1);
+            if (snowCover !== 0) {
+                this.map.setSnowfall(1);
+                this.map.setSnowfallLevel(snowCover);
+            }
         }
     }
 

@@ -7,7 +7,7 @@ const Effect = () => {
     const { setEffects, effectStrategy } = useContext(MapContext);
     const [effects, setLocalEffects] = useState({
         rain: { enabled: false, speed: 5, intensity: 5, image: '/rain1.png' },
-        snow: { enabled: false, speed: 5, intensity: 5, image: '/snow1.png' },
+        snow: { enabled: false, speed: 5, intensity: 5, image: '/snow1.png', snowCover: 0 },
         fog: { enabled: false, startDistance: 10, gradientDistance: 2000, density: 0.5, type: 'Fog' },
     });
 
@@ -91,6 +91,19 @@ const Effect = () => {
                                                 value={effects[effect].intensity}
                                                 onChange={(e) => handleSettingChange(effect, 'intensity', e.target.value)}
                                             />
+                                            {effect === 'snow' && (
+                                                <>
+                                                    <label className="form-label">Snow cover</label>
+                                                    <input
+                                                        type="range"
+                                                        className="form-range"
+                                                        min="0"
+                                                        max="100"
+                                                        value={effects[effect].snowCover}
+                                                        onChange={(e) => handleSettingChange(effect, 'snowCover', e.target.value)}
+                                                    />
+                                                </>
+                                            )}
                                             <label className="form-label">Type</label>
                                             <select
                                                 className="form-select"

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookmark, faSearch, faAdd, faTrash, faEye, faMousePointer } from '@fortawesome/free-solid-svg-icons';
 import { MapContext } from '../../../MapContext';
-import { fetchAllBookmarks, addBookmark, editBookmark, deleteBookmark } from "../../data/repositories/GeoserverRepository";
+import { fetchAllBookmarks, addBookmark, deleteBookmark } from "../../data/repositories/GeoserverRepository";
 import BookmarkEdit from './BookmarkEdit'
 import './Bookmark.css';
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useRef } from 'react';
+import React, { useEffect, useContext, useRef, useState } from 'react';
 import { MapContext } from '../../../MapContext';
 import layers3D from '../../../common/constants/Tiles3D';
 import { POI_LAYER_NAME } from '../../../common/constants/GeoserverConfig';
@@ -12,6 +12,7 @@ function getHeightFromZoom(zoomLevel) {
 const Map3D = () => {
 	const { is3DMapInitialized, setIs3DMapInitialized, currentLocation, setCurrentLocation, mode, map3DType, setMap3D, setSelectedPOI, wmsLayers, wfsLayers, setHoveredPOI, wfsPOIType } = useContext(MapContext);
 	const mapContainerRef = useRef(null);
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		const scriptSrc = './xd/engine/XDWorldEM.js';
@@ -52,13 +53,15 @@ const Map3D = () => {
 							servername: 'XDServer3d',
 						},
 					},
-					worker : {
-						use : true,
-						path : "./xd/worker/XDWorldWorker.js",
-						count : 5
+					worker: {
+						use: true,
+						path: "./xd/worker/XDWorldWorker.js",
+						count: 5
 					},
 					defaultKey: 'DFG~EpIREQDmdJe1E9QpdBca#FBSDJFmdzHoe(fB4!e1E(JS1I==',
 				});
+
+				console.log('finished');
 
 				Module.canvas.addEventListener("Fire_EventCameraMoveEnd", function (e) {
 					const location = Module.getViewCamera().getLocation();
@@ -68,53 +71,53 @@ const Map3D = () => {
 
 				updateWmsLayers(window.Module, wmsLayers);
 				updateWfsLayers(window.Module, wfsLayers, wfsPOIType);
+
+				setMap3D(window.Module);
+
+				window.onresize = function () {
+					if (typeof window.Module === 'object' && typeof window.Module.Resize === 'function') {
+						window.Module.Resize(window.innerWidth, window.innerHeight * 0.92);
+						window.Module.XDRenderData();
+					}
+				};
+
+				document.getElementById("map").onclick = function (e) {
+					let layerList = new window.Module.JSLayerList(true);
+					const poiLayer = layerList.nameAtLayer(POI_LAYER_NAME);
+					if (!poiLayer) return;
+					const pick = poiLayer.pick(e.offsetX, e.offsetY);
+					if (!pick) return;
+					const id = pick.objectKey;
+					moveToSingleFeature(window.Module, { geometry: { coordinates: [pick.position.longitude, pick.position.latitude] } });
+					setSelectedPOIOnMap(window.Module, id, setSelectedPOI);
+				};
+
+				document.getElementById("map").onmousemove = function (event) {
+					for (const e of wfsLayers) {
+						let layerList = new window.Module.JSLayerList(true);
+						const poiLayer = layerList.nameAtLayer(e.layerName);
+						if (!poiLayer || !poiLayer.getVisible()) continue;
+
+						const cameraLevel = window.Module.getViewCamera().getMapZoomLevel();
+						if (cameraLevel < e.min) {
+							setHoveredPOI(null);
+							continue;
+						}
+
+						const pick = poiLayer.pick(event.offsetX, event.offsetY);
+						if (pick) {
+							const props = JSON.parse(poiLayer.keyAtObject(pick.objectKey).getDescription());
+							setHoveredPOI({ properties: props, position: event });
+							break;
+						} else {
+							setHoveredPOI(null);
+						}
+					}
+				};
+
+				setIsLoading(false);
 			},
 		};
-
-		setMap3D(window.Module);
-
-		window.onresize = function (e) {
-			if (typeof window.Module == 'object') {
-				if (typeof window.Module.Resize == 'function') {
-					window.Module.Resize(window.innerWidth, window.innerHeight / 100 * 92);
-					window.Module.XDRenderData();
-				}
-			}
-		};
-
-		document.getElementById("map").onclick = function (e) {
-			let layerList = new window.Module.JSLayerList(true);
-			const poiLayer = layerList.nameAtLayer(POI_LAYER_NAME);
-			if (!poiLayer) return;
-			const pick = poiLayer.pick(e.offsetX, e.offsetY);
-			if (!pick) return;
-			const id = pick.objectKey;
-			moveToSingleFeature(window.Module, { geometry: { coordinates: [pick.position.longitude, pick.position.latitude] } });
-			setSelectedPOIOnMap(window.Module, id, setSelectedPOI);
-		}
-
-		document.getElementById("map").onmousemove = function (event) {
-			for (const e of wfsLayers) {
-				let layerList = new window.Module.JSLayerList(true);
-				const poiLayer = layerList.nameAtLayer(e.layerName);
-				if (!poiLayer || !poiLayer.getVisible()) continue;
-
-				const cameraLevel = window.Module.getViewCamera().getMapZoomLevel();
-				if (cameraLevel < e.min) {
-					setHoveredPOI(null);
-					continue;
-				}
-			
-				const pick = poiLayer.pick(event.offsetX, event.offsetY);
-				if (pick) {
-					const props = JSON.parse(poiLayer.keyAtObject(pick.objectKey).getDescription());
-					setHoveredPOI({ properties: props, position: event });
-					break;
-				} else {
-					setHoveredPOI(null);
-				}
-			}
-		}
 
 		loadScript(scriptSrc)
 			.then(() => {
@@ -126,7 +129,7 @@ const Map3D = () => {
 	}, [is3DMapInitialized, setIs3DMapInitialized, setCurrentLocation]);
 
 	useEffect(() => {
-		if (mode === '3D') {
+		if (mode === '3D' && !isLoading) {
 			window.Module.getViewCamera().moveOval(
 				new window.Module.JSVector3D(currentLocation.longitude, currentLocation.latitude, getHeightFromZoom(currentLocation.zoomLevel2D - 2)),
 				90,
@@ -134,12 +137,10 @@ const Map3D = () => {
 				0.1
 			);
 		}
-	}, [mode]);
-
+	}, [mode, isLoading]);
 
 	useEffect(() => {
-		if (mode !== '3D' || !window.Module) return;
-
+		if (mode !== '3D' || !window.Module || isLoading) return;
 		const Module = window.Module;
 
 		if (map3DType === 'Default') {
@@ -147,23 +148,19 @@ const Map3D = () => {
 		} else {
 			initializeMap(Module, map3DType);
 		}
-	}, [map3DType]);
-
-
-	useEffect(() => {
-		updateWmsLayers(window.Module, wmsLayers);
-	}, [wmsLayers]);
-
+	}, [map3DType, isLoading]);
 
 	useEffect(() => {
-		updateWfsLayers(window.Module, wfsLayers, wfsPOIType);
-	}, [wfsLayers]);
-
+		if (!isLoading) updateWmsLayers(window.Module, wmsLayers);
+	}, [wmsLayers, isLoading]);
 
 	useEffect(() => {
-		updateWfsPOILayerType(window.Module, wfsLayers, wfsPOIType);
-	}, [wfsPOIType]);
+		if (!isLoading) updateWfsLayers(window.Module, wfsLayers, wfsPOIType);
+	}, [wfsLayers, isLoading]);
 
+	useEffect(() => {
+		if (!isLoading) updateWfsPOILayerType(window.Module, wfsLayers, wfsPOIType);
+	}, [wfsPOIType, isLoading]);
 
 	const clearMap = () => {
 		const Module = window.Module;
@@ -185,7 +182,17 @@ const Map3D = () => {
 		baseMap.zerolevelOffset = zerolevelOffset;
 	};
 
-	return <div id="map" ref={mapContainerRef} className="map-container" />;
+	return (
+		<>
+			<div id="map" ref={mapContainerRef} className="map-container" />
+			{isLoading && (
+				<div className="preloader-overlay">
+					<div className="preloader">Loading 3D Map...</div>
+				</div>
+			)}
+		</>
+	);
+
 };
 
 export default Map3D;

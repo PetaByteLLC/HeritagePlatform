@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, { useState, useRef } from 'react';
 import ReactDOM from "react-dom";
 
 const BookmarkEdit = ({ onAdd }) => {

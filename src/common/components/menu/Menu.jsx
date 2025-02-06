@@ -1,11 +1,12 @@
 import React, { useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faBookmark, faLayerGroup, faMagic } from '@fortawesome/free-solid-svg-icons';
+import {faTimes, faBookmark, faLayerGroup, faMagic, faChartBar} from '@fortawesome/free-solid-svg-icons';
 import { MapContext } from '../../../MapContext';
 import Bookmark from './../bookmark';
 import LayerList from '../layer-list/LayerList';
 import Effect from "../effect";
 import './Menu.css';
+import Chart from "../chart";
 
 const Menu = ({ isOpen, onClose }) => {
     const { mode } = useContext(MapContext);
@@ -38,11 +39,19 @@ const Menu = ({ isOpen, onClose }) => {
                         Effects
                     </p>
                 </li>
+                <li data-bs-toggle="offcanvas" data-bs-target="#graphMenu" aria-controls="graphMenu" role="button"
+                    className={is2D ? 'disabled' : ''}>
+                    <p className='d-flex align-items-center gap-2 p-0 m-0'>
+                        <FontAwesomeIcon icon={faChartBar} className="icon" fixedWidth/>
+                        Chart
+                    </p>
+                </li>
             </ul>
         </div>
         <LayerList />
         <Bookmark bookmarkActive={bookmarkActive} setBookmarkActive={setBookmarkActive} />
         <Effect />
+        <Chart/>
     </>
     );
 };

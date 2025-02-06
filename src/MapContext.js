@@ -26,6 +26,7 @@ export const MapProvider = ({ children }) => {
     const [init2D, setInit2D] = useState(null);
     const [init3D, setInit3D] = useState(null);
     const [effects, setEffects] = useState(null);
+    const [charts, setCharts] = useState(null);
 
     useEffect(() => {
         if (mode === '2D' && map2D) {
@@ -63,7 +64,8 @@ export const MapProvider = ({ children }) => {
             wfsPOIType, setWfsPOIType,
             strategy,
             effectStrategy,
-            effects, setEffects
+            effects, setEffects,
+            charts, setCharts,
         }}>
             {children}
         </MapContext.Provider>

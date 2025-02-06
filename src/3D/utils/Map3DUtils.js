@@ -1,4 +1,4 @@
-import { POI_LAYER_NAME, WFS_VERSION } from "../../common/constants/GeoserverConfig";
+import { POI_LAYER_NAME } from "../../common/constants/GeoserverConfig";
 import GeoJSON from 'ol/format/GeoJSON';
 import { boundingExtent } from 'ol/extent';
 import { DEFAULT_SRS, WMS_VERSION, } from "../../common/constants/GeoserverConfig";

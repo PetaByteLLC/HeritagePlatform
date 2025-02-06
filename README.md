@@ -68,3 +68,119 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+### Used functions
+```
+XDWorldEM.js
+├── createPoint
+├── createPolygon
+├── createLineString
+├── createViewFrustum
+├── getOption
+│   └── callBackCompletePoint
+├── getMap
+├── getViewCamera
+├── getSymbol
+├── XDRenderData
+├── XDSetMouseState
+├── XDClearDistanceMeasurement
+├── XDClearAreaMeasurement
+├── XDClearCircleMeasurement
+├── canvas
+│   ├── addEventListener
+│   └── removeEventListener
+├── JSLayer
+│   ├── setMaxDistance
+│   ├── setMinDistance
+│   ├── setSelectable
+│   ├── setEditable
+│   ├── setVisible
+│   ├── addObject
+│   ├── getObjectCount
+│   ├── keyAtObject
+│   ├── removeAtKey
+│   └── removeAll
+├── JSLineString
+│   ├── setPartCoordinates
+│   ├── setUnionMode
+│   ├── setStyle
+├── JSLayerList
+│   ├── createLayer
+│   ├── nameAtLayer
+│   ├── delLayerAtName
+│   └── createWMSLayer
+├── JSVector2D
+├── JSVector3D
+├── JSVec3Array
+│   └── push
+├── JSPolygonStyle
+│   ├── setFill
+│   ├── setOutLine
+│   └── setOutLineColor
+├── JSColor
+│   └── setHexCode
+├── Collection
+│   └── add
+├── Map
+│   ├── ScreenToMapPointEX
+│   ├── getInputPoints
+│   │   ├── count
+│   │   └── get
+│   ├── getInputPointList
+│   │   └── item
+│   ├── getTerrHeight
+│   ├── getTerrHeightFast
+│   ├── createPoint
+│   ├── setFog
+│   ├── setFogEnable
+│   ├── setFogLimitAltitude
+│   ├── setRainImageURL
+│   ├── setSnowImageURL
+│   ├── setSnowfall
+│   ├── setSnowfallLevel
+│   ├── startWeather
+│   ├── stopWeather
+│   └── clearInputPoint
+├── Point
+│   └── setPosition
+├── JSPolygon
+│   ├── setPartCoordinates
+│   └── setStyle
+├── JSCamera
+│   ├── getLocation
+│   ├── setLocation
+│   ├── getTilt
+│   ├── setTilt
+│   ├── getDirect
+│   ├── setDirect
+│   ├── getAltitude
+│   ├── getMapZoomLevel
+│   ├── moveLonLatBoundarybyJson
+│   ├── moveOval
+│   ├── ZoomIn
+│   └── ZoomOut
+├── JSSymbol
+│   ├── insertIcon
+│   ├── getIcon
+│   └── deleteIcon
+├── JSPolyLineStyle
+│   ├── setColor
+│   └── setWidth
+├── ELT_3DPOINT
+├── ELT_POLYHEDRON
+├── ELT_3DLINE
+├── MML_INPUT_RECT
+├── MML_ANALYS_DISTANCE
+├── MML_ANALYS_AREA_CIRCLE
+├── MML_MOVE_GRAB
+├── MML_ANALYS_ALTITUDE
+├── MML_ANALYS_DISTANCE_STRAIGHT
+├── MML_ANALYS_AREA_PLANE
+└── Events
+    ├── Fire_EventCameraMoveEnd
+    ├── Fire_EventAddRadius
+    ├── Fire_EventAddAltitudePoint
+    ├── Fire_EventAddAreaPoint
+    └── Fire_EventAddDistancePoint
+```

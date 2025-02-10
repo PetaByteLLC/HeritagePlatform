@@ -1009,34 +1009,35 @@ export class Map3DStrategy extends MapStrategy {
 	createGraph(_data) {
 		var graph = this.map3D.createBarGraph3D("Graph");
 
-		var columnLabelList = ["Paris", "Roma", "Madrid", "New York", "Bishkek", "Seoul", "Daegu", "Berlin", "Naryn"];
-		var rowLabelList = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+		var columnLabelList = Object.keys(_data);
+		var rowLabelList = Object.keys(_data[columnLabelList[0]] || {});
 
-		var columnColorList = [
-			new this.map3D.JSColor(200,   0, 210,   0),
-			new this.map3D.JSColor(200,   0, 255, 255),
-			new this.map3D.JSColor(200, 255,   0,   0),
-			new this.map3D.JSColor(200, 255, 128,   0),
-			new this.map3D.JSColor(200,   0, 128, 255),
-			new this.map3D.JSColor(200,  47,   0, 255),
-			new this.map3D.JSColor(200, 255, 255,   0),
-			new this.map3D.JSColor(200, 148,   0, 211),
-			new this.map3D.JSColor(200, 128, 255,   0)
+		var baseColors = [
+			new this.map3D.JSColor(200, 0, 210, 0),
+			new this.map3D.JSColor(200, 0, 255, 255),
+			new this.map3D.JSColor(200, 255, 0, 0),
+			new this.map3D.JSColor(200, 255, 128, 0),
+			new this.map3D.JSColor(200, 0, 128, 255),
+			new this.map3D.JSColor(200, 47, 0, 255),
+			new this.map3D.JSColor(200, 255, 255, 0),
+			new this.map3D.JSColor(200, 148, 0, 211),
+			new this.map3D.JSColor(200, 128, 255, 0)
 		];
 
-		for (var i=0, len=columnLabelList.length; i<len; i++) {
-			graph.insertColumn("column"+i, columnLabelList[i], columnColorList[i]);
+		for (var i = 0; i < columnLabelList.length; i++) {
+			var color = baseColors[i % baseColors.length];
+			graph.insertColumn("column" + i, columnLabelList[i], color);
 		}
 
-		for (var i=0, len=rowLabelList.length; i<len; i++) {
-			graph.insertRow("row"+i, rowLabelList[i]);
+		for (var j = 0; j < rowLabelList.length; j++) {
+			graph.insertRow("row" + j, rowLabelList[j]);
 		}
 
-		for (var i=0, len=columnLabelList.length; i<len; i++) {
-			for (var j=0, subLen=rowLabelList.length; j<subLen; j++) {
-				if (_data && _data[columnLabelList[i]] && _data[columnLabelList[i]][rowLabelList[j]] !== undefined) {
+		for (var i = 0; i < columnLabelList.length; i++) {
+			for (var j = 0; j < rowLabelList.length; j++) {
+				if (_data[columnLabelList[i]] && _data[columnLabelList[i]][rowLabelList[j]] !== undefined) {
 					var data = _data[columnLabelList[i]][rowLabelList[j]];
-					graph.setData("column"+i, "row"+j, data);
+					graph.setData("column" + i, "row" + j, data);
 				} else {
 					console.error(`Data for ${columnLabelList[i]} - ${rowLabelList[j]} is missing`);
 				}

@@ -3,14 +3,14 @@ import { useContext, useState, useCallback } from "react";
 import './Chart.css';
 
 const Chart = () => {
-    const { setEffects, effectStrategy } = useContext(MapContext);
+    const { setEffects, strategy } = useContext(MapContext);
     const [ charts, setCharts ] = useState({ enabled: false });
 
     const handleChartAction = useCallback((newChart => {
-        if (effectStrategy) {
-            effectStrategy.handleChartAction(newChart);
+        if (strategy) {
+            strategy.handleChartAction(newChart);
         }
-    }), [effectStrategy]);
+    }), [strategy]);
 
     const toggleChart = () => {
         setCharts((prevChart) => {

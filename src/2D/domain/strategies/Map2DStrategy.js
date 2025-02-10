@@ -361,4 +361,9 @@ export class Map2DStrategy extends MapStrategy {
 		const heightPixels = this.map2D.getSize()[1]; // Количество пикселей по высоте
 		return resolution * heightPixels;
 	}
+
+	handleChartAction(boolean) {
+		alert('Unable to display charts in 2D mode');
+		console.log('Unable to display chart in 2D mode');
+	}
 }

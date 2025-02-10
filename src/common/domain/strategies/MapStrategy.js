@@ -82,4 +82,8 @@ export class MapStrategy {
 	removeBookmark() {
 		throw new Error('Method not implemented');
 	}
+
+	handleChartAction(boolean) {
+		throw new Error('Method not implemented');
+	}
 }
